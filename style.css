@@ -212,3 +212,23 @@ footer {
     text-decoration: underline;
 }
 
+/* Class Pages */
+
+.chapter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.chapter-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.chapter-card h3 {
+    margin-top: 0;
+    color: #0284c7;
+}
