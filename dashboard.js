@@ -134,9 +134,38 @@ function generatePrompt() {
 
     let prompt = "";
 
-    prompt += "Act as an expert Physics educator and assessment designer.\n\n";
+prompt += "Act as an expert Physics educator and assessment designer.\n\n";
 
-    prompt += `Class: ${classSelect.value}\n`;
+prompt += "CRITICAL OUTPUT RULES (HIGHEST PRIORITY):\n";
+
+prompt += "Return ONLY valid HTML.\n";
+prompt += "Never use bullet points.\n";
+prompt += "Never use unordered lists (<ul>).\n";
+prompt += "All questions MUST be inside <ol>.\n";
+prompt += "All MCQ options MUST be inside <ol type='a'>.\n";
+prompt += "Questions MUST be automatically numbered.\n";
+prompt += "The worksheet is INVALID if bullets are used.\n\n";
+
+prompt += "REQUIRED MCQ STRUCTURE:\n";
+
+prompt += "<ol>\n";
+prompt += "<li>\n";
+prompt += "Question Text\n";
+
+prompt += "<ol type='a'>\n";
+prompt += "<li>Option</li>\n";
+prompt += "<li>Option</li>\n";
+prompt += "<li>Option</li>\n";
+prompt += "<li>Option</li>\n";
+prompt += "</ol>\n";
+
+prompt += "</li>\n";
+prompt += "</ol>\n\n";
+
+prompt += "IMPORTANT: Follow the above HTML structure exactly.\n";
+prompt += "Do not use bullets anywhere.\n\n";
+
+prompt += `Class: ${classSelect.value}\n`;
 
     prompt += `Chapter: ${chapterSearch.value}\n`;
 
