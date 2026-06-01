@@ -69,7 +69,8 @@ function loadTopics() {
 
     topics.forEach(topic => {
 
-        const label = document.createElement("label");
+        const label =
+            document.createElement("label");
 
         label.innerHTML = `
             <input
@@ -110,9 +111,30 @@ function generatePrompt() {
             'input[name="outputMode"]:checked'
         ).value;
 
+    const mcq =
+        document.getElementById("mcqCount").value || 0;
+
+    const assertion =
+        document.getElementById("assertionCount").value || 0;
+
+    const vsa =
+        document.getElementById("vsaCount").value || 0;
+
+    const sa =
+        document.getElementById("saCount").value || 0;
+
+    const la =
+        document.getElementById("laCount").value || 0;
+
+    const numerical =
+        document.getElementById("numericalCount").value || 0;
+
+    const caseStudy =
+        document.getElementById("caseStudyCount").value || 0;
+
     let prompt = "";
 
-    prompt += `Generate a Physics Worksheet.\n\n`;
+    prompt += "Act as an expert Physics educator and assessment designer.\n\n";
 
     prompt += `Class: ${classSelect.value}\n`;
 
@@ -120,13 +142,15 @@ function generatePrompt() {
 
     prompt += `Worksheet Type: ${worksheetType}\n`;
 
-    prompt += `Difficulty: ${difficulty}\n\n`;
+    prompt += `Difficulty Level: ${difficulty}\n`;
 
-    prompt += `Topics:\n`;
+    prompt += `Output Mode: ${outputMode}\n\n`;
+
+    prompt += "Topics:\n";
 
     if (selectedTopics.length === 0) {
 
-        prompt += `- All Chapter Topics\n`;
+        prompt += "- All Chapter Topics\n";
 
     } else {
 
@@ -138,102 +162,106 @@ function generatePrompt() {
 
     }
 
-    prompt += `\n`;
+    prompt += "\n";
 
-    prompt += `Output Mode: ${outputMode}\n\n`;
+    prompt += "Question Distribution:\n";
 
-    prompt += `CinePhysics Physics Standards:\n`;
+    if (mcq > 0)
+        prompt += `- MCQ: ${mcq}\n`;
 
-    prompt += `• Proper SI Units\n`;
-    prompt += `• Proper Superscripts and Subscripts\n`;
-    prompt += `• Correct Scientific Notation\n`;
-    prompt += `• Correct Dimensional Formulae\n`;
-    prompt += `• Correct Vector Notation\n`;
-    prompt += `• Publication Quality Equations\n`;
-    prompt += `• Numerical Verification\n`;
-    prompt += `• Physical Realism\n`;
-    prompt += `• CBSE / NCERT Terminology\n`;
-    prompt += `• No Duplicate Questions\n`;
-    prompt += `• Plausible MCQ Distractors\n`;
+    if (assertion > 0)
+        prompt += `- Assertion Reason: ${assertion}\n`;
+
+    if (vsa > 0)
+        prompt += `- Very Short Answer: ${vsa}\n`;
+
+    if (sa > 0)
+        prompt += `- Short Answer: ${sa}\n`;
+
+    if (la > 0)
+        prompt += `- Long Answer: ${la}\n`;
+
+    if (numerical > 0)
+        prompt += `- Numericals: ${numerical}\n`;
+
+    if (caseStudy > 0)
+        prompt += `- Case Study: ${caseStudy}\n`;
+
+    prompt += "\n";
+
+    prompt += "Mandatory CinePhysics Physics Standards:\n";
+
+    prompt += "• Use proper SI Units\n";
+    prompt += "• Use proper superscripts and subscripts\n";
+    prompt += "• Use correct dimensional formulae\n";
+    prompt += "• Use correct vector notation\n";
+    prompt += "• Use scientifically accurate equations\n";
+    prompt += "• Validate numerical answers\n";
+    prompt += "• Avoid duplicate questions\n";
+    prompt += "• Follow CBSE and NCERT terminology\n";
+    prompt += "• Ensure physical realism\n";
+    prompt += "• Use plausible MCQ distractors\n";
+    prompt += "• Ensure mathematically correct expressions\n";
+
+    prompt += "\n";
+
+    prompt += "Optional Enhancements:\n";
+
+    if(document.getElementById("enhanceLearningOutcomes")?.checked)
+        prompt += "- Include Learning Outcomes\n";
+
+    if(document.getElementById("enhanceNcertAlignment")?.checked)
+        prompt += "- Include NCERT Alignment\n";
+
+    if(document.getElementById("enhanceCbseCompetencies")?.checked)
+        prompt += "- Include CBSE Competencies\n";
+
+    if(document.getElementById("enhanceTopicSummary")?.checked)
+        prompt += "- Include Topic Coverage Summary\n";
+
+    if(document.getElementById("enhanceEstTime")?.checked)
+        prompt += "- Include Estimated Completion Time\n";
+
+    if(document.getElementById("enhanceHots")?.checked)
+        prompt += "- Include HOTS Questions\n";
+
+    if(document.getElementById("enhanceCompetencyBased")?.checked)
+        prompt += "- Include Competency Based Questions\n";
+
+    if(document.getElementById("enhanceRealLife")?.checked)
+        prompt += "- Include Real Life Applications\n";
+
+    if(document.getElementById("enhanceExperimental")?.checked)
+        prompt += "- Include Experimental Skills Questions\n";
 
     outputArea.value = prompt;
 
 }
 
-// =====================================
-// Copy Output
-// =====================================
+    // =========================
+    // Question Counts
+    // =========================
 
-function copyOutput() {
+    const mcq =
+        document.getElementById("mcqCount").value;
 
-    outputArea.select();
+    const assertion =
+        document.getElementById("assertionCount").value;
 
-    document.execCommand("copy");
+    const vsa =
+        document.getElementById("vsaCount").value;
 
-    alert("Output copied.");
+    const sa =
+        document.getElementById("saCount").value;
 
-}
+    const la =
+        document.getElementById("laCount").value;
 
-// =====================================
-// Placeholder HTML Generator
-// =====================================
+    const numerical =
+        document.getElementById("numericalCount").value;
 
-function generateHTMLTemplate() {
+    const caseStudy =
+        document.getElementById("caseStudyCount").value;
 
-    outputArea.value =
-`<h1>CinePhysics Worksheet</h1>
-
-<h2>${chapterSearch.value}</h2>
-
-<p>Class: ${classSelect.value}</p>
-
-<h3>Questions</h3>
-
-<!-- Paste generated questions here -->
-
-<h3>Answers</h3>
-
-<!-- Paste answer key here -->`;
-
-}
-
-// =====================================
-// Event Listeners
-// =====================================
-
-classSelect.addEventListener(
-    "change",
-    loadChapters
-);
-
-chapterSearch.addEventListener(
-    "change",
-    loadTopics
-);
-
-document
-.getElementById("btnGeneratePrompt")
-.addEventListener(
-    "click",
-    generatePrompt
-);
-
-document
-.getElementById("btnCopyOutput")
-.addEventListener(
-    "click",
-    copyOutput
-);
-
-document
-.getElementById("btnGenerateHTML")
-.addEventListener(
-    "click",
-    generateHTMLTemplate
-);
-
-// =====================================
-// Initial Load
-// =====================================
-
-loadChapters();
+    // =========================
+    //
