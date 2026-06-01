@@ -146,23 +146,29 @@ function generatePrompt() {
 
     prompt += `Output Mode: ${outputMode}\n\n`;
 
-    prompt += "Topics:\n";
+ prompt += "Selected Topics (STRICTLY ENFORCED):\n\n";
 
-    if (selectedTopics.length === 0) {
+prompt += "Generate questions ONLY from the selected topics listed below.\n";
 
-        prompt += "- All Chapter Topics\n";
+prompt += "Do NOT generate questions from any unselected topic.\n";
 
-    } else {
+prompt += "Every question must directly map to at least one selected topic.\n\n";
 
-        selectedTopics.forEach(topic => {
+if (selectedTopics.length === 0) {
 
-            prompt += `- ${topic}\n`;
+    prompt += "Use all chapter topics.\n";
 
-        });
+} else {
 
-    }
+    selectedTopics.forEach(topic => {
 
-    prompt += "\n";
+        prompt += `- ${topic}\n`;
+
+    });
+
+}
+
+prompt += "\n";
 
     prompt += "Question Distribution:\n";
 
@@ -188,7 +194,18 @@ function generatePrompt() {
         prompt += `- Case Study: ${caseStudy}\n`;
 
     prompt += "\n";
+    prompt += "Topic Coverage Rules:\n";
 
+    prompt += "• Use ONLY selected topics\n";
+
+    prompt += "• Do NOT use unselected chapter topics\n";
+
+    prompt += "• Do NOT introduce concepts from future chapters\n";
+
+    prompt += "• If more questions are required, vary difficulty instead of introducing new topics\n";
+
+    prompt += "• Every question must be traceable to a selected topic\n\n";
+    
     prompt += "Mandatory CinePhysics Physics Standards:\n";
 
     prompt += "• Use proper SI Units\n";
