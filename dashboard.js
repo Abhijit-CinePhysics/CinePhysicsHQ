@@ -434,7 +434,22 @@ prompt += "All questions must be automatically numbered.\n";
 prompt += "All MCQ options must be automatically lettered a,b,c,d using <ol type='a'>.\n";
 prompt += "Return ONLY HTML.\n";
 prompt += "Do not include explanations before or after the HTML.\n";
+prompt += "\n\nABSOLUTE FINAL FORMAT CHECK:\n";
 
+prompt += "Before generating the worksheet, verify ALL of the following:\n";
+
+prompt += "✓ Every question is inside an <ol> list.\n";
+prompt += "✓ No question uses bullets.\n";
+prompt += "✓ No section uses <ul>.\n";
+prompt += "✓ MCQ options use <ol type='a'>.\n";
+prompt += "✓ Questions are automatically numbered.\n";
+prompt += "✓ MCQ options are automatically lettered a,b,c,d.\n";
+prompt += "✓ Question counts exactly match requested distribution.\n";
+prompt += "✓ Output starts with <h1> and ends with valid HTML.\n\n";
+
+prompt += "If any bullet point appears in the worksheet output, regenerate the worksheet using ordered lists only.\n";
+prompt += "Return ONLY HTML.\n";
+    
     outputArea.value = prompt;
 
 }
