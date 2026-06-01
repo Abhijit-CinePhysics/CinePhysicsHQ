@@ -207,7 +207,18 @@ prompt += "\n";
     prompt += "• Every question must be traceable to a selected topic\n\n";
     
     prompt += "Mandatory CinePhysics Physics Standards:\n";
+    prompt += "\nWebsite Publishing Requirements:\n";
 
+prompt += "• Output must be HTML-ready\n";
+prompt += "• Use <sup> for powers and exponents\n";
+prompt += "• Use <sub> for subscripts\n";
+prompt += "• Use ordered lists for questions\n";
+prompt += "• Use proper SI unit formatting\n";
+prompt += "• Preserve Greek symbols\n";
+prompt += "• Do not use Markdown\n";
+prompt += "• Do not use LaTeX\n";
+prompt += "• Generate clean HTML only\n";
+prompt += "• Ready for direct paste into worksheet HTML file\n";
     prompt += "• Use proper SI Units\n";
     prompt += "• Use proper superscripts and subscripts\n";
     prompt += "• Use correct dimensional formulae\n";
