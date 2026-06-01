@@ -1,4 +1,7 @@
 /* CinePhysics Main Stylesheet */
+/* ==========================================================================
+   CinePhysics Global Design Tokens & Theme Configurations
+   ========================================================================== */
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -9,6 +12,10 @@ body {
     color: #1e293b;
 }
 
+/* ==========================================================================
+   Header & Identity Styling
+   ========================================================================== */
+
 header {
     background-color: #1e293b;
     color: #f8fafc;
@@ -16,12 +23,24 @@ header {
     text-align: center;
 }
 
+.profile-title {
+    font-size: 0.95rem;
+    color: #38bdf8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 5px;
+}
+
+/* ==========================================================================
+   Navigation Engine Layout
+   ========================================================================== */
+
 nav {
     background: #334155;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    padding: 10px;
+    padding: 5px;
 }
 
 nav a {
@@ -31,46 +50,165 @@ nav a {
     margin: 5px;
     border-radius: 4px;
     font-weight: 500;
+    transition: background 0.2s ease;
 }
 
 nav a:hover {
     background-color: #0284c7;
 }
 
+/* ==========================================================================
+   Structural Layout Containers
+   ========================================================================== */
+
 .container {
-    max-width: 1200px;
+    max-width: 1140px;
     margin: 40px auto;
     padding: 0 20px;
 }
 
-h2 {
-    color: #0f172a;
-    margin-bottom: 25px;
+section {
+    margin-bottom: 50px;
 }
 
-.chapter-grid {
+h2 {
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Interactive Simulation Lab Grid Architecture
+   ========================================================================== */
+
+.lab-showcase {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    padding: 25px;
+    border-radius: 8px;
+}
+
+.lab-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.lab-card {
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.btn-launch {
+    background: #16a34a;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: background 0.2s;
+}
+
+.btn-launch:hover {
+    background: #15803d;
+}
+
+/* ==========================================================================
+   Grade-Wise / Curriculum Matrix
+   ========================================================================== */
+
+.grade-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
 
-.chapter-card {
+.grade-card {
     background: white;
+    padding: 25px;
+    border-radius: 6px;
+    text-align: center;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.chapter-card h3 {
+.grade-card h3 {
     margin-top: 0;
     color: #0284c7;
 }
 
+.grade-card ul {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.grade-card li {
+    padding: 6px 0;
+    border-bottom: 1px dashed #f1f5f9;
+}
+
+/* ==========================================================================
+   Latest Updates Feed Components
+   ========================================================================== */
+
+.update-box {
+    background: white;
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.update-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.update-item:last-child {
+    border-bottom: none;
+}
+
+.tag {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   Footer & Portfolio Anchors
+   ========================================================================== */
+
 footer {
     background: #1e293b;
     color: #94a3b8;
+    padding: 40px 20px;
     text-align: center;
-    padding: 20px;
-    margin-top: 50px;
+    margin-top: 60px;
 }
+
+.contact-links a {
+    color: #38bdf8;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: 500;
+}
+
+.contact-links a:hover {
+    text-decoration: underline;
+}
+
