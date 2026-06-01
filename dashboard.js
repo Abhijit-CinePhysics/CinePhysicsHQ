@@ -286,83 +286,125 @@ prompt += "<h2>Section C</h2>\n";
 if(outputMode !== "student"){
     prompt += "<h2>Answer Key</h2>\n";
 }
-    prompt += "\nQUESTION FORMATTING RULES:\n";
+    // =====================================
+// STRICT HTML OUTPUT RULES
+// =====================================
 
-prompt += "Use proper HTML numbering.\n";
+prompt += "\nSTRICT HTML OUTPUT RULES (MANDATORY):\n";
 
-prompt += "MCQs must be formatted as:\n";
+prompt += "The worksheet will be pasted directly into a website.\n";
+
+prompt += "The output is INVALID if:\n";
+
+prompt += "1. Any question uses bullet points.\n";
+prompt += "2. Any section uses <ul> for question numbering.\n";
+prompt += "3. MCQ options are not automatically lettered.\n";
+prompt += "4. Questions are not automatically numbered.\n";
+prompt += "5. Section headings are missing.\n";
+prompt += "6. Question counts do not match requested distribution.\n\n";
+
+prompt += "Use ONLY ordered lists.\n";
+
+prompt += "Never use:\n";
+prompt += "<ul>\n";
+prompt += "<li> for question numbering\n\n";
+
+prompt += "Use ONLY:\n";
 prompt += "<ol>\n";
-prompt += "<li>Question\n";
-prompt += "<ol type='a'>\n";
-prompt += "<li>Option</li>\n";
-prompt += "<li>Option</li>\n";
-prompt += "<li>Option</li>\n";
-prompt += "<li>Option</li>\n";
-prompt += "</ol>\n";
-prompt += "</li>\n";
-prompt += "</ol>\n\n";
+prompt += "<li>\n\n";
 
-prompt += "Assertion-Reason questions must be numbered.\n";
+// =====================================
+// SECTION ENFORCEMENT
+// =====================================
 
-prompt += "Very Short Answer questions must use ordered numbering.\n";
+prompt += "\nSECTION GENERATION RULES:\n";
 
-prompt += "Short Answer questions must use ordered numbering.\n";
+if(mcq > 0)
+    prompt += `Section A must contain EXACTLY ${mcq} MCQs.\n`;
 
-prompt += "Long Answer questions must use ordered numbering.\n";
+if(assertion > 0)
+    prompt += `Section B must contain EXACTLY ${assertion} Assertion-Reason questions.\n`;
 
-prompt += "Case Study questions must use sub-question numbering:\n";
-prompt += "(i), (ii), (iii), (iv)\n\n";
+if(vsa > 0)
+    prompt += `Section C must contain EXACTLY ${vsa} Very Short Answer questions.\n`;
 
-prompt += "Do NOT use bullets for questions.\n";
+if(sa > 0)
+    prompt += `Section D must contain EXACTLY ${sa} Short Answer questions.\n`;
 
-prompt += "All questions must be automatically numbered.\n";
+if(la > 0)
+    prompt += `Section E must contain EXACTLY ${la} Long Answer questions.\n`;
 
-prompt += "All MCQ options MUST be displayed using HTML ordered list type='a'.\n";
-prompt += "Exactly 4 options per MCQ unless otherwise specified.\n";
-prompt += "Never use bullets for MCQ options.\n";
-prompt += "Never use A), B), C), D).\n";
-prompt += "Use automatic HTML lettering.\n";
-    prompt += "\nOUTPUT EXAMPLE:\n";
+if(numerical > 0)
+    prompt += `Section F must contain EXACTLY ${numerical} Numerical questions.\n`;
+
+if(caseStudy > 0)
+    prompt += `Section G must contain EXACTLY ${caseStudy} Case Study questions.\n`;
+
+// =====================================
+// REQUIRED HTML TEMPLATE
+// =====================================
+
+prompt += "\nFOLLOW THIS HTML TEMPLATE EXACTLY:\n";
 
 prompt += `
-<h2>Section A: MCQs</h2>
+<h2>Section A: Multiple Choice Questions</h2>
 
 <ol>
+
 <li>
-What is SI unit of force?
+
+Question Text
 
 <ol type="a">
-<li>Newton</li>
-<li>Joule</li>
-<li>Watt</li>
-<li>Pascal</li>
+<li>Option</li>
+<li>Option</li>
+<li>Option</li>
+<li>Option</li>
 </ol>
 
 </li>
+
 </ol>
-`;
-    prompt += `
-<h2>Section B: Very Short Answer Questions</h2>
+
+<h2>Section B: Assertion Reason</h2>
 
 <ol>
-<li>Define SI unit.</li>
-<li>What is dimensional analysis?</li>
-<li>Define significant figures.</li>
+<li>Question</li>
+<li>Question</li>
 </ol>
 
-<h2>Section C: Case Study</h2>
+<h2>Section C: Very Short Answer</h2>
 
-<p><strong>Case Study:</strong></p>
-
-<p>Read the passage and answer the following:</p>
-
-<ol type="i">
+<ol>
 <li>Question</li>
 <li>Question</li>
+</ol>
+
+<h2>Section D: Short Answer</h2>
+
+<ol>
+<li>Question</li>
+<li>Question</li>
+</ol>
+
+<h2>Section E: Numericals</h2>
+
+<ol>
 <li>Question</li>
 <li>Question</li>
 </ol>
 `;
+
+prompt += "\nFINAL INSTRUCTION:\n";
+
+prompt += "Follow the HTML template exactly.\n";
+prompt += "Do not invent your own layout.\n";
+prompt += "Do not replace ordered lists with unordered lists.\n";
+prompt += "Do not use bullets anywhere in the worksheet.\n";
+prompt += "All questions must be automatically numbered.\n";
+prompt += "All MCQ options must be automatically lettered a,b,c,d using <ol type='a'>.\n";
+prompt += "Return ONLY HTML.\n";
+prompt += "Do not include explanations before or after the HTML.\n";
 
     outputArea.value = prompt;
 
