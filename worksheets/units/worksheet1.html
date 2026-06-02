@@ -81,6 +81,48 @@
     position:relative;
     z-index:2;
     }
+    #worksheetContent{
+    position:relative;
+    z-index:2;
+
+    padding:40px;
+
+    max-width:1100px;
+    margin:auto;
+}
+
+#worksheetContent h1{
+    font-size:48px;
+    margin-top:40px;
+}
+
+#worksheetContent h2{
+    margin-top:50px;
+    border-bottom:2px solid #ddd;
+    padding-bottom:10px;
+}
+
+#worksheetContent ol{
+    line-height:1.8;
+}
+
+#worksheetContent li{
+    margin-bottom:12px;
+}
+    @media print{
+
+    .worksheet-banner{
+        height:140px;
+    }
+
+    h1,h2{
+        page-break-after:avoid;
+    }
+
+    ol{
+        page-break-inside:avoid;
+    }
+    }
 </style>
 <!DOCTYPE html>
 <html lang="en">
