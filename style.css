@@ -254,8 +254,13 @@ footer {
     position:absolute;
     top:20px;
     right:20px;
-    width:80px;
+    width:100px;
+    opacity:0.9;
     z-index:3;
+}
+
+#previewArea{
+    padding-top:120px;
 }
 
 .worksheet-watermark{
