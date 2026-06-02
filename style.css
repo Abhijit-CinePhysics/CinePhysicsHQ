@@ -253,6 +253,7 @@ footer {
 .worksheet-logo{
     display:block;
     width:100px;
+    height:auto;
     margin-left:auto;
     margin-bottom:20px;
 }
