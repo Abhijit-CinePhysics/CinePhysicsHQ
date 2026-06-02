@@ -1,4 +1,21 @@
 <style>
+
+#previewAreaWrapper{
+    position:relative;
+    background:white;
+    color:black;
+    padding:30px;
+    margin-top:20px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    min-height:600px;
+}
+
+#previewArea{
+    position:relative;
+    z-index:2;
+}
+
 .worksheet-logo{
     position:absolute;
     top:20px;
@@ -6,6 +23,27 @@
     width:80px;
     z-index:3;
 }
+
+.worksheet-watermark{
+    position:absolute;
+    top:50%;
+    left:50%;
+
+    transform:
+        translate(-50%,-50%)
+        rotate(-30deg);
+
+    font-size:80px;
+    font-weight:bold;
+
+    color:rgba(0,0,0,0.05);
+
+    z-index:1;
+
+    pointer-events:none;
+    user-select:none;
+}
+
 </style>
 
 <h1>Worksheet Importer</h1>
