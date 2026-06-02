@@ -251,12 +251,10 @@ footer {
 }
 
 .worksheet-logo{
-    position:absolute;
-    top:20px;
-    right:20px;
+    display:block;
     width:100px;
-    opacity:0.9;
-    z-index:3;
+    margin-left:auto;
+    margin-bottom:20px;
 }
 
 #previewArea{
