@@ -264,10 +264,10 @@ footer {
     left:50%;
     transform:translate(-50%, -50%) rotate(-30deg);
 
-    font-size:70px;
+    font-size:120px;
     font-weight:bold;
 
-    color:rgba(0,0,0,0.05);
+    color:rgba(0,0,0,0.03);
 
     pointer-events:none;
     user-select:none;
