@@ -1,39 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-R41EJ3144X"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-R41EJ3144X');
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Numericals | Units and Measurements</title>
     <link rel="stylesheet" href="../../style.css?v=5">
     <style>
-        /* Reusing your established styles */
-        #previewAreaWrapper{ position:relative; background:white; color:black; margin-top:20px; border:1px solid #ccc; border-radius:10px; min-height:600px; overflow:hidden; }
-        #previewArea{ position:relative; z-index:2; padding:30px; }
-        .worksheet-banner{ display:block; width:calc(100% + 60px); margin-left:-30px; margin-right:-30px; margin-top:-30px; height:auto; border-radius:10px 10px 0 0; }
-        .watermark-grid{ position:absolute; inset:0; display:flex; flex-wrap:wrap; align-content:space-evenly; justify-content:space-evenly; font-size:60px; font-weight:bold; color:rgba(0,0,0,0.025); transform:rotate(-30deg); pointer-events:none; user-select:none; z-index:1; }
-        .worksheet-footer{ text-align:center; margin-top:40px; padding-top:15px; border-top:1px solid #ddd; font-size:14px; color:#666; position:relative; z-index:2; }
+        #previewAreaWrapper{
+            position:relative;
+            background:white;
+            color:black;
+            margin-top:20px;
+            border:1px solid #ccc;
+            border-radius:10px;
+            min-height:600px;
+            overflow:hidden;
+        }
+        #previewArea{
+            position:relative;
+            z-index:2;
+            padding:30px;
+        }
+        .worksheet-banner{
+            display:block;
+            width:calc(100% + 60px);
+            margin-left:-30px;
+            margin-right:-30px;
+            margin-top:-30px;
+            height:auto;
+            border-radius:10px 10px 0 0;
+        }
+        .watermark-grid{
+            position:absolute;
+            inset:0;
+            display:flex;
+            flex-wrap:wrap;
+            align-content:space-evenly;
+            justify-content:space-evenly;
+            font-size:60px;
+            font-weight:bold;
+            color:rgba(0,0,0,0.025);
+            transform:rotate(-30deg);
+            pointer-events:none;
+            user-select:none;
+            z-index:1;
+        }
+        .worksheet-footer{
+            text-align:center;
+            margin-top:40px;
+            padding-top:15px;
+            border-top:1px solid #ddd;
+            font-size:14px;
+            color:#666;
+            position:relative;
+            z-index:2;
+        }
     </style>
 </head>
 <body>
 
 <div id="previewAreaWrapper">
     <img src="/CinePhysics/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
-    <div class="watermark-grid">CINEPHYSICS CINEPHYSICS CINEPHYSICS</div>
+    <div class="watermark-grid">
+        CINEPHYSICS CINEPHYSICS CINEPHYSICS
+        CINEPHYSICS CINEPHYSICS CINEPHYSICS
+    </div>
 
     <div id="previewArea">
-        <h1>Advanced Numericals: Units and Measurements</h1>
-        <p><strong>Class:</strong> XI | <strong>Chapter:</strong> Units and Measurements</p>
+        <h1>Worksheet: Advanced Numericals on Units and Measurements</h1>
+        <p><strong>Class:</strong> 11 | <strong>Chapter:</strong> Units and Measurements</p>
         
         <h2>Instructions</h2>
         <ol>
             <li>Read all questions carefully. Pay special attention to significant figures and error limits.</li>
+            <li>Use proper HTML formatting for your answers, ensuring correct subscripts and superscripts.</li>
             <li>For dimensional analysis, express final formulas enclosed in square brackets [ ].</li>
             <li>Show all steps for error propagation clearly.</li>
         </ol>
@@ -43,15 +83,58 @@
             <li>A physical quantity P is related to four observables a, b, c, and d as P = a<sup>3</sup> b<sup>2</sup> / (c<sup>1/2</sup> d). The percentage errors in measurements of a, b, c, and d are 1%, 3%, 4%, and 2% respectively. What is the percentage error in P?
                 <ol type="a"><li>10%</li><li>11%</li><li>13%</li><li>15%</li></ol>
             </li>
-            </ol>
+            <li>The period of oscillation of a simple pendulum is given by T = 2π√(L/g). The measured value of L is 20.0 cm known to 1 mm accuracy, and the time for 100 oscillations is 90 s using a wristwatch of 1 s resolution. The percentage error in g is:
+                <ol type="a"><li>1.5%</li><li>2.7%</li><li>3.2%</li><li>4.1%</li></ol>
+            </li>
+            <li>If velocity (v), force (F), and energy (E) are taken as the fundamental units, what is the dimensional formula for mass?
+                <ol type="a"><li>E v<sup>-1</sup></li><li>E v<sup>-2</sup></li><li>F v<sup>-1</sup></li><li>F v<sup>-2</sup></li></ol>
+            </li>
+            <li>In the Vander Waal's equation (P + a/V<sup>2</sup>)(V - b) = RT, what is the dimension of the product ab?
+                <ol type="a"><li>[M L<sup>8</sup> T<sup>-2</sup>]</li><li>[M L<sup>5</sup> T<sup>-2</sup>]</li><li>[M L<sup>2</sup> T<sup>-2</sup>]</li><li>[M L<sup>8</sup> T<sup>-1</sup>]</li></ol>
+            </li>
+            <li>The density of a material in CGS is 8 g cm<sup>-3</sup>. In a system where unit length is 5 cm and unit mass is 20 g, the density is:
+                <ol type="a"><li>10</li><li>25</li><li>40</li><li>50</li></ol>
+            </li>
+        </ol>
 
         <h2>Section B: Advanced Numericals</h2>
         <ol start="6">
-            <li>The length, breadth, and thickness of a rectangular sheet of metal are 4.234 m, 1.005 m, and 2.01 cm respectively. Calculate the area and volume.</li>
-            </ol>
+            <li>The length, breadth, and thickness of a sheet are 4.234 m, 1.005 m, and 2.01 cm. Calculate area and volume to correct significant figures.</li>
+            <li>Two resistances R<sub>1</sub> = 100 ± 3 Ω and R<sub>2</sub> = 200 ± 4 Ω are in parallel. Find the equivalent resistance with error.</li>
+            <li>The refractive index of water is 1.29, 1.33, 1.34, 1.35, 1.32, 1.36, 1.30, 1.33. Calculate mean, mean absolute, and percentage error.</li>
+            <li>For X = M<sup>a</sup> L<sup>b</sup> T<sup>c</sup>, derive the expression for maximum percentage error given α, β, and γ.</li>
+            <li>Find dimensions of a/b in F = a√x + bt<sup>2</sup>.</li>
+            <li>Deduce dimensions of A, B, C, and D in v = A + Bt + C/(D+t).</li>
+            <li>Determine the dimensional formula and SI unit of the Universal Gravitational Constant G.</li>
+            <li>Check the accuracy of ν = (1 / 2L) √(T / m) using dimensional analysis.</li>
+            <li>Derive an expression for the time period T of a pendulum using the method of dimensions.</li>
+            <li>Prove dimensionally that λ ∝ h / (m v) for a moving particle.</li>
+            <li>Derive the formula for volume rate of flow V through a capillary tube using dimensional analysis.</li>
+            <li>Evaluate (25.2 × 1374) / 33.3 applying significant figure rules.</li>
+            <li>Radius of a sphere is 2.1 ± 0.5 cm. Calculate surface area with error limits.</li>
+            <li>Travel distance Δx = 13.8 ± 0.2 m in t = 4.0 ± 0.3 s. Calculate velocity v with error.</li>
+            <li>Given 1/f = 1/u + 1/v with u = 30.0 ± 0.1 cm and v = 60.0 ± 0.1 cm, find max percentage error in f.</li>
+            <li>Calculate max percentage error in c = Q / (m Δθ) given 2%, 1%, and 3% errors respectively.</li>
+            <li>Subtract 2.50 g from 10.354 g using significant figure rules.</li>
+            <li>Find base units of M, L, T if Force=20N, Energy=200J, Velocity=5 m/s are fundamental.</li>
+            <li>Show that 1 calorie (4.2 J) in a new system is 4.2 α<sup>-1</sup> β<sup>-2</sup> γ<sup>2</sup>.</li>
+            <li>Prove t ∝ √(ρ r<sup>3</sup> / σ) for a liquid drop.</li>
+            <li>Convert 10<sup>9</sup> light-years into parsecs (1 pc ≈ 3.26 ly).</li>
+            <li>Convert 100 J into a system with units 20 cm, 250 g, and 30 s.</li>
+            <li>Find dimensions/SI units of a and b in (P + a/V<sup>2</sup>)(V - b) = nRT.</li>
+            <li>Relate critical velocity v<sub>c</sub> to η, ρ, and r using dimensional analysis.</li>
+            <li>Mass 2.00 ± 0.01 g, Volume 5.0 ± 0.1 cm<sup>3</sup>. Find max percentage error in density.</li>
+            <li>A wire of length L and radius r is stretched by force F. Find dimensions of Young's Modulus Y = (F/A) / (ΔL/L).</li>
+            <li>If force F, length L, and time T are fundamental, what is the dimensional formula for density?</li>
+            <li>Calculate the number of significant figures in the following: 0.007, 2.64×10<sup>24</sup>, 0.2370, 6.320, 6.000.</li>
+            <li>The equation of a wave is y = A sin(ωt - kx). Find dimensions of ω and k.</li>
+            <li>Find the percentage error in the area of a circle if the radius is measured with an error of 2%.</li>
+        </ol>
     </div>
 
-    <div class="worksheet-footer">CinePhysics HQ • Physics Made Visual</div>
+    <div class="worksheet-footer">
+        CinePhysics HQ • Physics Made Visual
+    </div>
 </div>
 
 </body>
