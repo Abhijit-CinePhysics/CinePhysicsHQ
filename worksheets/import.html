@@ -21,7 +21,35 @@
             --cp-pdf-dark: #0f172a;
             --cp-pdf-blue: #00bfff;
         }
+/* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            background: rgba(11, 11, 11, 0.9);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+        }
 
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--gold-bright);
+        }
+        
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--cp-bg);
@@ -195,7 +223,13 @@
     </style>
 </head>
 <body>
-
+    <nav>
+        <a href="../index.html">Home</a>
+        <a href="../class11.html">Class 11</a>
+        <a href="../class12.html">Class 12</a>
+        <a href="../worksheet-builder.html" class="active">Builder</a>
+        
+    </nav>
     <div class="dashboard-container">
         <h1 class="page-title">Worksheet Builder</h1>
 
