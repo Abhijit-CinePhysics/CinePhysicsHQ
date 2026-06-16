@@ -1,3 +1,3 @@
 # Worksheets
 
-This folder will contain CinePhysics worksheets.
+This folder will contain CinePhysicsHQ worksheets.
