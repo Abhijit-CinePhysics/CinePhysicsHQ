@@ -8,14 +8,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        /* 1. Cinematic Dark Theme Variables */
+        /* --- Dark Cinematic Theme Variables --- */
         :root {
-            --cp-bg: #050505;          /* Deepest black for the page background */
-            --cp-panel: #0f0f0f;       /* Slightly lighter black for the cards */
-            --cp-border: #222222;      /* Subtle border color for the cards */
-            --cp-gold: #d8a435;        /* The premium gold from your screenshot */
-            --cp-text-light: #f3f4f6;  /* White/light gray for reading text */
-            --cp-text-muted: #888888;  /* Muted gray for placeholders or secondary info */
+            --cp-bg: #050505;          
+            --cp-panel: #0f0f0f;       
+            --cp-border: #222222;      
+            --cp-gold: #d8a435;        
+            --cp-text-light: #f3f4f6;  
+            --cp-text-muted: #888888;  
             
             /* PDF Print Variables */
             --cp-pdf-dark: #0f172a;
@@ -38,7 +38,6 @@
             max-width: 1000px;
         }
 
-        /* 2. Typography matching the screenshot */
         .page-title {
             color: var(--cp-gold);
             text-align: center;
@@ -49,7 +48,7 @@
             font-weight: 500;
         }
 
-        /* 3. Panel/Card Styling */
+        /* --- Panel & Form Styling --- */
         .panel {
             background: var(--cp-panel);
             border: 1px solid var(--cp-border);
@@ -68,30 +67,42 @@
             margin-bottom: 20px;
         }
 
-        /* 4. Form Controls */
-        textarea {
+        .input-label {
+            color: var(--cp-text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"], textarea {
             width: 100%;
             box-sizing: border-box;
-            padding: 15px;
+            padding: 12px 15px;
             background: #000000;
             color: var(--cp-text-light);
             border: 1px solid var(--cp-border);
             border-radius: 6px;
-            font-family: monospace;
+            font-family: 'Poppins', sans-serif;
             font-size: 14px;
-            resize: vertical;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
         }
         
-        textarea:focus {
+        textarea {
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus, textarea:focus {
             outline: none;
             border-color: var(--cp-gold);
         }
 
-        /* 5. Button Styling */
+        /* --- Button Styling --- */
         .btn-group {
             display: flex;
             gap: 15px;
-            margin-top: 20px;
         }
 
         .btn {
@@ -114,7 +125,7 @@
             color: var(--cp-bg);
         }
 
-        /* 6. Worksheet Print Preview (Kept White for PDF) */
+        /* --- Worksheet Print Preview Area --- */
         #previewAreaWrapper {
             position: relative;
             background: white;
@@ -122,11 +133,17 @@
             margin-top: 40px;
             border-radius: 10px;
             min-height: 800px;
-            overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            /* Important for containing absolute watermarks */
+            position: relative; 
         }
 
-        .worksheet-banner { width: 100%; height: auto; display: block; }
+        .worksheet-banner {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 10px 10px 0 0;
+        }
 
         .worksheet-title-bar {
             background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue));
@@ -136,30 +153,47 @@
             font-weight: 700;
         }
 
-        .watermark-grid {
-            position: absolute; inset: 0; display: flex;
-            align-items: center; justify-content: center;
-            pointer-events: none; user-select: none; z-index: 1;
+        /* The container holding our dynamic multi-page watermarks */
+        #watermarkContainer {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
         }
-        .watermark-logo { width: 450px; opacity: 0.04; }
 
-        #previewArea { position: relative; z-index: 2; padding: 30px; }
+        .watermark-logo {
+            width: 450px;
+            opacity: 0.04;
+        }
+
+        #previewArea {
+            position: relative;
+            z-index: 2;
+            padding: 30px;
+        }
 
         .worksheet-meta {
-            display: flex; justify-content: space-between;
-            margin-bottom: 25px; padding: 15px;
-            background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
         }
 
         .worksheet-footer {
-            text-align: center; margin-top: 40px; padding-top: 15px; padding-bottom: 20px;
-            border-top: 1px solid #ddd; font-size: 14px; color: #666;
-            position: relative; z-index: 2;
-        }
-
-        .page-number {
-            position: absolute; bottom: 15px; right: 30px;
-            font-size: 12px; color: #888; z-index: 2;
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 15px;
+            padding-bottom: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 14px;
+            color: #666;
+            position: relative;
+            z-index: 2;
         }
     </style>
 </head>
@@ -171,9 +205,23 @@
 
         <div class="panel">
             <h2 class="panel-title">Content Input</h2>
-            <textarea id="worksheetInput" rows="8">
-<h3>Problem 1: Electron Dynamics in Conductors</h3>
-<p>Describe the concept of drift velocity in a standard copper conductor. Ensure your explanation explicitly details the slow drift of negative electrons moving in the opposite direction of the applied electric field.</p>
+            
+            <label class="input-label">Chapter / Topic</label>
+            <input type="text" id="topicInput" value="Motion in a Straight Line">
+
+            <label class="input-label">Worksheet Content</label>
+            <textarea id="worksheetInput" rows="12">
+<h3>Problem 1: Kinematics</h3>
+<p>A car accelerates uniformly from rest to a speed of 25 m/s in 8.0 seconds. Calculate the acceleration of the car.</p>
+<br><br><br><br><br><br>
+
+<h3>Problem 2: Free Fall</h3>
+<p>An object is dropped from a height of 50 meters. How long does it take to hit the ground? (Assume g = 9.8 m/s²)</p>
+<br><br><br><br><br><br>
+
+<h3>Problem 3: Velocity-Time Graphs</h3>
+<p>Sketch a velocity-time graph for an object moving with constant negative acceleration.</p>
+<br><br><br><br><br><br>
             </textarea>
             
             <div class="btn-group">
@@ -183,19 +231,19 @@
         </div>
 
         <div id="previewAreaWrapper">
+            
+            <div id="watermarkContainer">
+                </div>
+
             <img src="/CinePhysicsHQ/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
             
             <div class="worksheet-title-bar">
                 CinePhysicsHQ Worksheet
             </div>
 
-            <div class="watermark-grid">
-                <img src="/CinePhysicsHQ/logo.png" class="watermark-logo" alt="Watermark">
-            </div>
-
             <div id="previewArea">
                 <div class="worksheet-meta">
-                    <div><strong>Topic:</strong> Electromagnetism</div>
+                    <div><strong>Topic:</strong> <span id="displayTopic">Motion in a Straight Line</span></div>
                     <div><strong>Name:</strong> ____________________</div>
                     <div><strong>Date:</strong> ____________________</div>
                 </div>
@@ -206,21 +254,68 @@
             <div class="worksheet-footer">
                 CinePhysics HQ | Physics Made Visual | © 2026 CinePhysics
             </div>
-            
-            <div class="page-number">Page 1</div>
         </div>
 
     </div>
 
     <script>
+        // --- Generate Preview Logic ---
         document.getElementById("btnPreview").addEventListener("click", () => {
             const content = document.getElementById("worksheetInput").value;
+            const topic = document.getElementById("topicInput").value;
+            
             document.getElementById("dynamicContent").innerHTML = content;
+            document.getElementById("displayTopic").innerText = topic;
+
+            // Apply a single watermark for the screen preview
+            setupPreviewWatermark();
         });
 
+        // Helper function: Centers one watermark for the screen preview
+        function setupPreviewWatermark() {
+            const wmContainer = document.getElementById('watermarkContainer');
+            wmContainer.innerHTML = ''; 
+            const img = document.createElement('img');
+            img.src = '/CinePhysicsHQ/logo.png';
+            img.className = 'watermark-logo';
+            img.style.position = 'absolute';
+            img.style.top = '50%';
+            img.style.left = '50%';
+            img.style.transform = 'translate(-50%, -50%)';
+            wmContainer.appendChild(img);
+        }
+
+        // Initialize preview on page load
+        document.getElementById("btnPreview").click();
+
+        // --- Export PDF Logic with Multi-Page Watermark Calculation ---
         document.getElementById("btnExportPDF").addEventListener("click", () => {
             const element = document.getElementById("previewAreaWrapper");
+            const wmContainer = document.getElementById('watermarkContainer');
 
+            // 1. Calculate the dimensions to place a watermark on every A4 page
+            const wrapperWidth = element.offsetWidth;
+            // The aspect ratio of an A4 page is roughly 1 : 1.414 (210mm x 297mm)
+            const pageHeightInPx = wrapperWidth * (297 / 210); 
+            // Calculate how many pages the content spans
+            const totalPages = Math.max(1, Math.ceil(element.offsetHeight / pageHeightInPx));
+            
+            // 2. Clear existing preview watermark and inject multiple spaced watermarks
+            wmContainer.innerHTML = ''; 
+            
+            for(let i = 0; i < totalPages; i++) {
+                const img = document.createElement('img');
+                img.src = '/CinePhysicsHQ/logo.png';
+                img.className = 'watermark-logo';
+                img.style.position = 'absolute';
+                // Center the logo perfectly in the middle of each calculated page slice
+                img.style.top = `${(i * pageHeightInPx) + (pageHeightInPx / 2)}px`;
+                img.style.left = '50%';
+                img.style.transform = 'translate(-50%, -50%)';
+                wmContainer.appendChild(img);
+            }
+
+            // 3. Execute html2pdf
             html2pdf()
                 .set({
                     margin: 10,
@@ -230,7 +325,11 @@
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 })
                 .from(element)
-                .save();
+                .save()
+                .then(() => {
+                    // Reset back to a single centered watermark for the screen preview once finished
+                    setupPreviewWatermark();
+                });
         });
     </script>
 </body>
