@@ -62,7 +62,6 @@
             text-transform: uppercase;
             font-size: 16px;
             font-weight: 600;
-            letter-spacing: 1px;
             margin-top: 0;
             margin-bottom: 20px;
         }
@@ -86,7 +85,6 @@
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
             margin-bottom: 20px;
-            transition: border-color 0.3s ease;
         }
         
         textarea {
@@ -99,7 +97,6 @@
             border-color: var(--cp-gold);
         }
 
-        /* --- Button Styling --- */
         .btn-group {
             display: flex;
             gap: 15px;
@@ -115,7 +112,6 @@
             font-size: 14px;
             font-family: 'Poppins', sans-serif;
             text-transform: uppercase;
-            letter-spacing: 1px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
@@ -126,21 +122,29 @@
         }
 
         /* --- Worksheet Print Preview Area --- */
+        
+        /* 1. The Print Container holds the shadows and margins for the web view */
+        .print-container {
+            margin-top: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: white;
+        }
+
+        /* 2. The Wrapper is perfectly flush to the edges for export */
         #previewAreaWrapper {
             position: relative;
             background: white;
             color: black;
-            margin-top: 40px;
             min-height: 800px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            /* Removed border-radius so the PDF edges are perfectly sharp */
+            margin: 0;
+            padding: 0;
         }
 
         .worksheet-banner {
             width: 100%;
             height: auto;
             display: block;
-            /* Removed border-radius to ensure edge-to-edge printing */
+            margin: 0;
         }
 
         .worksheet-title-bar {
@@ -151,7 +155,6 @@
             font-weight: 700;
         }
 
-        /* The container holding our dynamic multi-page watermarks */
         #watermarkContainer {
             position: absolute;
             inset: 0;
@@ -169,7 +172,7 @@
         #previewArea {
             position: relative;
             z-index: 2;
-            padding: 40px 30px; /* Top/bottom padding added to ensure content doesn't hit the title bar */
+            padding: 40px 30px;
         }
 
         .worksheet-meta {
@@ -182,23 +185,18 @@
             border: 1px solid #e2e8f0;
         }
 
-        .worksheet-footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 15px;
-            padding-bottom: 30px; /* Extra bottom padding so it doesn't hug the bottom edge of the paper */
-            border-top: 1px solid #ddd;
-            font-size: 14px;
-            color: #666;
-            position: relative;
-            z-index: 2;
+        /* 3. This class prevents elements from being cut in half during a page break */
+        .question-block {
+            page-break-inside: avoid;
+            break-inside: avoid;
+            margin-bottom: 30px;
         }
+
     </style>
 </head>
 <body>
 
     <div class="dashboard-container">
-        
         <h1 class="page-title">Worksheet Builder</h1>
 
         <div class="panel">
@@ -208,18 +206,24 @@
             <input type="text" id="topicInput" value="Motion in a Straight Line">
 
             <label class="input-label">Worksheet Content</label>
-            <textarea id="worksheetInput" rows="12">
-<h3>Problem 1: Kinematics</h3>
-<p>A car accelerates uniformly from rest to a speed of 25 m/s in 8.0 seconds. Calculate the acceleration of the car.</p>
-<br><br><br><br><br><br>
+            <textarea id="worksheetInput" rows="15">
+<div class="question-block">
+    <h3>Problem 1: Kinematics</h3>
+    <p>A car accelerates uniformly from rest to a speed of 25 m/s in 8.0 seconds. Calculate the acceleration of the car.</p>
+    <br><br><br><br><br><br>
+</div>
 
-<h3>Problem 2: Free Fall</h3>
-<p>An object is dropped from a height of 50 meters. How long does it take to hit the ground? (Assume g = 9.8 m/s²)</p>
-<br><br><br><br><br><br>
+<div class="question-block">
+    <h3>Problem 2: Free Fall</h3>
+    <p>An object is dropped from a height of 50 meters. How long does it take to hit the ground? (Assume g = 9.8 m/s²)</p>
+    <br><br><br><br><br><br>
+</div>
 
-<h3>Problem 3: Velocity-Time Graphs</h3>
-<p>Sketch a velocity-time graph for an object moving with constant negative acceleration.</p>
-<br><br><br><br><br><br>
+<div class="question-block">
+    <h3>Problem 3: Velocity-Time Graphs</h3>
+    <p>Sketch a velocity-time graph for an object moving with constant negative acceleration.</p>
+    <br><br><br><br><br><br>
+</div>
             </textarea>
             
             <div class="btn-group">
@@ -228,29 +232,26 @@
             </div>
         </div>
 
-        <div id="previewAreaWrapper">
-            
-            <div id="watermarkContainer">
-                </div>
-
-            <img src="/CinePhysicsHQ/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
-            
-            <div class="worksheet-title-bar">
-                CinePhysicsHQ Worksheet
-            </div>
-
-            <div id="previewArea">
-                <div class="worksheet-meta">
-                    <div><strong>Topic:</strong> <span id="displayTopic">Motion in a Straight Line</span></div>
-                    <div><strong>Name:</strong> ____________________</div>
-                    <div><strong>Date:</strong> ____________________</div>
-                </div>
+        <div class="print-container">
+            <div id="previewAreaWrapper">
                 
-                <div id="dynamicContent"></div>
-            </div>
+                <div id="watermarkContainer"></div>
 
-            <div class="worksheet-footer">
-                CinePhysics HQ | Physics Made Visual | © 2026 CinePhysics
+                <img src="/CinePhysicsHQ/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
+                
+                <div class="worksheet-title-bar">
+                    CinePhysicsHQ Worksheet
+                </div>
+
+                <div id="previewArea">
+                    <div class="worksheet-meta">
+                        <div><strong>Topic:</strong> <span id="displayTopic">Motion in a Straight Line</span></div>
+                        <div><strong>Name:</strong> ____________________</div>
+                        <div><strong>Date:</strong> ____________________</div>
+                    </div>
+                    
+                    <div id="dynamicContent"></div>
+                </div>
             </div>
         </div>
 
@@ -265,11 +266,9 @@
             document.getElementById("dynamicContent").innerHTML = content;
             document.getElementById("displayTopic").innerText = topic;
 
-            // Apply a single watermark for the screen preview
             setupPreviewWatermark();
         });
 
-        // Helper function: Centers one watermark for the screen preview
         function setupPreviewWatermark() {
             const wmContainer = document.getElementById('watermarkContainer');
             wmContainer.innerHTML = ''; 
@@ -283,23 +282,21 @@
             wmContainer.appendChild(img);
         }
 
-        // Initialize preview on page load
         document.getElementById("btnPreview").click();
 
-        // --- Export PDF Logic with Multi-Page Watermark Calculation ---
+        // --- Export PDF Logic with Repeating Footer ---
         document.getElementById("btnExportPDF").addEventListener("click", () => {
             const element = document.getElementById("previewAreaWrapper");
             const wmContainer = document.getElementById('watermarkContainer');
 
-            // 1. Calculate the dimensions to place a watermark on every A4 page
+            // Set up multi-page watermarks
             const wrapperWidth = element.offsetWidth;
             const pageHeightInPx = wrapperWidth * (297 / 210); 
-            const totalPages = Math.max(1, Math.ceil(element.offsetHeight / pageHeightInPx));
+            // Add +1 to totalPages to ensure the watermark covers the bottom safely
+            const totalPagesCalculated = Math.max(1, Math.ceil(element.offsetHeight / pageHeightInPx)) + 1;
             
-            // 2. Clear existing preview watermark and inject multiple spaced watermarks
             wmContainer.innerHTML = ''; 
-            
-            for(let i = 0; i < totalPages; i++) {
+            for(let i = 0; i < totalPagesCalculated; i++) {
                 const img = document.createElement('img');
                 img.src = '/CinePhysicsHQ/logo.png';
                 img.className = 'watermark-logo';
@@ -310,21 +307,40 @@
                 wmContainer.appendChild(img);
             }
 
-            // 3. Execute html2pdf (MARGIN SET TO 0 for edge-to-edge printing)
-            html2pdf()
-                .set({
-                    margin: 0, // <-- Changed this to 0 to remove the white border
-                    filename: 'CinePhysics-Worksheet.pdf',
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { scale: 2, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                })
-                .from(element)
-                .save()
-                .then(() => {
-                    // Reset back to a single centered watermark for the screen preview once finished
-                    setupPreviewWatermark();
-                });
+            // PDF Configuration
+            const opt = {
+                // Margins: [top, left, bottom, right]
+                // We leave a 15mm bottom margin to make physical room for our repeating footer!
+                margin:       [0, 0, 15, 0], 
+                filename:     'CinePhysics-Worksheet.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                // scrollY: 0 prevents the browser scroll position from creating a gap at the top
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                // This tells the PDF engine to respect our .question-block CSS and not slice them in half
+                pagebreak:    { mode: ['css', 'legacy'], avoid: '.question-block' }
+            };
+
+            // Generate the PDF
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                // This block runs AFTER the PDF pages are generated. 
+                // We loop through every created page and physically stamp the footer onto it.
+                var totalPages = pdf.internal.getNumberOfPages();
+                
+                for (var i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(9);
+                    pdf.setTextColor(136, 136, 136); // #888 gray color
+                    
+                    // Add Footer Text (Centered at X:105mm, Y:290mm)
+                    pdf.text('CinePhysics HQ | Physics Made Visual | © 2026 CinePhysics', 105, 290, null, null, 'center');
+                    
+                    // Add Page Number (Right-aligned at X:195mm, Y:290mm)
+                    pdf.text('Page ' + i, 195, 290);
+                }
+            }).save().then(() => {
+                setupPreviewWatermark();
+            });
         });
     </script>
 </body>
