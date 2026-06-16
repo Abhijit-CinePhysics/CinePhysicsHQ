@@ -1,142 +1,214 @@
-<style>
-
-#previewAreaWrapper{
-    position:relative;
-    background:white;
-    color:black;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePhysicsHQ Worksheet Generator</title>
     
-    margin-top:20px;
-    border:1px solid #ccc;
-    border-radius:10px;
-    min-height:600px;
-    overflow:hidden;
-}
-
-#previewArea{
-    position:relative;
-    z-index:2;
-    padding:30px;
-}
-
-.worksheet-header{
-    display:flex;
-    justify-content:flex-end;
-    margin-bottom:20px;
-}
-
-.worksheet-logo{
-    width:100px;
-    height:auto;
-}
-
-.worksheet-banner{
-    display:block;
-
-    width:calc(100% + 60px);
-
-    margin-left:-30px;
-    margin-right:-30px;
-    margin-top:-30px;
-
-    height:auto;
-    display:block;
-
-    border-radius:10px 10px 0 0;
-}
+    <!-- 1. Include html2pdf library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-.watermark-grid{
-    position:absolute;
-    inset:0;
+    <style>
+        /* 2. Define the CinePhysicsHQ Theme Variables */
+        :root {
+            --cp-dark: #0f172a;
+            --cp-blue: #00bfff;
+            --cp-gold: #f5b942;
+        }
 
-    display:flex;
-    flex-wrap:wrap;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+            color: #333;
+        }
 
-    align-content:space-evenly;
-    justify-content:space-evenly;
+        h1 {
+            color: var(--cp-dark);
+            border-left: 6px solid var(--cp-blue);
+            padding-left: 12px;
+        }
 
-    font-size:60px;
-    font-weight:bold;
+        /* Styling for both buttons to match the theme */
+        .btn {
+            background: linear-gradient(135deg, var(--cp-blue), var(--cp-dark));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            transition: opacity 0.2s ease;
+        }
 
-    color:rgba(0,0,0,0.025);
+        .btn:hover {
+            opacity: 0.9;
+        }
 
-    transform:rotate(-30deg);
+        /* 3. The main wrapper that will be converted to PDF */
+        #previewAreaWrapper {
+            position: relative;
+            background: white;
+            color: black;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            min-height: 800px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-    pointer-events:none;
-    user-select:none;
+        .worksheet-banner {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
 
-    z-index:1;
-}
+        /* Colored title strip just below the banner */
+        .worksheet-title-bar {
+            background: linear-gradient(90deg, var(--cp-dark), var(--cp-blue));
+            color: white;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-weight: 700;
+        }
 
-    .worksheet-footer{
-    text-align:center;
+        /* Clean, single-image watermark */
+        .watermark-grid {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
 
-    margin-top:40px;
-    padding-top:15px;
+        .watermark-logo {
+            width: 450px;
+            opacity: 0.04;
+        }
 
-    border-top:1px solid #ddd;
+        #previewArea {
+            position: relative;
+            z-index: 2;
+            padding: 30px;
+        }
 
-    font-size:14px;
-    color:#666;
+        /* Structured Worksheet Header */
+        .worksheet-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
 
-    position:relative;
-    z-index:2;
-    }
-</style>
+        .worksheet-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 15px;
+            padding-bottom: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 14px;
+            color: #666;
+            position: relative;
+            z-index: 2;
+        }
 
-<h1>Worksheet Importer</h1>
+        .page-number {
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            font-size: 12px;
+            color: #888;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
 
-<textarea
-id="worksheetInput"
-rows="20"
-style="width:100%;">
-</textarea>
+    <h1>Worksheet Importer</h1>
 
-<br><br>
+    <!-- 4. Textarea for inputting HTML/Text -->
+    <textarea id="worksheetInput" rows="12" style="width:100%; padding: 15px; font-family: monospace; border-radius: 8px; border: 1px solid #ccc;">
+<h3>Problem 1: Electron Dynamics in Conductors</h3>
+<p>Describe the concept of drift velocity in a standard copper conductor. Ensure your explanation explicitly details the slow drift of negative electrons moving in the opposite direction of the applied electric field. Note: For accurate visualization, there should be strictly no positive charges shown drifting within the current flow.</p>
+    </textarea>
 
-<button id="btnPreview">
-Preview Worksheet
-</button>
+    <br><br>
 
-<hr>
+    <button id="btnPreview" class="btn">Preview Worksheet</button>
+    <button id="btnExportPDF" class="btn">Export PDF</button>
 
-<div id="previewAreaWrapper">
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
 
-    <img
-        src="/CinePhysicsHQ/banner.jpg"
-        class="worksheet-banner"
-        alt="CinePhysics Banner">
+    <!-- This is the container that html2pdf targets -->
+    <div id="previewAreaWrapper">
 
-    <div class="watermark-grid">
-        CINEPHYSICS CINEPHYSICS CINEPHYSICS
-        CINEPHYSICS CINEPHYSICS CINEPHYSICS
-        CINEPHYSICS CINEPHYSICS CINEPHYSICS
-        CINEPHYSICS CINEPHYSICS CINEPHYSICS
+        <!-- Top visual elements -->
+        <img src="/CinePhysicsHQ/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
+        
+        <div class="worksheet-title-bar">
+            CinePhysicsHQ Worksheet
+        </div>
+
+        <!-- Premium watermark -->
+        <div class="watermark-grid">
+            <img src="/CinePhysicsHQ/logo.png" class="watermark-logo" alt="Watermark">
+        </div>
+
+        <!-- Main content area -->
+        <div id="previewArea">
+            <div class="worksheet-meta">
+                <div><strong>Topic:</strong> Electromagnetism</div>
+                <div><strong>Name:</strong> ____________________</div>
+                <div><strong>Date:</strong> ____________________</div>
+            </div>
+            
+            <!-- Dynamic content from the textarea gets injected here -->
+            <div id="dynamicContent"></div>
+        </div>
+
+        <div class="worksheet-footer">
+            CinePhysics HQ | Physics Made Visual | © 2026 CinePhysics
+        </div>
+        
+        <div class="page-number">Page 1</div>
+
     </div>
 
-    <div id="previewArea"></div>
-<div class="worksheet-footer">
-        CinePhysics HQ | Physics Made Visual |
-        © 2026 CinePhysics
-    </div>
+    <script>
+        // --- Step 1: Handle Worksheet Previewing ---
+        document.getElementById("btnPreview").addEventListener("click", () => {
+            // Grab the raw text/HTML from the textarea
+            const content = document.getElementById("worksheetInput").value;
+            // Inject it into the specific dynamic content div below the meta header
+            document.getElementById("dynamicContent").innerHTML = content;
+        });
 
-</div>
-</div>
-    
+        // --- Step 2: Handle PDF Exporting ---
+        document.getElementById("btnExportPDF").addEventListener("click", () => {
+            // Target the entire visual wrapper
+            const element = document.getElementById("previewAreaWrapper");
 
-    
-<script>
-
-document
-.getElementById("btnPreview")
-.addEventListener("click", () => {
-
-    const content =
-        document.getElementById("worksheetInput").value;
-
-    document
-        .getElementById("previewArea")
-        .innerHTML = content;
-
-});
-
-</script>
+            // Configure and execute the PDF generation
+            html2pdf()
+                .set({
+                    margin: 10,
+                    filename: 'CinePhysics-Worksheet.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { scale: 2, useCORS: true }, // useCORS allows rendering of local/external images
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                })
+                .from(element)
+                .save();
+        });
+    </script>
+</body>
+</html>
