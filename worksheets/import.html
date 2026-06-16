@@ -131,18 +131,16 @@
             background: white;
             color: black;
             margin-top: 40px;
-            border-radius: 10px;
             min-height: 800px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            /* Important for containing absolute watermarks */
-            position: relative; 
+            /* Removed border-radius so the PDF edges are perfectly sharp */
         }
 
         .worksheet-banner {
             width: 100%;
             height: auto;
             display: block;
-            border-radius: 10px 10px 0 0;
+            /* Removed border-radius to ensure edge-to-edge printing */
         }
 
         .worksheet-title-bar {
@@ -171,7 +169,7 @@
         #previewArea {
             position: relative;
             z-index: 2;
-            padding: 30px;
+            padding: 40px 30px; /* Top/bottom padding added to ensure content doesn't hit the title bar */
         }
 
         .worksheet-meta {
@@ -188,7 +186,7 @@
             text-align: center;
             margin-top: 40px;
             padding-top: 15px;
-            padding-bottom: 20px;
+            padding-bottom: 30px; /* Extra bottom padding so it doesn't hug the bottom edge of the paper */
             border-top: 1px solid #ddd;
             font-size: 14px;
             color: #666;
@@ -295,9 +293,7 @@
 
             // 1. Calculate the dimensions to place a watermark on every A4 page
             const wrapperWidth = element.offsetWidth;
-            // The aspect ratio of an A4 page is roughly 1 : 1.414 (210mm x 297mm)
             const pageHeightInPx = wrapperWidth * (297 / 210); 
-            // Calculate how many pages the content spans
             const totalPages = Math.max(1, Math.ceil(element.offsetHeight / pageHeightInPx));
             
             // 2. Clear existing preview watermark and inject multiple spaced watermarks
@@ -308,17 +304,16 @@
                 img.src = '/CinePhysicsHQ/logo.png';
                 img.className = 'watermark-logo';
                 img.style.position = 'absolute';
-                // Center the logo perfectly in the middle of each calculated page slice
                 img.style.top = `${(i * pageHeightInPx) + (pageHeightInPx / 2)}px`;
                 img.style.left = '50%';
                 img.style.transform = 'translate(-50%, -50%)';
                 wmContainer.appendChild(img);
             }
 
-            // 3. Execute html2pdf
+            // 3. Execute html2pdf (MARGIN SET TO 0 for edge-to-edge printing)
             html2pdf()
                 .set({
-                    margin: 10,
+                    margin: 0, // <-- Changed this to 0 to remove the white border
                     filename: 'CinePhysics-Worksheet.pdf',
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { scale: 2, useCORS: true },
