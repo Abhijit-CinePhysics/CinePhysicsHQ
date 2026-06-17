@@ -243,34 +243,65 @@
             5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
             6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
             ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}`;
-IMPORTANT MATHEMATICAL FORMATTING:
+IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
 
-Do NOT use LaTeX.
-Do NOT use Markdown math.
-Do NOT use $, \( \), \[ \], ^ or _ notation.
+1. Return ONLY valid HTML.
+2. Never use LaTeX notation.
+3. Never use Markdown math.
+4. Never use $, $$, ..., ..., ^, _, \frac, \Delta, \theta, \alpha, \beta, \mu, \lambda, or any LaTeX commands.
+5. Never wrap equations in code blocks.
 
-Use HTML only:
+Use HTML tags and entities only:
 
+Superscripts:
 x<sup>2</sup>
 x<sup>3</sup>
+10<sup>-3</sup>
+
+Subscripts:
 v<sub>0</sub>
 v<sub>f</sub>
 a<sub>x</sub>
+F<sub>net</sub>
 
-&Delta;x
-&theta;
-&alpha;
-&beta;
-&mu;
-&lambda;
+Greek Symbols:
+Δ
+θ
+α
+β
+μ
+λ
+ω
+φ
 
-Fractions should be written inline:
-(1/2)mv<sup>2</sup>
-
-Vectors should use bold text:
+Vectors:
 <strong>F</strong>
+<strong>v</strong>
+<strong>a</strong>
 
-All equations must be valid HTML.
+Units:
+m s<sup>-1</sup>
+m s<sup>-2</sup>
+kg m<sup>2</sup> s<sup>-2</sup>
+J s<sup>-1</sup>
+
+Fractions:
+Use inline text format such as:
+(1/2)mv<sup>2</sup>
+(mv<sup>2</sup>)/r
+(Fd)/t
+
+Dimensional Formulae:
+[M]
+[L]
+[T]
+[M L T<sup>-2</sup>]
+
+Scientific Notation:
+6.63 × 10<sup>-34</sup>
+3 × 10<sup>8</sup>
+
+All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.
             return prompt;
         }
 
