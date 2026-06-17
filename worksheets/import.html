@@ -10,14 +10,10 @@
     <script>
         window.MathJax = {
             tex: {
-                // Configure standard LaTeX delimiters
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
             },
-            startup: {
-                // We will manually trigger typesetting after loading dynamic content
-                typeset: false 
-            }
+            startup: { typeset: false }
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -38,20 +34,14 @@
         .title-bar { background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue)); color: white; padding: 15px 30px; font-size: 22px; font-weight: bold; }
         
         #previewArea { padding: 40px; position: relative; z-index: 2; }
-        
-        /* Fix 1: Added color: #1e293b to force dark text in the meta box */
         .meta-box { display: flex; justify-content: space-between; background: #f1f5f9; color: #1e293b; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
         
         .question-block { page-break-inside: avoid; margin-bottom: 25px; }
         .question-block h4 { margin-bottom: 5px; color: #1e293b; }
         
-        /* Force AI content to print in black */
-        #dynamicContent,
-        #dynamicContent * {
-            color: #000 !important;
-        }
+        #dynamicContent, #dynamicContent * { color: #000 !important; }
         
-        /* Fix: Lowered watermark opacity */
+        /* Keep watermark in DOM for jsPDF to read, but apply opacity here for the web preview */
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.015; pointer-events: none; z-index: 1; }
     </style>
 </head>
@@ -68,7 +58,7 @@
 
     <div class="print-container">
         <div id="previewAreaWrapper">
-            <img src="../logo.png" class="watermark">
+            <img src="../logo.png" class="watermark" id="wmImage">
             <img src="../banner.jpg" class="banner">
             <div class="title-bar" id="pdfTitle">CinePhysics Assessment</div>
             
@@ -79,8 +69,7 @@
                     <div><strong>Max Marks:</strong> <span id="pdfMarks">--</span></div>
                 </div>
                 
-                <div id="dynamicContent">
-                    </div>
+                <div id="dynamicContent"></div>
             </div>
         </div>
     </div>
@@ -90,60 +79,90 @@
             let html = localStorage.getItem("cp_ai_html");
             const topic = localStorage.getItem("cp_ai_topic") || "Physics Worksheet";
             const time = localStorage.getItem("cp_ai_time") || "60 Minutes";
-            // Fix 3: Retrieve marks from storage
             const marks = localStorage.getItem("cp_ai_marks") || "0";
 
             if(html) {
-                // Strip out any inline white styling from the AI output just in case
                 html = html.replace(/color:\s*white/gi, "color:black")
                            .replace(/color:\s*#fff/gi, "color:black")
                            .replace(/color:\s*#ffffff/gi, "color:black");
 
-                // Inject the HTML and details
                 document.getElementById("dynamicContent").innerHTML = html;
                 document.getElementById("pdfTitle").innerText = topic;
                 document.getElementById("pdfTime").innerText = time;
-                // Inject the marks
                 document.getElementById("pdfMarks").innerText = marks;
                 
-                // Trigger MathJax to render the newly injected equations
                 if (window.MathJax) {
                     MathJax.typesetPromise([document.getElementById('dynamicContent')])
-                        .then(() => {
-                            console.log('MathJax successfully rendered the equations.');
-                        })
-                        .catch((err) => {
-                            console.error('MathJax rendering failed: ', err.message);
-                        });
+                        .then(() => console.log('MathJax successfully rendered the equations.'))
+                        .catch((err) => console.error('MathJax rendering failed: ', err.message));
                 }
             } else {
-                // Added a test equation here just so you can verify MathJax works even if localStorage is empty!
-                document.getElementById("dynamicContent").innerHTML = `
-                    <p>No content found in storage. Please generate from the builder.</p>
-                    <div class="question-block">
-                        <h4>Example Physics Equation:</h4>
-                        <p>Calculate the force using Newton's Second Law: $$F = m \\cdot a$$</p>
-                        <p>Where $m$ is mass and $a$ is acceleration.</p>
-                    </div>
-                `;
-                // Render the fallback content
-                if (window.MathJax) {
-                    MathJax.typesetPromise([document.getElementById('dynamicContent')]);
-                }
+                document.getElementById("dynamicContent").innerHTML = `<p>No content found in storage. Please generate from the builder.</p>`;
             }
         };
 
         function exportPDF() {
             const element = document.getElementById("previewAreaWrapper");
+            const wmImg = document.getElementById("wmImage");
+            
+            // 1. Hide the CSS watermark so it doesn't double print
+            wmImg.style.display = 'none';
+
+            // 2. Prepare the watermark with 0.015 opacity onto a pure Canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = wmImg.naturalWidth || 800;
+            canvas.height = wmImg.naturalHeight || 800;
+            const ctx = canvas.getContext('2d');
+            ctx.globalAlpha = 0.015; // Set exact opacity here
+            ctx.drawImage(wmImg, 0, 0, canvas.width, canvas.height);
+            const imgData = canvas.toDataURL('image/png');
+
             const opt = {
-                margin: [0, 0, 10, 0],
+                margin: [0, 0, 15, 0], // Added 15mm bottom margin so questions don't overlap footer
                 filename: 'CinePhysics_Worksheet.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['css', 'legacy'], avoid: '.question-block' }
             };
-            html2pdf().set(opt).from(element).save();
+
+            // 3. Generate PDF and loop through pages to add repeating elements
+            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+                const totalPages = pdf.internal.getNumberOfPages();
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                // Calculate watermark dimensions (140mm wide)
+                const wmWidth = 140;
+                const wmHeight = (canvas.height / canvas.width) * wmWidth;
+                const wmX = (pageWidth - wmWidth) / 2;
+                const wmY = (pageHeight - wmHeight) / 2;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    
+                    // Add Repeating Watermark Image
+                    pdf.addImage(imgData, 'PNG', wmX, wmY, wmWidth, wmHeight);
+                    
+                    // Add Repeating Footer Text
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(128, 128, 128); // Gray color
+                    const footerText = "Abhijit Singh | CinePhysicsHQ";
+                    
+                    // Center the footer text
+                    const textWidth = pdf.getStringUnitWidth(footerText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    const textX = (pageWidth - textWidth) / 2;
+                    pdf.text(footerText, textX, pageHeight - 8); // 8mm from bottom edge
+                    
+                    // Optional: Add Page Numbers to the bottom right
+                    const pageText = `Page ${i} of ${totalPages}`;
+                    const pw = pdf.getStringUnitWidth(pageText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                    pdf.text(pageText, pageWidth - pw - 10, pageHeight - 8); 
+                }
+            }).save().then(() => {
+                // Restore the CSS watermark in the web preview
+                wmImg.style.display = 'block';
+            });
         }
     </script>
 </body>
