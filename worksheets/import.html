@@ -43,6 +43,12 @@
         .question-block { page-break-inside: avoid; margin-bottom: 25px; }
         .question-block h4 { margin-bottom: 5px; color: #1e293b; }
         
+        /* Fix: Force AI content to print in black */
+        #dynamicContent,
+        #dynamicContent * {
+            color: #000 !important;
+        }
+        
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.04; pointer-events: none; z-index: 1; }
     </style>
 </head>
@@ -78,11 +84,16 @@
 
     <script>
         window.onload = () => {
-            const html = localStorage.getItem("cp_ai_html");
+            let html = localStorage.getItem("cp_ai_html");
             const topic = localStorage.getItem("cp_ai_topic") || "Physics Worksheet";
             const time = localStorage.getItem("cp_ai_time") || "60 Minutes";
 
             if(html) {
+                // Fix: Strip out any inline white styling from the AI output just in case
+                html = html.replace(/color:\s*white/gi, "color:black")
+                           .replace(/color:\s*#fff/gi, "color:black")
+                           .replace(/color:\s*#ffffff/gi, "color:black");
+
                 // 1. Inject the HTML
                 document.getElementById("dynamicContent").innerHTML = html;
                 document.getElementById("pdfTitle").innerText = topic;
