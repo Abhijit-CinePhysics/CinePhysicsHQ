@@ -199,113 +199,112 @@
             });
         }
 
-function generatePrompt() {
-    const topics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value).join(", ");
-    const mcq = document.getElementById("mcqCount").value;
-    const ar = document.getElementById("arCount").value;
-    const vsa = document.getElementById("vsaCount").value;
-    const sa = document.getElementById("saCount").value;
-    const la = document.getElementById("laCount").value;
-    const num = document.getElementById("numCount").value;
-    
-    const mode = document.getElementById("outputMode").value;
-    const title = document.getElementById("examTitle").value || "Physics Worksheet";
-    const time = document.getElementById("examTime").value;
+        function generatePrompt() {
+            const topics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value).join(", ");
+            const mcq = document.getElementById("mcqCount").value;
+            const ar = document.getElementById("arCount").value;
+            const vsa = document.getElementById("vsaCount").value;
+            const sa = document.getElementById("saCount").value;
+            const la = document.getElementById("laCount").value;
+            const num = document.getElementById("numCount").value;
+            
+            const mode = document.getElementById("outputMode").value;
+            const title = document.getElementById("examTitle").value || "Physics Worksheet";
+            const time = document.getElementById("examTime").value;
 
-    let prompt = `Act as an expert Physics educator. Create questions for a test based on the following context:
-    Chapter: ${document.getElementById("chapterSearch").value}.
-    Topics: ${topics}.
-    Difficulty: ${document.getElementById("difficulty").value}.
-    Time Allowed: ${time}.
+            let prompt = `Act as an expert Physics educator. Create questions for a test based on the following context:
+            Chapter: ${document.getElementById("chapterSearch").value}.
+            Topics: ${topics}.
+            Difficulty: ${document.getElementById("difficulty").value}.
+            Time Allowed: ${time}.
 
-    DISTRIBUTION:
-    - ${mcq} Multiple Choice Questions
-    - ${ar} Assertion-Reason Questions
-    - ${vsa} Very Short Answer (2 Marks)
-    - ${sa} Short Answer (3 Marks)
-    - ${la} Long Answer (5 Marks)
-    - ${num} Numericals
-    
-    ${document.getElementById("enhNCERT").checked ? "- Ensure NCERT alignment." : ""}
-    ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
-    ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
+            DISTRIBUTION:
+            - ${mcq} Multiple Choice Questions
+            - ${ar} Assertion-Reason Questions
+            - ${vsa} Very Short Answer (2 Marks)
+            - ${sa} Short Answer (3 Marks)
+            - ${la} Long Answer (5 Marks)
+            - ${num} Numericals
+            
+            ${document.getElementById("enhNCERT").checked ? "- Ensure NCERT alignment." : ""}
+            ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
+            ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
 
-    STRICT HTML FORMATTING:
-    1. Return ONLY valid HTML fragments. No <html>, <head>, or <body> tags.
-    2. Wrap every question in <div class="question-block">.
-    3. Use <h3> for Section headers and <h4> for question numbers.
-    4. MCQs MUST use <ol type="a"> for options.
-    5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
-    6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
-    ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
+            STRICT HTML FORMATTING:
+            1. Return ONLY valid HTML fragments. No <html>, <head>, or <body> tags.
+            2. Wrap every question in <div class="question-block">.
+            3. Use <h3> for Section headers and <h4> for question numbers.
+            4. MCQs MUST use <ol type="a"> for options.
+            5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
+            6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
+            ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
 
-    IMPORTANT CONTENT RULES (MANDATORY):
-    - DO NOT generate the Worksheet Title, Chapter Name, Topic List, Difficulty, Time Allowed, Maximum Marks, or Subject details.
-    - Start directly with the first section header (e.g., <h3>Section A: Multiple Choice Questions</h3>).
+            IMPORTANT CONTENT RULES (MANDATORY):
+            - DO NOT generate the Worksheet Title, Chapter Name, Topic List, Difficulty, Time Allowed, Maximum Marks, or Subject details.
+            - Start directly with the first section header (e.g., <h3>Section A: Multiple Choice Questions</h3>).
 
-    IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
+            IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
 
-    1. Return ONLY valid HTML.
-    2. Never use LaTeX notation.
-    3. Never use Markdown math.
-    4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
-    5. Never wrap equations in code blocks.
+            1. Return ONLY valid HTML.
+            2. Never use LaTeX notation.
+            3. Never use Markdown math.
+            4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
+            5. Never wrap equations in code blocks.
 
-    Use HTML tags and entities only:
+            Use HTML tags and entities only:
 
-    Superscripts:
-    x<sup>2</sup>
-    x<sup>3</sup>
-    10<sup>-3</sup>
+            Superscripts:
+            x<sup>2</sup>
+            x<sup>3</sup>
+            10<sup>-3</sup>
 
-    Subscripts:
-    v<sub>0</sub>
-    v<sub>f</sub>
-    a<sub>x</sub>
-    F<sub>net</sub>
+            Subscripts:
+            v<sub>0</sub>
+            v<sub>f</sub>
+            a<sub>x</sub>
+            F<sub>net</sub>
 
-    Greek Symbols:
-    &Delta;
-    &theta;
-    &alpha;
-    &beta;
-    &mu;
-    &lambda;
-    &omega;
-    &phi;
+            Greek Symbols:
+            &Delta;
+            &theta;
+            &alpha;
+            &beta;
+            &mu;
+            &lambda;
+            &omega;
+            &phi;
 
-    Vectors:
-    <strong>F</strong>
-    <strong>v</strong>
-    <strong>a</strong>
+            Vectors:
+            <strong>F</strong>
+            <strong>v</strong>
+            <strong>a</strong>
 
-    Units:
-    m s<sup>-1</sup>
-    m s<sup>-2</sup>
-    kg m<sup>2</sup> s<sup>-2</sup>
-    J s<sup>-1</sup>
+            Units:
+            m s<sup>-1</sup>
+            m s<sup>-2</sup>
+            kg m<sup>2</sup> s<sup>-2</sup>
+            J s<sup>-1</sup>
 
-    Fractions:
-    Use inline text format such as:
-    (1/2)mv<sup>2</sup>
-    (mv<sup>2</sup>)/r
-    (Fd)/t
+            Fractions:
+            Use inline text format such as:
+            (1/2)mv<sup>2</sup>
+            (mv<sup>2</sup>)/r
+            (Fd)/t
 
-    Dimensional Formulae:
-    [M]
-    [L]
-    [T]
-    [M L T<sup>-2</sup>]
+            Dimensional Formulae:
+            [M]
+            [L]
+            [T]
+            [M L T<sup>-2</sup>]
 
-    Scientific Notation:
-    6.63 &times; 10<sup>-34</sup>
-    3 &times; 10<sup>8</sup>
+            Scientific Notation:
+            6.63 &times; 10<sup>-34</sup>
+            3 &times; 10<sup>8</sup>
 
-    All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
-    
-    return prompt;
-}
-
+            All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
+            
+            return prompt;
+        }
 
         async function startAI() {
             const overlay = document.getElementById("loadingOverlay");
@@ -345,9 +344,24 @@ function generatePrompt() {
                     let htmlContent = data.candidates[0].content.parts[0].text;
                     htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
 
+                    // --- NEW: Calculate Total Marks ---
+                    const mcq = parseInt(document.getElementById("mcqCount").value) || 0;
+                    const ar = parseInt(document.getElementById("arCount").value) || 0;
+                    const vsa = parseInt(document.getElementById("vsaCount").value) || 0;
+                    const sa = parseInt(document.getElementById("saCount").value) || 0;
+                    const la = parseInt(document.getElementById("laCount").value) || 0;
+                    const num = parseInt(document.getElementById("numCount").value) || 0;
+                    
+                    // Multiply count by respective standard marks
+                    const totalMarks = (mcq * 1) + (ar * 1) + (vsa * 2) + (sa * 3) + (la * 5) + (num * 3);
+                    // ----------------------------------
+
                     localStorage.setItem("cp_ai_html", htmlContent);
                     localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
                     localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
+                    
+                    // Save calculated marks to localStorage
+                    localStorage.setItem("cp_ai_marks", totalMarks); 
 
                     window.location.href = "./worksheets/import.html";
                 } else {
