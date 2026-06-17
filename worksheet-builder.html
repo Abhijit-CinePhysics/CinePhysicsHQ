@@ -281,18 +281,19 @@ async function startAI() {
 
         const data = await response.json();
         
-        // 3. Extract the text from Gemini's response
-        let htmlContent = data.candidates[0].content.parts[0].text;
-        
-        // Clean up markdown code blocks if the AI added them
-        htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
+        // Defensive check: Make sure the structure exists before reading '0'
+        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+            let htmlContent = data.candidates[0].content.parts[0].text;
+            htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
 
-        // 4. Save and Redirect
-        localStorage.setItem("cp_ai_html", htmlContent);
-        localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
-        localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
+            localStorage.setItem("cp_ai_html", htmlContent);
+            localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
+            localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
 
-        window.location.href = "import.html";
+            window.location.href = "import.html";
+        } else {
+            throw new Error("The AI response was empty or malformed.");
+        }
 
     } catch (error) {
         console.error("AI Fetch Error:", error);
