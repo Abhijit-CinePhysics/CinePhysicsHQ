@@ -4,7 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CinePhysicsHQ Exporter</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                // Configure standard LaTeX delimiters
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                // We will manually trigger typesetting after loading dynamic content
+                typeset: false 
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <style>
         :root {
             --cp-bg: #050505; --cp-panel: #0f0f0f; --cp-border: #222222;
@@ -54,8 +71,7 @@
                 </div>
                 
                 <div id="dynamicContent">
-                    <!-- AI Content Lands Here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -63,16 +79,39 @@
     <script>
         window.onload = () => {
             const html = localStorage.getItem("cp_ai_html");
-            const topic = localStorage.getItem("cp_ai_topic");
-            const time = localStorage.getItem("cp_ai_time");
+            const topic = localStorage.getItem("cp_ai_topic") || "Physics Worksheet";
+            const time = localStorage.getItem("cp_ai_time") || "60 Minutes";
 
             if(html) {
+                // 1. Inject the HTML
                 document.getElementById("dynamicContent").innerHTML = html;
                 document.getElementById("pdfTitle").innerText = topic;
                 document.getElementById("pdfTime").innerText = time;
-                // localStorage.removeItem("cp_ai_html"); // Keep it for refreshes, clear on builder start
+                
+                // Step 3: Trigger MathJax to render the newly injected equations
+                if (window.MathJax) {
+                    MathJax.typesetPromise([document.getElementById('dynamicContent')])
+                        .then(() => {
+                            console.log('MathJax successfully rendered the equations.');
+                        })
+                        .catch((err) => {
+                            console.error('MathJax rendering failed: ', err.message);
+                        });
+                }
             } else {
-                document.getElementById("dynamicContent").innerHTML = "<p>No content found. Please generate from the builder.</p>";
+                // Added a test equation here just so you can verify MathJax works even if localStorage is empty!
+                document.getElementById("dynamicContent").innerHTML = `
+                    <p>No content found in storage. Please generate from the builder.</p>
+                    <div class="question-block">
+                        <h4>Example Physics Equation:</h4>
+                        <p>Calculate the force using Newton's Second Law: $$F = m \\cdot a$$</p>
+                        <p>Where $m$ is mass and $a$ is acceleration.</p>
+                    </div>
+                `;
+                // Render the fallback content
+                if (window.MathJax) {
+                    MathJax.typesetPromise([document.getElementById('dynamicContent')]);
+                }
             }
         };
 
