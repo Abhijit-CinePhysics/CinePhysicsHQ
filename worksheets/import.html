@@ -38,18 +38,21 @@
         .title-bar { background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue)); color: white; padding: 15px 30px; font-size: 22px; font-weight: bold; }
         
         #previewArea { padding: 40px; position: relative; z-index: 2; }
-        .meta-box { display: flex; justify-content: space-between; background: #f1f5f9; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
+        
+        /* Fix 1: Added color: #1e293b to force dark text in the meta box */
+        .meta-box { display: flex; justify-content: space-between; background: #f1f5f9; color: #1e293b; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
         
         .question-block { page-break-inside: avoid; margin-bottom: 25px; }
         .question-block h4 { margin-bottom: 5px; color: #1e293b; }
         
-        /* Fix: Force AI content to print in black */
+        /* Force AI content to print in black */
         #dynamicContent,
         #dynamicContent * {
             color: #000 !important;
         }
         
-        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.04; pointer-events: none; z-index: 1; }
+        /* Fix: Lowered watermark opacity */
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.015; pointer-events: none; z-index: 1; }
     </style>
 </head>
 <body>
@@ -73,7 +76,7 @@
                 <div class="meta-box">
                     <div><strong>Subject:</strong> Physics</div>
                     <div><strong>Time:</strong> <span id="pdfTime">--</span></div>
-                    <div><strong>Max Marks:</strong> [As Assigned]</div>
+                    <div><strong>Max Marks:</strong> <span id="pdfMarks">--</span></div>
                 </div>
                 
                 <div id="dynamicContent">
@@ -87,19 +90,23 @@
             let html = localStorage.getItem("cp_ai_html");
             const topic = localStorage.getItem("cp_ai_topic") || "Physics Worksheet";
             const time = localStorage.getItem("cp_ai_time") || "60 Minutes";
+            // Fix 3: Retrieve marks from storage
+            const marks = localStorage.getItem("cp_ai_marks") || "0";
 
             if(html) {
-                // Fix: Strip out any inline white styling from the AI output just in case
+                // Strip out any inline white styling from the AI output just in case
                 html = html.replace(/color:\s*white/gi, "color:black")
                            .replace(/color:\s*#fff/gi, "color:black")
                            .replace(/color:\s*#ffffff/gi, "color:black");
 
-                // 1. Inject the HTML
+                // Inject the HTML and details
                 document.getElementById("dynamicContent").innerHTML = html;
                 document.getElementById("pdfTitle").innerText = topic;
                 document.getElementById("pdfTime").innerText = time;
+                // Inject the marks
+                document.getElementById("pdfMarks").innerText = marks;
                 
-                // Step 3: Trigger MathJax to render the newly injected equations
+                // Trigger MathJax to render the newly injected equations
                 if (window.MathJax) {
                     MathJax.typesetPromise([document.getElementById('dynamicContent')])
                         .then(() => {
