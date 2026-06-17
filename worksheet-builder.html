@@ -290,7 +290,7 @@ async function startAI() {
             localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
             localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
 
-            window.location.href = "import.html";
+            window.location.href = "/worksheets/import.html";
         } else {
             throw new Error("The AI response was empty or malformed.");
         }
