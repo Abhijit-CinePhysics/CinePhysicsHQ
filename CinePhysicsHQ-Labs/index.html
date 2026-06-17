@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="CinePhysicsHQ Labs - Interactive Physics Simulations for Class 11, Class 12, JEE, and NEET. Master dimensional analysis, error propagation, electromagnetic forces, and more through hands-on virtual laboratories.">
+<meta name="keywords" content="physics labs, interactive simulations, dimensional analysis, error analysis, JEE physics, NEET physics, Class 11, Class 12">
+<meta property="og:title" content="CinePhysicsHQ Labs - Interactive Physics Simulations">
+<meta property="og:description" content="Free interactive physics laboratories. Learn through simulation, not memorization.">
+<meta property="og:url" content="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/index.html">
+<title>CinePhysicsHQ Labs - Interactive Physics Simulations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #0f1424;
+    --surface2: #141d33;
+    --border: #1e2f47;
+    --accent: #00d4ff;
+    --accent-warm: #ff9d00;
+    --accent-alt: #7c3aed;
+    --text: #e2eaf5;
+    --text-muted: #5a7a99;
+    --success: #00e5a0;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* HEADER */
+  header {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4rem;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .nav-link:hover {
+    color: var(--accent);
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 5rem;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .hero h1 .accent {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-cta {
+    display: inline-block;
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
+    color: var(--bg);
+    border: none;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 212, 255, 0.2);
+  }
+
+  /* LABS GRID */
+  .labs-section {
+    margin-bottom: 5rem;
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .labs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .lab-card {
+    background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .lab-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
+  }
+
+  .lab-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+  }
+
+  .lab-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .lab-category {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .lab-card h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    line-height: 1.2;
+  }
+
+  .lab-description {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    line-height: 1.6;
+  }
+
+  .lab-features {
+    list-style: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .lab-features li {
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    position: relative;
+  }
+
+  .lab-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success);
+    font-weight: 700;
+  }
+
+  .lab-button {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: rgba(0, 212, 255, 0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 6px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .lab-button:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2rem;
+    margin: 4rem 0;
+    padding: 2rem;
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .cta-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .cta-section p {
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 4rem;
+  }
+
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    text-decoration: underline;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header-content {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+    }
+
+    .labs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .stats-row {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-section {
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  /* ANIMATIONS */
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-card {
+      animation: slideUp 0.6s ease-out backwards;
+    }
+
+    .lab-card:nth-child(1) { animation-delay: 0.1s; }
+    .lab-card:nth-child(2) { animation-delay: 0.2s; }
+    .lab-card:nth-child(3) { animation-delay: 0.3s; }
+    .lab-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+</style>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-R41EJ3144X"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-R41EJ3144X');
+</script>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">⚡ CinePhysicsHQ Labs</div>
+      <nav>
+        <a href="https://abhijit-cinephysics.github.io/CinePhysics/" class="nav-link">← Back to Platform</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Interactive Physics Learning</div>
+    <h1>Physics You Can <span class="accent">See & Interact With</span></h1>
+    <p class="hero-subtitle">Master dimensional analysis, error propagation, electromagnetic forces, and more. No memorization. No textbooks. Just simulations.</p>
+    <a href="#labs" class="hero-cta">Explore Labs →</a>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-number">4</div>
+      <div class="stat-label">Interactive Labs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">19+</div>
+      <div class="stat-label">Simulation Sections</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">Free</div>
+      <div class="stat-label">No Login Required</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">JEE Ready</div>
+      <div class="stat-label">Olympiad Level</div>
+    </div>
+  </div>
+
+  <!-- LABS SECTION -->
+  <section class="labs-section" id="labs">
+    <div class="section-label">🧪 Available Labs</div>
+
+    <div class="labs-grid">
+
+      <!-- Lab 1: Dimensional Analysis -->
+      <div class="lab-card">
+        <div class="lab-category">Class 11 • Fundamentals</div>
+        <div class="lab-icon">🎯</div>
+        <h3>Dimensional Analysis</h3>
+        <p class="lab-description">Verify equations, derive formulas, and master dimensional reasoning with real-time verification and the Buckingham π theorem.</p>
+        <ul class="lab-features">
+          <li>Equation checker (instant verification)</li>
+          <li>Quantity finder (reverse search)</li>
+          <li>Buckingham π derivation</li>
+          <li>Boss Battle (gamified challenges)</li>
+          <li>Certificate of mastery</li>
+        </ul>
+        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/" class="lab-button">Launch Lab →</a>
+      </div>
+
+      <!-- Lab 2: Error Analysis -->
+      <div class="lab-card">
+        <div class="lab-category">Class 11 • Advanced</div>
+        <div class="lab-icon">📊</div>
+        <h3>Uncertainty & Error Analysis</h3>
+        <p class="lab-description">Master error propagation, measurement uncertainty, and statistical analysis with 19 interactive sections designed for practical exams.</p>
+        <ul class="lab-features">
+          <li>Error propagation (max vs statistical)</li>
+          <li>Monte Carlo simulations</li>
+          <li>Linear regression (least squares)</li>
+          <li>Significant figures challenges</li>
+          <li>Full experimental error calculator</li>
+        </ul>
+        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/error_analysis_lab/" class="lab-button">Launch Lab →</a>
+      </div>
+
+      <!-- Lab 3: Lorentz Force -->
+      <div class="lab-card">
+        <div class="lab-category">Class 12 • Electromagnetism</div>
+        <div class="lab-icon">⚡</div>
+        <h3>Magnetic Lorentz Force</h3>
+        <p class="lab-description">Visualize charged particle motion in magnetic fields. Control charge sign, mass, speed, and magnetic field strength in real time.</p>
+        <ul class="lab-features">
+          <li>Real-time particle simulation</li>
+          <li>Adjustable parameters (q, m, v, B)</li>
+          <li>Circular motion visualization</li>
+          <li>CSV data export</li>
+          <li>Teacher worksheet generator</li>
+        </ul>
+        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Magnetic%20lorentz-force/" class="lab-button">Launch Lab →</a>
+      </div>
+
+      <!-- Lab 4: Parallel Conductors -->
+      <div class="lab-card">
+        <div class="lab-category">Class 12 • Magnetism</div>
+        <div class="lab-icon">🧲</div>
+        <h3>Parallel Conductors & Ampere's Law</h3>
+        <p class="lab-description">Explore magnetic forces between parallel current-carrying conductors. Map magnetic fields, verify Ampere's law, analyze SI current definitions.</p>
+        <ul class="lab-features">
+          <li>Magnetic field visualization</li>
+          <li>Ampere benchmark (SI definition)</li>
+          <li>Multiple view modes (3D, cross-section)</li>
+          <li>Force calculation</li>
+          <li>Experimental protocols</li>
+        </ul>
+        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/" class="lab-button">Launch Lab →</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WHY THESE LABS -->
+  <section class="labs-section">
+    <div class="section-label">Why CinePhysicsHQ Labs</div>
+    
+    <div class="labs-grid">
+      <div class="lab-card" style="grid-column: span 1;">
+        <div class="lab-icon">👁️</div>
+        <h3>See the Physics</h3>
+        <p class="lab-description">Interactive simulations make abstract concepts tangible. Watch equations verify in real time. Observe particle behavior as you adjust parameters.</p>
+      </div>
+      
+      <div class="lab-card">
+        <div class="lab-icon">🎮</div>
+        <h3>Learn Through Interaction</h3>
+        <p class="lab-description">Gamified challenges and instant feedback replace passive reading. Build intuition through experimentation, not memorization.</p>
+      </div>
+      
+      <div class="lab-card">
+        <div class="lab-icon">📈</div>
+        <h3>Exam Focused</h3>
+        <p class="lab-description">Designed for NCERT, JEE, NEET, and Olympiad syllabi. Every lab covers concepts that appear in board and competitive exams.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>Ready to Master Physics Concepts?</h2>
+    <p>Start with Dimensional Analysis or explore Error Analysis. Both labs are completely free, require no login, and work in any modern browser.</p>
+    <a href="#labs" class="hero-cta">Start Learning Now →</a>
+  </section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>Built by <a href="https://github.com/Abhijit-CinePhysics">Abhijit Singh</a> • Physics Educator & Simulation Developer</p>
+    <p style="margin-top: 1rem; color: var(--text-muted); font-size: 0.8rem;">CinePhysicsHQ Labs © 2026 • <a href="https://abhijit-cinephysics.github.io/CinePhysics/">Back to Main Platform</a></p>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Replace GA4 ID with your actual ID
+  const gaId = 'G-XXXXXXXXXX'; // Replace with your GA4 ID
+  if (document.currentScript) {
+    const scripts = document.querySelectorAll('script[src*="googletagmanager"]');
+    scripts.forEach(script => {
+      script.src = script.src.replace('G-XXXXXXXXXX', gaId);
+    });
+  }
+</script>
+
+</body>
+</html>
