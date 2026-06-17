@@ -199,109 +199,113 @@
             });
         }
 
-        function generatePrompt() {
-            const topics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value).join(", ");
-            const mcq = document.getElementById("mcqCount").value;
-            const ar = document.getElementById("arCount").value;
-            const vsa = document.getElementById("vsaCount").value;
-            const sa = document.getElementById("saCount").value;
-            const la = document.getElementById("laCount").value;
-            const num = document.getElementById("numCount").value;
-            
-            const mode = document.getElementById("outputMode").value;
-            const title = document.getElementById("examTitle").value || "Physics Worksheet";
-            const time = document.getElementById("examTime").value;
+function generatePrompt() {
+    const topics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value).join(", ");
+    const mcq = document.getElementById("mcqCount").value;
+    const ar = document.getElementById("arCount").value;
+    const vsa = document.getElementById("vsaCount").value;
+    const sa = document.getElementById("saCount").value;
+    const la = document.getElementById("laCount").value;
+    const num = document.getElementById("numCount").value;
+    
+    const mode = document.getElementById("outputMode").value;
+    const title = document.getElementById("examTitle").value || "Physics Worksheet";
+    const time = document.getElementById("examTime").value;
 
-            // Corrected template literal string encompassing the entire prompt
-            let prompt = `Act as an expert Physics educator. Create a ${title} for ${document.getElementById("classSelect").value}.
-            Chapter: ${document.getElementById("chapterSearch").value}.
-            Topics: ${topics}.
-            Difficulty: ${document.getElementById("difficulty").value}.
-            Time Allowed: ${time}.
+    let prompt = `Act as an expert Physics educator. Create questions for a test based on the following context:
+    Chapter: ${document.getElementById("chapterSearch").value}.
+    Topics: ${topics}.
+    Difficulty: ${document.getElementById("difficulty").value}.
+    Time Allowed: ${time}.
 
-            DISTRIBUTION:
-            - ${mcq} Multiple Choice Questions
-            - ${ar} Assertion-Reason Questions
-            - ${vsa} Very Short Answer (2 Marks)
-            - ${sa} Short Answer (3 Marks)
-            - ${la} Long Answer (5 Marks)
-            - ${num} Numericals
-            
-            ${document.getElementById("enhNCERT").checked ? "- Ensure NCERT alignment." : ""}
-            ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
-            ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
+    DISTRIBUTION:
+    - ${mcq} Multiple Choice Questions
+    - ${ar} Assertion-Reason Questions
+    - ${vsa} Very Short Answer (2 Marks)
+    - ${sa} Short Answer (3 Marks)
+    - ${la} Long Answer (5 Marks)
+    - ${num} Numericals
+    
+    ${document.getElementById("enhNCERT").checked ? "- Ensure NCERT alignment." : ""}
+    ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
+    ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
 
-            STRICT HTML FORMATTING:
-            1. Return ONLY valid HTML fragments. No <html>, <head>, or <body> tags.
-            2. Wrap every question in <div class="question-block">.
-            3. Use <h3> for Section headers and <h4> for question numbers.
-            4. MCQs MUST use <ol type="a"> for options.
-            5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
-            6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
-            ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
+    STRICT HTML FORMATTING:
+    1. Return ONLY valid HTML fragments. No <html>, <head>, or <body> tags.
+    2. Wrap every question in <div class="question-block">.
+    3. Use <h3> for Section headers and <h4> for question numbers.
+    4. MCQs MUST use <ol type="a"> for options.
+    5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
+    6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
+    ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
 
-            IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
+    IMPORTANT CONTENT RULES (MANDATORY):
+    - DO NOT generate the Worksheet Title, Chapter Name, Topic List, Difficulty, Time Allowed, Maximum Marks, or Subject details.
+    - Start directly with the first section header (e.g., <h3>Section A: Multiple Choice Questions</h3>).
 
-            1. Return ONLY valid HTML.
-            2. Never use LaTeX notation.
-            3. Never use Markdown math.
-            4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
-            5. Never wrap equations in code blocks.
+    IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
 
-            Use HTML tags and entities only:
+    1. Return ONLY valid HTML.
+    2. Never use LaTeX notation.
+    3. Never use Markdown math.
+    4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
+    5. Never wrap equations in code blocks.
 
-            Superscripts:
-            x<sup>2</sup>
-            x<sup>3</sup>
-            10<sup>-3</sup>
+    Use HTML tags and entities only:
 
-            Subscripts:
-            v<sub>0</sub>
-            v<sub>f</sub>
-            a<sub>x</sub>
-            F<sub>net</sub>
+    Superscripts:
+    x<sup>2</sup>
+    x<sup>3</sup>
+    10<sup>-3</sup>
 
-            Greek Symbols:
-            &Delta;
-            &theta;
-            &alpha;
-            &beta;
-            &mu;
-            &lambda;
-            &omega;
-            &phi;
+    Subscripts:
+    v<sub>0</sub>
+    v<sub>f</sub>
+    a<sub>x</sub>
+    F<sub>net</sub>
 
-            Vectors:
-            <strong>F</strong>
-            <strong>v</strong>
-            <strong>a</strong>
+    Greek Symbols:
+    &Delta;
+    &theta;
+    &alpha;
+    &beta;
+    &mu;
+    &lambda;
+    &omega;
+    &phi;
 
-            Units:
-            m s<sup>-1</sup>
-            m s<sup>-2</sup>
-            kg m<sup>2</sup> s<sup>-2</sup>
-            J s<sup>-1</sup>
+    Vectors:
+    <strong>F</strong>
+    <strong>v</strong>
+    <strong>a</strong>
 
-            Fractions:
-            Use inline text format such as:
-            (1/2)mv<sup>2</sup>
-            (mv<sup>2</sup>)/r
-            (Fd)/t
+    Units:
+    m s<sup>-1</sup>
+    m s<sup>-2</sup>
+    kg m<sup>2</sup> s<sup>-2</sup>
+    J s<sup>-1</sup>
 
-            Dimensional Formulae:
-            [M]
-            [L]
-            [T]
-            [M L T<sup>-2</sup>]
+    Fractions:
+    Use inline text format such as:
+    (1/2)mv<sup>2</sup>
+    (mv<sup>2</sup>)/r
+    (Fd)/t
 
-            Scientific Notation:
-            6.63 &times; 10<sup>-34</sup>
-            3 &times; 10<sup>8</sup>
+    Dimensional Formulae:
+    [M]
+    [L]
+    [T]
+    [M L T<sup>-2</sup>]
 
-            All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
-            
-            return prompt;
-        }
+    Scientific Notation:
+    6.63 &times; 10<sup>-34</sup>
+    3 &times; 10<sup>8</sup>
+
+    All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
+    
+    return prompt;
+}
+
 
         async function startAI() {
             const overlay = document.getElementById("loadingOverlay");
