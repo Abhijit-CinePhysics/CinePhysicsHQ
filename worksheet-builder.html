@@ -88,7 +88,6 @@
     </header>
 
     <div class="container">
-        <!-- 1. API & Class -->
         <div class="chapter-card">
             <h3>1. Curriculum</h3>
             
@@ -108,13 +107,11 @@
             </div>
         </div>
 
-        <!-- 2. Topics -->
         <div class="chapter-card">
             <h3>2. Selected Topics</h3>
             <div id="topicsContainer" style="font-size: 0.85rem; color: var(--text-secondary);">Select a chapter first.</div>
         </div>
 
-        <!-- 3. Question Distribution -->
         <div class="chapter-card">
             <h3>3. Question Distribution</h3>
             <div class="grid-3">
@@ -134,7 +131,6 @@
             </select>
         </div>
 
-        <!-- 4. Exam Paper Settings -->
         <div class="chapter-card">
             <h3>4. Exam Paper Generator</h3>
             <label>Paper Title / Header</label>
@@ -159,7 +155,6 @@
             </div>
         </div>
 
-        <!-- 5. Advanced Toggle -->
         <div class="chapter-card">
             <h3>5. Optional Enhancements</h3>
             <div style="font-size: 0.85rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
@@ -217,6 +212,7 @@
             const title = document.getElementById("examTitle").value || "Physics Worksheet";
             const time = document.getElementById("examTime").value;
 
+            // Corrected template literal string encompassing the entire prompt
             let prompt = `Act as an expert Physics educator. Create a ${title} for ${document.getElementById("classSelect").value}.
             Chapter: ${document.getElementById("chapterSearch").value}.
             Topics: ${topics}.
@@ -242,123 +238,125 @@
             4. MCQs MUST use <ol type="a"> for options.
             5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
             6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
-            ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}`;
-IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
+            ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
 
-1. Return ONLY valid HTML.
-2. Never use LaTeX notation.
-3. Never use Markdown math.
-4. Never use $, $$, ..., ..., ^, _, \frac, \Delta, \theta, \alpha, \beta, \mu, \lambda, or any LaTeX commands.
-5. Never wrap equations in code blocks.
+            IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
 
-Use HTML tags and entities only:
+            1. Return ONLY valid HTML.
+            2. Never use LaTeX notation.
+            3. Never use Markdown math.
+            4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
+            5. Never wrap equations in code blocks.
 
-Superscripts:
-x<sup>2</sup>
-x<sup>3</sup>
-10<sup>-3</sup>
+            Use HTML tags and entities only:
 
-Subscripts:
-v<sub>0</sub>
-v<sub>f</sub>
-a<sub>x</sub>
-F<sub>net</sub>
+            Superscripts:
+            x<sup>2</sup>
+            x<sup>3</sup>
+            10<sup>-3</sup>
 
-Greek Symbols:
-Δ
-θ
-α
-β
-μ
-λ
-ω
-φ
+            Subscripts:
+            v<sub>0</sub>
+            v<sub>f</sub>
+            a<sub>x</sub>
+            F<sub>net</sub>
 
-Vectors:
-<strong>F</strong>
-<strong>v</strong>
-<strong>a</strong>
+            Greek Symbols:
+            &Delta;
+            &theta;
+            &alpha;
+            &beta;
+            &mu;
+            &lambda;
+            &omega;
+            &phi;
 
-Units:
-m s<sup>-1</sup>
-m s<sup>-2</sup>
-kg m<sup>2</sup> s<sup>-2</sup>
-J s<sup>-1</sup>
+            Vectors:
+            <strong>F</strong>
+            <strong>v</strong>
+            <strong>a</strong>
 
-Fractions:
-Use inline text format such as:
-(1/2)mv<sup>2</sup>
-(mv<sup>2</sup>)/r
-(Fd)/t
+            Units:
+            m s<sup>-1</sup>
+            m s<sup>-2</sup>
+            kg m<sup>2</sup> s<sup>-2</sup>
+            J s<sup>-1</sup>
 
-Dimensional Formulae:
-[M]
-[L]
-[T]
-[M L T<sup>-2</sup>]
+            Fractions:
+            Use inline text format such as:
+            (1/2)mv<sup>2</sup>
+            (mv<sup>2</sup>)/r
+            (Fd)/t
 
-Scientific Notation:
-6.63 × 10<sup>-34</sup>
-3 × 10<sup>8</sup>
+            Dimensional Formulae:
+            [M]
+            [L]
+            [T]
+            [M L T<sup>-2</sup>]
 
-All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.
+            Scientific Notation:
+            6.63 &times; 10<sup>-34</sup>
+            3 &times; 10<sup>8</sup>
+
+            All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
+            
             return prompt;
         }
 
-        // worksheet-builder.html
-async function startAI() {
-    const overlay = document.getElementById("loadingOverlay");
-    const chapter = document.getElementById("chapterSearch").value;
-    
-    if(!chapter) {
-        alert("Please select a chapter first!");
-        return;
-    }
-    
-    overlay.style.display = "flex";
+        async function startAI() {
+            const overlay = document.getElementById("loadingOverlay");
+            const chapter = document.getElementById("chapterSearch").value;
+            
+            if(!chapter) {
+                alert("Please select a chapter first!");
+                return;
+            }
+            
+            overlay.style.display = "flex";
 
-    // 1. THIS MUST MATCH YOUR VERCEL URL EXACTLY
-    const BACKEND_URL = "https://cinephysics-api.vercel.app/api/generate";
+            // 1. THIS MUST MATCH YOUR VERCEL URL EXACTLY
+            const BACKEND_URL = "https://cinephysics-api.vercel.app/api/generate";
 
-    try {
-        console.log("Sending request to AI...");
-        
-        const response = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                prompt: generatePrompt() 
-            })
-        });
+            try {
+                console.log("Sending request to AI...");
+                
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        prompt: generatePrompt() 
+                    })
+                });
 
-        // 2. Check if the backend sent an error
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || "Backend Error");
+                // 2. Check if the backend sent an error
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Backend Error");
+                }
+
+                const data = await response.json();
+                
+                // Defensive check: Make sure the structure exists before reading '0'
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    let htmlContent = data.candidates[0].content.parts[0].text;
+                    htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
+
+                    localStorage.setItem("cp_ai_html", htmlContent);
+                    localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
+                    localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
+
+                    window.location.href = "./worksheets/import.html";
+                } else {
+                    throw new Error("The AI response was empty or malformed.");
+                }
+
+            } catch (error) {
+                console.error("AI Fetch Error:", error);
+                alert("AI Error: " + error.message);
+                overlay.style.display = "none";
+            }
         }
-
-        const data = await response.json();
         
-        // Defensive check: Make sure the structure exists before reading '0'
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-            let htmlContent = data.candidates[0].content.parts[0].text;
-            htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
-
-            localStorage.setItem("cp_ai_html", htmlContent);
-            localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
-            localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
-
-            window.location.href = "./worksheets/import.html";
-        } else {
-            throw new Error("The AI response was empty or malformed.");
-        }
-
-    } catch (error) {
-        console.error("AI Fetch Error:", error);
-        alert("AI Error: " + error.message);
-        overlay.style.display = "none";
-    }
-}
         document.getElementById("btnAISync").onclick = startAI;
         window.onload = loadChapters;
     </script>
