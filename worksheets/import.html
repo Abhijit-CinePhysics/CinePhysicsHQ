@@ -3,379 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CinePhysicsHQ Worksheet Builder</title>
-    
+    <title>CinePhysicsHQ Exporter</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <style>
-        /* --- Dark Cinematic Theme Variables --- */
         :root {
-            --cp-bg: #050505;          
-            --cp-panel: #0f0f0f;       
-            --cp-border: #222222;      
-            --cp-gold: #d8a435;        
-            --cp-text-light: #f3f4f6;  
-            --cp-text-muted: #888888;  
-            
-            /* PDF Print Variables */
-            --cp-pdf-dark: #0f172a;
-            --cp-pdf-blue: #00bfff;
+            --cp-bg: #050505; --cp-panel: #0f0f0f; --cp-border: #222222;
+            --cp-gold: #d8a435; --cp-pdf-dark: #0f172a; --cp-pdf-blue: #00bfff;
         }
-/* --- NAVIGATION --- */
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            padding: 1.5rem;
-            background: rgba(11, 11, 11, 0.9);
-            backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            flex-wrap: wrap;
-        }
-
-        nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s ease;
-        }
-
-        nav a:hover, nav a.active {
-            color: var(--gold-bright);
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--cp-bg); color: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .panel { background: var(--cp-panel); border: 1px solid var(--cp-border); padding: 20px; border-radius: 8px; width: 100%; max-width: 1000px; margin-bottom: 20px; }
+        .btn { padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; border: none; }
         
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--cp-bg);
-            color: var(--cp-text-light);
-            padding: 40px 20px;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .dashboard-container {
-            width: 100%;
-            max-width: 1000px;
-        }
-
-        .page-title {
-            color: var(--cp-gold);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-size: 24px;
-            margin-bottom: 40px;
-            font-weight: 500;
-        }
-
-        /* --- Panel & Form Styling --- */
-        .panel {
-            background: var(--cp-panel);
-            border: 1px solid var(--cp-border);
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 25px;
-        }
-
-        .panel-title {
-            color: var(--cp-gold);
-            text-transform: uppercase;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        .input-label {
-            color: var(--cp-text-muted);
-            font-size: 12px;
-            text-transform: uppercase;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 12px 15px;
-            background: #000000;
-            color: var(--cp-text-light);
-            border: 1px solid var(--cp-border);
-            border-radius: 6px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+        /* PDF Preview Container */
+        .print-container { background: white; color: black; width: 100%; max-width: 800px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        #previewAreaWrapper { position: relative; min-height: 1000px; }
+        .banner { width: 100%; display: block; }
+        .title-bar { background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue)); color: white; padding: 15px 30px; font-size: 22px; font-weight: bold; }
         
-        textarea {
-            font-family: monospace;
-            resize: vertical;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            outline: none;
-            border-color: var(--cp-gold);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        .btn {
-            background: transparent;
-            color: var(--cp-gold);
-            border: 1px solid var(--cp-gold);
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            text-transform: uppercase;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: var(--cp-gold);
-            color: var(--cp-bg);
-        }
-
-        /* --- Worksheet Print Preview Area --- */
+        #previewArea { padding: 40px; position: relative; z-index: 2; }
+        .meta-box { display: flex; justify-content: space-between; background: #f1f5f9; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
         
-        /* 1. The Print Container holds the shadows and margins for the web view */
-        .print-container {
-            margin-top: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background: white;
-        }
-
-        /* 2. The Wrapper is perfectly flush to the edges for export */
-        #previewAreaWrapper {
-            position: relative;
-            background: white;
-            color: black;
-            min-height: 800px;
-            margin: 0;
-            padding: 0;
-        }
-
-        .worksheet-banner {
-            width: 100%;
-            height: auto;
-            display: block;
-            margin: 0;
-        }
-
-        .worksheet-title-bar {
-            background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue));
-            color: white;
-            padding: 15px 30px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        #watermarkContainer {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            pointer-events: none;
-            user-select: none;
-            z-index: 1;
-        }
-
-        .watermark-logo {
-            width: 450px;
-            opacity: 0.04;
-        }
-
-        #previewArea {
-            position: relative;
-            z-index: 2;
-            padding: 40px 30px;
-        }
-
-        .worksheet-meta {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* 3. This class prevents elements from being cut in half during a page break */
-        .question-block {
-            page-break-inside: avoid;
-            break-inside: avoid;
-            margin-bottom: 30px;
-        }
-
+        .question-block { page-break-inside: avoid; margin-bottom: 25px; }
+        .question-block h4 { margin-bottom: 5px; color: #1e293b; }
+        
+        .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.04; pointer-events: none; z-index: 1; }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="../index.html">Home</a>
-        <a href="../class11.html">Class 11</a>
-        <a href="../class12.html">Class 12</a>
-        <a href="../worksheet-builder.html" class="active">Builder</a>
-        
-    </nav>
-    <div class="dashboard-container">
-        <h1 class="page-title">Worksheet Builder</h1>
 
-        <div class="panel">
-            <h2 class="panel-title">Content Input</h2>
-            
-            <label class="input-label">Chapter / Topic</label>
-            <input type="text" id="topicInput" value="Motion in a Straight Line">
-
-            <label class="input-label">Worksheet Content</label>
-            <textarea id="worksheetInput" rows="15">
-<div class="question-block">
-    <h3>Problem 1: Kinematics</h3>
-    <p>A car accelerates uniformly from rest to a speed of 25 m/s in 8.0 seconds. Calculate the acceleration of the car.</p>
-    <br><br><br><br><br><br>
-</div>
-
-<div class="question-block">
-    <h3>Problem 2: Free Fall</h3>
-    <p>An object is dropped from a height of 50 meters. How long does it take to hit the ground? (Assume g = 9.8 m/s²)</p>
-    <br><br><br><br><br><br>
-</div>
-
-<div class="question-block">
-    <h3>Problem 3: Velocity-Time Graphs</h3>
-    <p>Sketch a velocity-time graph for an object moving with constant negative acceleration.</p>
-    <br><br><br><br><br><br>
-</div>
-            </textarea>
-            
-            <div class="btn-group">
-                <button id="btnPreview" class="btn">Generate Preview</button>
-                <button id="btnExportPDF" class="btn">Export PDF</button>
-            </div>
+    <div class="panel">
+        <h2 style="color: var(--cp-gold); margin-bottom: 10px;">PDF Export Preview</h2>
+        <p style="font-size: 0.8rem; color: #888;">Review your AI generated worksheet. Click Download to save as PDF.</p>
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <button class="btn" style="background: var(--cp-gold); color: #000;" onclick="exportPDF()">Download PDF</button>
+            <button class="btn" style="background: transparent; color: #888; border: 1px solid #444;" onclick="window.location.href='worksheet-builder.html'">Back to Builder</button>
         </div>
+    </div>
 
-        <div class="print-container">
-            <div id="previewAreaWrapper">
-                
-                <div id="watermarkContainer"></div>
-
-                <img src="/CinePhysicsHQ/banner.jpg" class="worksheet-banner" alt="CinePhysics Banner">
-                
-                <div class="worksheet-title-bar">
-                    CinePhysicsHQ Worksheet
+    <div class="print-container">
+        <div id="previewAreaWrapper">
+            <img src="logo.png" class="watermark">
+            <img src="banner.jpg" class="banner">
+            <div class="title-bar" id="pdfTitle">CinePhysics Assessment</div>
+            
+            <div id="previewArea">
+                <div class="meta-box">
+                    <div><strong>Subject:</strong> Physics</div>
+                    <div><strong>Time:</strong> <span id="pdfTime">--</span></div>
+                    <div><strong>Max Marks:</strong> [As Assigned]</div>
                 </div>
-
-                <div id="previewArea">
-                    <div class="worksheet-meta">
-                        <div><strong>Topic:</strong> <span id="displayTopic">Motion in a Straight Line</span></div>
-                        <div><strong>Name:</strong> ____________________</div>
-                        <div><strong>Date:</strong> ____________________</div>
-                    </div>
-                    
-                    <div id="dynamicContent"></div>
+                
+                <div id="dynamicContent">
+                    <!-- AI Content Lands Here -->
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
-        // --- Generate Preview Logic ---
-        document.getElementById("btnPreview").addEventListener("click", () => {
-            const content = document.getElementById("worksheetInput").value;
-            const topic = document.getElementById("topicInput").value;
-            
-            document.getElementById("dynamicContent").innerHTML = content;
-            document.getElementById("displayTopic").innerText = topic;
+        window.onload = () => {
+            const html = localStorage.getItem("cp_ai_html");
+            const topic = localStorage.getItem("cp_ai_topic");
+            const time = localStorage.getItem("cp_ai_time");
 
-            setupPreviewWatermark();
-        });
-
-        function setupPreviewWatermark() {
-            const wmContainer = document.getElementById('watermarkContainer');
-            wmContainer.innerHTML = ''; 
-            const img = document.createElement('img');
-            img.src = '/CinePhysicsHQ/logo.png';
-            img.className = 'watermark-logo';
-            img.style.position = 'absolute';
-            img.style.top = '50%';
-            img.style.left = '50%';
-            img.style.transform = 'translate(-50%, -50%)';
-            wmContainer.appendChild(img);
-        }
-
-        document.getElementById("btnPreview").click();
-
-        // --- Export PDF Logic with Repeating Footer ---
-        document.getElementById("btnExportPDF").addEventListener("click", () => {
-            const element = document.getElementById("previewAreaWrapper");
-            const wmContainer = document.getElementById('watermarkContainer');
-
-            // Set up multi-page watermarks
-            const wrapperWidth = element.offsetWidth;
-            const pageHeightInPx = wrapperWidth * (297 / 210); 
-            // Add +1 to totalPages to ensure the watermark covers the bottom safely
-            const totalPagesCalculated = Math.max(1, Math.ceil(element.offsetHeight / pageHeightInPx)) + 1;
-            
-            wmContainer.innerHTML = ''; 
-            for(let i = 0; i < totalPagesCalculated; i++) {
-                const img = document.createElement('img');
-                img.src = '/CinePhysicsHQ/logo.png';
-                img.className = 'watermark-logo';
-                img.style.position = 'absolute';
-                img.style.top = `${(i * pageHeightInPx) + (pageHeightInPx / 2)}px`;
-                img.style.left = '50%';
-                img.style.transform = 'translate(-50%, -50%)';
-                wmContainer.appendChild(img);
+            if(html) {
+                document.getElementById("dynamicContent").innerHTML = html;
+                document.getElementById("pdfTitle").innerText = topic;
+                document.getElementById("pdfTime").innerText = time;
+                // localStorage.removeItem("cp_ai_html"); // Keep it for refreshes, clear on builder start
+            } else {
+                document.getElementById("dynamicContent").innerHTML = "<p>No content found. Please generate from the builder.</p>";
             }
+        };
 
-            // PDF Configuration
+        function exportPDF() {
+            const element = document.getElementById("previewAreaWrapper");
             const opt = {
-                // Margins: [top, left, bottom, right]
-                // We leave a 15mm bottom margin to make physical room for our repeating footer!
-                margin:       [0, 0, 15, 0], 
-                filename:     'CinePhysics-Worksheet.pdf',
-                image:        { type: 'jpeg', quality: 1 },
-                // scrollY: 0 prevents the browser scroll position from creating a gap at the top
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0 }, 
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                // This tells the PDF engine to respect our .question-block CSS and not slice them in half
-                pagebreak:    { mode: ['css', 'legacy'], avoid: '.question-block' }
+                margin: [0, 0, 10, 0],
+                filename: 'CinePhysics_Worksheet.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], avoid: '.question-block' }
             };
-
-            // Generate the PDF
-            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
-                // This block runs AFTER the PDF pages are generated. 
-                // We loop through every created page and physically stamp the footer onto it.
-                var totalPages = pdf.internal.getNumberOfPages();
-                
-                for (var i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    pdf.setFontSize(9);
-                    pdf.setTextColor(136, 136, 136); // #888 gray color
-                    
-                    // Add Footer Text (Centered at X:105mm, Y:290mm)
-                    pdf.text('CinePhysics HQ | Physics Made Visual | © 2026 CinePhysics', 105, 290, null, null, 'center');
-                    
-                    // Add Page Number (Right-aligned at X:195mm, Y:290mm)
-                    pdf.text('Page ' + i, 195, 290);
-                }
-            }).save().then(() => {
-                setupPreviewWatermark();
-            });
-        });
+            html2pdf().set(opt).from(element).save();
+        }
     </script>
 </body>
 </html>
