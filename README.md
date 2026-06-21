@@ -202,7 +202,7 @@ Feel free to open an issue or submit a pull request.
 
 ## 📬 Connect
 
-Website: https://abhijitsingh.io
+instagram: @abhijitsingh.io
 
 LinkedIn:
 https://linkedin.com/in/abhijitsingh-physics-edtech
