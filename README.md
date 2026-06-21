@@ -199,6 +199,12 @@ Suggestions, bug reports, and educational collaborations are welcome.
 Feel free to open an issue or submit a pull request.
 
 ---
+## Built By
+
+Physics educator + simulation developer. Making physics education visual, interactive, and conceptual.
+
+[@CinePhysicsHQ](https://www.youtube.com/@CinePhysicsHQ) | [GitHub](https://github.com/Abhijit-CinePhysics)
+---
 
 ## 📬 Connect
 
