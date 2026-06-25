@@ -605,6 +605,42 @@
         }
       }
     </style>
+    <!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+
+<script>
+// Firebase Configuration (YOUR actual config from Wednesday)
+const firebaseConfig = {
+  apiKey: "AIzaSyAVPytvxafQYkoLhxOr2QcNT-fgwk6Cnmk",
+  authDomain: "cinephysicshq.firebaseapp.com",
+  databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedata.com",
+  projectId: "cinephysicshq",
+  storageBucket: "cinephysicshq.appspot.com",
+  messagingSenderId: "506903518720",
+  appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
+  measurementId: "G-TC2GZCD8K5"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Test Connection Function
+function testFirebaseConnection() {
+  db.ref('worksheets/Units-Measurements/test001').once('value')
+    .then(snapshot => {
+      console.log('✓ Firebase connected!');
+      console.log('Data:', snapshot.val());
+    })
+    .catch(error => {
+      console.log('✗ Firebase error:', error);
+    });
+}
+
+// Run test when page loads
+window.addEventListener('load', testFirebaseConnection);
+</script>
 </head>
 <body>
 
