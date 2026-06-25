@@ -605,30 +605,30 @@
         }
       }
     </style>
-    <script>
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
-  authDomain: "cinephysicshq.firebaseapp.com",
-  databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "cinephysicshq",
-  storageBucket: "cinephysicshq.firebasestorage.app",
-  messagingSenderId: "506903518720",
-  appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
-  measurementId: "G-TC2GZCD8K5"
-};
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
+    authDomain: "cinephysicshq.firebaseapp.com",
+    databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "cinephysicshq",
+    storageBucket: "cinephysicshq.firebasestorage.app",
+    messagingSenderId: "506903518720",
+    appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
+    measurementId: "G-TC2GZCD8K5"
+  };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-    </script> 
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
     <!-- Firebase Connection Indicator (visible test) -->
 <script>
 // Create a test element that shows connection status
