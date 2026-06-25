@@ -641,6 +641,46 @@ function testFirebaseConnection() {
 // Run test when page loads
 window.addEventListener('load', testFirebaseConnection);
 </script>
+    <!-- Firebase Connection Indicator (visible test) -->
+<script>
+// Create a test element that shows connection status
+function showFirebaseStatus() {
+  const statusDiv = document.createElement('div');
+  statusDiv.id = 'firebase-status';
+  statusDiv.style.cssText = `
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 10px 15px;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    z-index: 9999;
+    font-size: 12px;
+  `;
+  statusDiv.textContent = '🔴 Firebase: Connecting...';
+  document.body.appendChild(statusDiv);
+  
+  // Test connection
+  setTimeout(() => {
+    db.ref('worksheets/Units-Measurements/test001').once('value')
+      .then(snapshot => {
+        statusDiv.style.background = '#00e5a0';
+        statusDiv.textContent = '🟢 Firebase: Connected!';
+        console.log('✓ Firebase working', snapshot.val());
+      })
+      .catch(error => {
+        statusDiv.style.background = '#ff6b6b';
+        statusDiv.textContent = '🔴 Firebase: Error - ' + error.message;
+        console.log('✗ Error:', error);
+      });
+  }, 1000);
+}
+
+// Run when page loads
+window.addEventListener('load', showFirebaseStatus);
+</script>
 </head>
 <body>
 
@@ -652,6 +692,7 @@ window.addEventListener('load', testFirebaseConnection);
       <div class="logo-text">CinePhysicsHQ</div>
     </div>
     <nav>
+      <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/worksheet-builder.html">Worksheet Generator</a>
       <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ//CinePhysicsHQ-Labs/">Labs</a>
       <a href="#videos">Videos</a>
       <a href="#curriculum">Classes</a>
