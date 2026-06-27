@@ -63,8 +63,6 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
         }
-        
-        .analytics-box { background: rgba(0,0,0,0.3); padding: 10px; border-left: 3px solid var(--gold-accent); margin-top: 10px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -90,7 +88,6 @@
     <div class="container">
         <div class="chapter-card">
             <h3>1. Curriculum</h3>
-            
             <div class="grid-2">
                 <div>
                     <label>Class</label>
@@ -230,18 +227,38 @@
             ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
             ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
 
-            STRICT HTML FORMATTING:
-            1. Return ONLY valid HTML fragments. No <html>, <head>, or <body> tags.
-            2. Wrap every question in <div class="question-block">.
-            3. Use <h3> for Section headers and <h4> for question numbers.
-            4. MCQs MUST use <ol type="a"> for options.
-            5. Subjective/Numerical questions MUST have 4 <br> tags at the end for spacing.
-            6. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
-            ${mode === "teacher" ? "7. At the very end, add a <hr> and an <h2>Answer Key</h2> with brief solutions." : ""}
+            LAYOUT RULES (MANDATORY)
+            1. Never use <br> or multiple blank lines for spacing.
+            2. Every question must use exactly this structure:
+
+            <div class="question">
+                <span class="q-number">1.</span>
+                <div class="q-content">
+                    <p>Question text...</p>
+                    <ol class="options" type="a">
+                        <li>Option 1</li>
+                        <li>Option 2</li>
+                    </ol>
+                </div>
+            </div>
+
+            3. Question number and question text must appear on the same horizontal line.
+            4. Never place the question number on its own line.
+            5. Use only <p> tags inside .q-content.
+            6. Each question must have only one outer .question div.
+            7. Do not insert empty paragraphs.
+            8. Do not insert empty divs.
+            9. Do not use inline styles.
+            10. Keep spacing compact and suitable for A4 printable worksheets.
+
+            Additional Rules:
+            1. Section Titles: Wrap in <h3 class="section-title">Section Name</h3>
+            2. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
+            ${mode === "teacher" ? "3. At the very end, add a <hr> and an <h3 class=\"section-title\">Answer Key</h3> with brief solutions." : ""}
 
             IMPORTANT CONTENT RULES (MANDATORY):
             - DO NOT generate the Worksheet Title, Chapter Name, Topic List, Difficulty, Time Allowed, Maximum Marks, or Subject details.
-            - Start directly with the first section header (e.g., <h3>Section A: Multiple Choice Questions</h3>).
+            - Start directly with the first section header (e.g., <h3 class="section-title">Section A: Multiple Choice Questions</h3>).
 
             IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
 
@@ -252,54 +269,14 @@
             5. Never wrap equations in code blocks.
 
             Use HTML tags and entities only:
-
-            Superscripts:
-            x<sup>2</sup>
-            x<sup>3</sup>
-            10<sup>-3</sup>
-
-            Subscripts:
-            v<sub>0</sub>
-            v<sub>f</sub>
-            a<sub>x</sub>
-            F<sub>net</sub>
-
-            Greek Symbols:
-            &Delta;
-            &theta;
-            &alpha;
-            &beta;
-            &mu;
-            &lambda;
-            &omega;
-            &phi;
-
-            Vectors:
-            <strong>F</strong>
-            <strong>v</strong>
-            <strong>a</strong>
-
-            Units:
-            m s<sup>-1</sup>
-            m s<sup>-2</sup>
-            kg m<sup>2</sup> s<sup>-2</sup>
-            J s<sup>-1</sup>
-
-            Fractions:
-            Use inline text format such as:
-            (1/2)mv<sup>2</sup>
-            (mv<sup>2</sup>)/r
-            (Fd)/t
-
-            Dimensional Formulae:
-            [M]
-            [L]
-            [T]
-            [M L T<sup>-2</sup>]
-
-            Scientific Notation:
-            6.63 &times; 10<sup>-34</sup>
-            3 &times; 10<sup>8</sup>
+            Superscripts: x<sup>2</sup>, 10<sup>-3</sup>
+            Subscripts: v<sub>0</sub>, F<sub>net</sub>
+            Greek Symbols: &Delta;, &theta;, &alpha;
+            Vectors: <strong>F</strong>, <strong>v</strong>
+            Units: m s<sup>-1</sup>, kg m<sup>2</sup> s<sup>-2</sup>
+            Fractions: (1/2)mv<sup>2</sup>, (Fd)/t
+            Dimensional Formulae: [M L T<sup>-2</sup>]
+            Scientific Notation: 6.63 &times; 10<sup>-34</sup>
 
             All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
             
@@ -317,21 +294,50 @@
             
             overlay.style.display = "flex";
 
-            // 1. THIS MUST MATCH YOUR VERCEL URL EXACTLY
             const BACKEND_URL = "https://cinephysics-api.vercel.app/api/generate";
 
             try {
                 console.log("Sending request to AI...");
                 
+                // --- NEW: Gather detailed data for Firestore ---
+                const selectedTopics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value);
+                const mcq = parseInt(document.getElementById("mcqCount").value) || 0;
+                const ar = parseInt(document.getElementById("arCount").value) || 0;
+                const vsa = parseInt(document.getElementById("vsaCount").value) || 0;
+                const sa = parseInt(document.getElementById("saCount").value) || 0;
+                const la = parseInt(document.getElementById("laCount").value) || 0;
+                const num = parseInt(document.getElementById("numCount").value) || 0;
+                const totalMarks = (mcq * 1) + (ar * 1) + (vsa * 2) + (sa * 3) + (la * 5) + (num * 3);
+                
+                // Construct the highly detailed payload
+                const payload = {
+                    prompt: generatePrompt(),
+                    title: document.getElementById("examTitle").value || "Untitled Worksheet",
+                    className: document.getElementById("classSelect").value,
+                    chapter: chapter,
+                    topics: selectedTopics,
+                    difficulty: document.getElementById("difficulty").value,
+                    worksheetType: "Worksheet", 
+                    board: document.getElementById("enhCBSE").checked ? "CBSE" : "State Board",
+                    language: "English",
+                    outputMode: document.getElementById("outputMode").value,
+                    distribution: {
+                        mcq,
+                        assertionReason: ar,
+                        vsa,
+                        sa,
+                        la,
+                        numerical: num,
+                        totalMarks
+                    }
+                };
+
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt: generatePrompt() 
-                    })
+                    body: JSON.stringify(payload)
                 });
 
-                // 2. Check if the backend sent an error
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.error || "Backend Error");
@@ -339,28 +345,13 @@
 
                 const data = await response.json();
                 
-                // Defensive check: Make sure the structure exists before reading '0'
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     let htmlContent = data.candidates[0].content.parts[0].text;
                     htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
 
-                    // --- NEW: Calculate Total Marks ---
-                    const mcq = parseInt(document.getElementById("mcqCount").value) || 0;
-                    const ar = parseInt(document.getElementById("arCount").value) || 0;
-                    const vsa = parseInt(document.getElementById("vsaCount").value) || 0;
-                    const sa = parseInt(document.getElementById("saCount").value) || 0;
-                    const la = parseInt(document.getElementById("laCount").value) || 0;
-                    const num = parseInt(document.getElementById("numCount").value) || 0;
-                    
-                    // Multiply count by respective standard marks
-                    const totalMarks = (mcq * 1) + (ar * 1) + (vsa * 2) + (sa * 3) + (la * 5) + (num * 3);
-                    // ----------------------------------
-
                     localStorage.setItem("cp_ai_html", htmlContent);
                     localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
                     localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
-                    
-                    // Save calculated marks to localStorage
                     localStorage.setItem("cp_ai_marks", totalMarks); 
 
                     window.location.href = "./worksheets/import.html";
