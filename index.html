@@ -605,72 +605,7 @@
         }
       }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
-    authDomain: "cinephysicshq.firebaseapp.com",
-    databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "cinephysicshq",
-    storageBucket: "cinephysicshq.firebasestorage.app",
-    messagingSenderId: "506903518720",
-    appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
-    measurementId: "G-TC2GZCD8K5"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-    <!-- Firebase Connection Indicator (visible test) -->
-<script>
-// Create a test element that shows connection status
-function showFirebaseStatus() {
-  const statusDiv = document.createElement('div');
-  statusDiv.id = 'firebase-status';
-  statusDiv.style.cssText = `
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 10px 15px;
-    background: #ff6b6b;
-    color: white;
-    border-radius: 5px;
-    font-weight: bold;
-    z-index: 9999;
-    font-size: 12px;
-  `;
-  statusDiv.textContent = '🔴 Firebase: Connecting...';
-  document.body.appendChild(statusDiv);
-  
-  // Test connection
-  setTimeout(() => {
-    db.ref('worksheets/Units-Measurements/test001').once('value')
-      .then(snapshot => {
-        statusDiv.style.background = '#00e5a0';
-        statusDiv.textContent = '🟢 Firebase: Connected!';
-        console.log('✓ Firebase working', snapshot.val());
-      })
-      .catch(error => {
-        statusDiv.style.background = '#ff6b6b';
-        statusDiv.textContent = '🔴 Firebase: Error - ' + error.message;
-        console.log('✗ Error:', error);
-      });
-  }, 1000);
-}
-
-// Run when page loads
-window.addEventListener('load', showFirebaseStatus);
-</script>
+    
 </head>
 <body>
 
