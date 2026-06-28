@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | CinePhysicsHQ</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
     <style>
         /* ==========================================================================
            CSS VARIABLES & RESET
@@ -150,12 +153,18 @@
             gap: 0.5rem;
             color: #000;
         }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
 
         .btn-gold {
             background-color: var(--gold);
         }
 
-        .btn-gold:hover {
+        .btn-gold:hover:not(:disabled) {
             background-color: var(--gold-hover);
             box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
         }
@@ -166,7 +175,7 @@
             border: 1px solid var(--gold);
         }
 
-        .btn-outline:hover {
+        .btn-outline:hover:not(:disabled) {
             background-color: rgba(212, 160, 23, 0.1);
         }
 
@@ -176,7 +185,7 @@
             border: 1px solid var(--danger);
         }
 
-        .btn-danger:hover {
+        .btn-danger:hover:not(:disabled) {
             background-color: rgba(255, 77, 77, 0.1);
         }
 
@@ -428,23 +437,24 @@
             </select>
             <select class="filter-select" id="filter-class">
                 <option value="">All Classes</option>
-                <option value="11">Class 11</option>
-                <option value="12">Class 12</option>
+                <option value="Class 11">Class 11</option>
+                <option value="Class 12">Class 12</option>
             </select>
             <select class="filter-select" id="filter-difficulty">
                 <option value="">All Difficulties</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
+                <option value="Basic">Basic</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Advanced">Advanced</option>
+                <option value="Mixed (Board Level)">Mixed (Board Level)</option>
             </select>
+            
             <button class="btn btn-gold" id="btn-refresh">
                 <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
                 Refresh
             </button>
         </section>
 
-        <section id="worksheet-container" class="worksheet-grid">
-            </section>
+        <section id="worksheet-container" class="worksheet-grid"></section>
     </main>
 
     <div id="toast-container"></div>
@@ -454,11 +464,9 @@
             <button class="close-modal" id="close-preview">&times;</button>
             <h2 id="preview-title" style="color: var(--gold); margin-bottom: 1rem;">Worksheet Preview</h2>
             
-            <div class="card-meta" style="margin-bottom: 1rem;" id="preview-meta">
-                </div>
+            <div class="card-meta" style="margin-bottom: 1rem;" id="preview-meta"></div>
 
-            <div class="preview-body" id="preview-body">
-                </div>
+            <div class="preview-body" id="preview-body"></div>
             
             <div class="modal-actions">
                 <button class="btn btn-outline" id="preview-btn-reject">Reject</button>
@@ -490,12 +498,10 @@
                 reject:  '/admin/reject',
                 delete:  '/admin/delete',
                 worksheet: '/worksheet',
-                stats: '/admin/stats' // NEW: Stats endpoint
+                stats: '/admin/stats' 
             },
-            // FUTURE READY: Place to easily grab auth tokens when implemented
             getHeaders: () => ({
-                'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` 
+                'Content-Type': 'application/json'
             })
         };
 
@@ -505,7 +511,6 @@
         const Utilities = {
             formatDate: (dateString) => {
                 if(!dateString) return 'N/A';
-                // Handles Firestore timestamps or ISO strings safely
                 const date = new Date(dateString); 
                 return isNaN(date) ? 'N/A' : date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
             },
@@ -551,7 +556,7 @@
                     if (!response.ok) throw new Error('Stats endpoint failed');
                     return await response.json();
                 } catch (error) {
-                    console.warn("Stats API not ready yet. Defaulting to zeros.", error);
+                    console.warn("Stats API error. Defaulting to zeros.", error);
                     return { pending: 0, approved: 0, rejected: 0, total: 0 };
                 }
             },
@@ -611,10 +616,17 @@
                 document.getElementById('close-preview').addEventListener('click', () => Modal.preview.close());
                 document.getElementById('confirm-cancel').addEventListener('click', () => Modal.confirm.close());
                 
-                document.getElementById('confirm-delete').addEventListener('click', async () => {
+                // FIXED 4: Add loading state to delete button
+                document.getElementById('confirm-delete').addEventListener('click', async (e) => {
                     if (Modal.currentDeleteId) {
-                        Modal.confirm.close();
+                        const btn = e.target;
+                        btn.disabled = true; // Disable button to prevent double-click
+                        
                         const success = await AdminAPI.action(CONFIG.endpoints.delete, Modal.currentDeleteId);
+                        
+                        btn.disabled = false; // Re-enable button
+                        Modal.confirm.close();
+                        
                         if (success) {
                             Toast.success('Deleted successfully');
                             Dashboard.loadData();
@@ -643,7 +655,7 @@
                 const metaEl = document.getElementById('preview-meta');
                 const bodyEl = document.getElementById('preview-body');
 
-                titleEl.textContent = cachedData.title || `Worksheet ${worksheetId}`;
+                titleEl.textContent = cachedData?.title || `Worksheet ${worksheetId}`;
                 bodyEl.innerHTML = `<div class="skeleton" style="height: 200px; width: 100%;"></div>`;
                 
                 Modal.preview.showModal();
@@ -658,7 +670,22 @@
                         <span><strong>Questions:</strong> ${data.questionCount || 0}</span>
                         <span><strong>Generated:</strong> ${Utilities.formatDate(data.generatedAt)}</span>
                     `;
-                    bodyEl.innerHTML = data.worksheetHTML || '<p style="color: var(--text-muted)">No HTML content provided.</p>';
+                    
+                    let html = data.worksheetHTML || "";
+                    html = html
+                        .replace(/color:\s*white/gi, "color:black")
+                        .replace(/color:\s*#fff/gi, "color:black")
+                        .replace(/color:\s*#ffffff/gi, "color:black");
+                    
+                    bodyEl.innerHTML = html;
+
+                    // FIXED 1: Safer MathJax Promise Loading
+                    if (window.MathJax?.startup?.promise) {
+                        MathJax.startup.promise
+                            .then(() => MathJax.typesetPromise([bodyEl]))
+                            .catch(console.error);
+                    }
+
                 } else {
                     bodyEl.innerHTML = '<p style="color: var(--danger)">Failed to load preview.</p>';
                 }
@@ -690,7 +717,6 @@
             },
 
             updateStats(stats) {
-                // Now consumes the object from the backend API
                 document.getElementById('stat-total').textContent = stats.total || 0;
                 document.getElementById('stat-pending').textContent = stats.pending || 0;
                 document.getElementById('stat-approved').textContent = stats.approved || 0;
@@ -733,7 +759,6 @@
                     </div>`;
                 }).join('');
 
-                // Attach event listeners mapping ID properly
                 document.querySelectorAll('.btn-preview').forEach(btn => 
                     btn.addEventListener('click', (e) => {
                         const worksheetId = e.target.dataset.id;
@@ -769,7 +794,8 @@
             },
 
             bindEvents() {
-                document.getElementById('btn-refresh').addEventListener('click', Dashboard.loadData);
+                // FIXED 2: Preserved execution context with an arrow function
+                document.getElementById('btn-refresh').addEventListener('click', () => Dashboard.loadData());
                 
                 const filterChangeHandler = () => Dashboard.applyFilters();
                 document.getElementById('filter-status').addEventListener('change', filterChangeHandler);
@@ -784,19 +810,15 @@
             async loadData() {
                 AdminUI.renderSkeletons();
                 
-                // Fetch stats and worksheets concurrently for performance
                 const [stats, response] = await Promise.all([
                     AdminAPI.fetchStats(),
                     AdminAPI.fetchPending()
                 ]);
 
-                // 1. Process Response Array
-                Dashboard.state.allData = (response && response.worksheets) ? response.worksheets : [];
+                // FIXED 3: Safer API response handling
+                Dashboard.state.allData = Array.isArray(response?.worksheets) ? response.worksheets : [];
                 
-                // 2. Update Stats
                 AdminUI.updateStats(stats);
-                
-                // 3. Render filtered UI
                 Dashboard.applyFilters();
             },
 
@@ -807,13 +829,18 @@
                 const diffF = document.getElementById('filter-difficulty').value;
 
                 Dashboard.state.filteredData = Dashboard.state.allData.filter(item => {
-                    // Adjusted search to match worksheetId
-                    const searchStr = `${item.worksheetId} ${item.title} ${item.chapter} ${item.topics?.join(' ')}`.toLowerCase();
+                    const searchStr = `
+                        ${item.worksheetId || ""}
+                        ${item.title || ""}
+                        ${item.chapter || ""}
+                        ${(item.topics || []).join(" ")}
+                    `.toLowerCase();
+                    
                     const matchesSearch = searchStr.includes(searchQ);
 
                     const matchesStatus = statusF ? (item.status || 'pending').toLowerCase() === statusF : true;
                     const matchesClass = classF ? String(item.className) === classF : true;
-                    const matchesDiff = diffF ? (item.difficulty || '').toLowerCase() === diffF : true;
+                    const matchesDiff = diffF ? (item.difficulty || '').toLowerCase() === diffF.toLowerCase() : true;
 
                     return matchesSearch && matchesStatus && matchesClass && matchesDiff;
                 });
@@ -827,8 +854,14 @@
                     'reject': CONFIG.endpoints.reject
                 };
 
+                // FIXED 4: Disable all buttons while the request is running
+                document.querySelectorAll("button").forEach(btn => btn.disabled = true);
+
                 const success = await AdminAPI.action(endpoints[actionType], worksheetId);
                 
+                // Re-enable buttons after the request completes
+                document.querySelectorAll("button").forEach(btn => btn.disabled = false);
+
                 if (success) {
                     Toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)}d successfully`);
                     Dashboard.loadData(); 
