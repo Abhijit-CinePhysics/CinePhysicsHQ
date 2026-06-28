@@ -153,7 +153,189 @@
         </section>
     </main>
 
-    <script type="module" src="js/ai-tutor.js"></script>
-    <script>lucide.createIcons();</script>
+    <script type="module">
+        // Updated import path assuming ai-tutor.html is in the root 
+        // and worksheet-ai.js is in the js folder
+        import { generateAIResponse } from './js/worksheet-ai.js';
+
+        const chatWindow = document.getElementById('chatWindow');
+        const promptInput = document.getElementById('promptInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+
+        // Initialize layout with the mockup messages exactly as shown in the image
+        function init() {
+            renderMockupMessages();
+            
+            // Auto-resize textarea
+            promptInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Keyboard shortcut
+            promptInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            });
+
+            sendBtn.addEventListener('click', handleSend);
+            clearChatBtn.addEventListener('click', () => {
+                chatWindow.innerHTML = '';
+            });
+        }
+
+        function renderMockupMessages() {
+            // 1. User Message: Explain Lorentz Force.
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg-row user';
+            userMsg.innerHTML = `
+                <div class="msg-bubble">
+                    <span>Explain Lorentz Force.</span>
+                    <div class="msg-meta">10:45 AM <i data-lucide="check-check"></i></div>
+                </div>
+            `;
+            
+            // 2. AI Message: The detailed response
+            const aiMsg = document.createElement('div');
+            aiMsg.className = 'msg-row ai';
+            aiMsg.innerHTML = `
+                <div class="ai-avatar-msg"><i data-lucide="bot"></i></div>
+                <div class="msg-bubble">
+                    <p style="margin-bottom: 1rem;">The <strong>Lorentz Force</strong> is the force experienced by a charged particle moving in an electromagnetic field. It is the combination of electric force and magnetic force acting on the charge.</p>
+                    
+                    <h4 style="color: var(--primary-cyan); font-weight: 600; margin-bottom: 0.5rem;">Formula</h4>
+                    <div class="formula-box">
+                        $$ \\vec{F} = q(\\vec{E} + \\vec{v} \\times \\vec{B}) $$
+                    </div>
+                    
+                    <div class="lorentz-layout">
+                        <div class="lorentz-vars">
+                            <p>Where,</p>
+                            <ul>
+                                <li>$\\vec{F}$ = Lorentz force (N)</li>
+                                <li>$q$ = charge of the particle (C)</li>
+                                <li>$\\vec{E}$ = electric field (N/C)</li>
+                                <li>$\\vec{v}$ = velocity of the charge (m/s)</li>
+                                <li>$\\vec{B}$ = magnetic field (T)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="lorentz-diagram">
+                            <svg viewBox="0 0 100 100" width="100%">
+                                <circle cx="20" cy="80" r="6" fill="none" stroke="var(--primary-cyan)" stroke-width="1.5"/>
+                                <text x="17" y="83" fill="var(--primary-cyan)" font-size="10">+</text>
+                                <line x1="20" y1="74" x2="20" y2="20" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+                                <text x="25" y="25" fill="#10b981" font-size="12">F</text>
+                                <line x1="26" y1="80" x2="80" y2="80" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arrow-yellow)"/>
+                                <text x="75" y="75" fill="#f59e0b" font-size="12">v</text>
+                                <line x1="16" y1="84" x2="5" y2="95" stroke="var(--primary-cyan)" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+                                <text x="5" y="90" fill="var(--primary-cyan)" font-size="12">B</text>
+                                
+                                <defs>
+                                    <marker id="arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981" />
+                                    </marker>
+                                    <marker id="arrow-yellow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" />
+                                    </marker>
+                                    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                                      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--primary-cyan)" />
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="ai-actions">
+                        <div class="action-icons">
+                            <button class="icon-btn"><i data-lucide="copy"></i></button>
+                            <button class="icon-btn"><i data-lucide="thumbs-up"></i></button>
+                            <button class="icon-btn"><i data-lucide="thumbs-down"></i></button>
+                        </div>
+                        <div class="msg-meta">10:46 AM</div>
+                    </div>
+                </div>
+            `;
+
+            chatWindow.appendChild(userMsg);
+            chatWindow.appendChild(aiMsg);
+            
+            // Render Icons & Math
+            lucide.createIcons({ root: chatWindow });
+            if (window.MathJax) {
+                MathJax.typesetPromise([chatWindow]);
+            }
+        }
+
+        async function handleSend() {
+            const text = promptInput.value.trim();
+            if (!text) return;
+
+            // Reset input
+            promptInput.value = '';
+            promptInput.style.height = 'auto';
+
+            // Get current time
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            // 1. Add User Message
+            const userMsg = document.createElement('div');
+            userMsg.className = 'msg-row user';
+            userMsg.innerHTML = `
+                <div class="msg-bubble">
+                    <span>${text}</span>
+                    <div class="msg-meta">${timeStr} <i data-lucide="check-check"></i></div>
+                </div>
+            `;
+            chatWindow.appendChild(userMsg);
+            lucide.createIcons({ root: userMsg });
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // 2. Call Mock Backend (Using your existing worksheet-ai.js integration)
+            try {
+                const responseText = await generateAIResponse(text, "System Prompt", []);
+                
+                const aiMsg = document.createElement('div');
+                aiMsg.className = 'msg-row ai';
+                
+                // Parse markdown 
+                const htmlContent = marked.parse(responseText);
+
+                aiMsg.innerHTML = `
+                    <div class="ai-avatar-msg"><i data-lucide="bot"></i></div>
+                    <div class="msg-bubble">
+                        ${htmlContent}
+                        <div class="ai-actions">
+                            <div class="action-icons">
+                                <button class="icon-btn"><i data-lucide="copy"></i></button>
+                                <button class="icon-btn"><i data-lucide="thumbs-up"></i></button>
+                                <button class="icon-btn"><i data-lucide="thumbs-down"></i></button>
+                            </div>
+                            <div class="msg-meta">${timeStr}</div>
+                        </div>
+                    </div>
+                `;
+                
+                chatWindow.appendChild(aiMsg);
+                lucide.createIcons({ root: aiMsg });
+                if (window.MathJax) {
+                    MathJax.typesetPromise([aiMsg]);
+                }
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            } catch (error) {
+                console.error("Engine connection error", error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Initialize static icons outside the dynamic chat
+        lucide.createIcons();
+    </script>
 </body>
 </html>
