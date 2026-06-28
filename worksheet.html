@@ -1,0 +1,2400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="description" content="Open a CinePhysicsHQ worksheet with a focused, printable reading experience.">
+    <link rel="canonical" href="">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="CinePhysicsHQ Worksheet">
+    <meta property="og:description" content="Open a CinePhysicsHQ worksheet with a focused, printable reading experience.">
+    <meta property="og:url" content="">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CinePhysicsHQ Worksheet">
+    <meta name="twitter:description" content="Open a CinePhysicsHQ worksheet with a focused, printable reading experience.">
+    <title>CinePhysicsHQ Worksheet</title>
+    <style>
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --bg-soft: #111111;
+  --panel: rgba(22, 22, 22, 0.78);
+  --panel-strong: rgba(30, 30, 30, 0.92);
+  --text: #f6f1e6;
+  --muted: #c9c0ac;
+  --subtle: #8f8879;
+  --gold: #d4a017;
+  --gold-soft: rgba(212, 160, 23, 0.18);
+  --border: rgba(255, 255, 255, 0.13);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  --radius: 8px;
+  --max: 1120px;
+  --focus: 0 0 0 3px rgba(212, 160, 23, 0.42);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fbfaf7;
+  --bg-soft: #f1eee7;
+  --panel: rgba(255, 255, 255, 0.86);
+  --panel-strong: rgba(255, 255, 255, 0.96);
+  --text: #17140e;
+  --muted: #514a3c;
+  --subtle: #756e60;
+  --gold-soft: rgba(212, 160, 23, 0.16);
+  --border: rgba(23, 20, 14, 0.13);
+  --shadow: 0 22px 54px rgba(43, 35, 20, 0.13);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(212, 160, 23, 0.12), transparent 28rem),
+    linear-gradient(135deg, var(--bg) 0%, var(--bg-soft) 100%);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+
+body.is-focus-mode .hero,
+body.is-focus-mode .toc,
+body.is-focus-mode .questions,
+body.is-focus-mode .related {
+  display: none;
+}
+
+body.is-focus-mode .page-shell {
+  display: block;
+  max-width: 860px;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 20;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.7rem 0.95rem;
+  transform: translateY(-140%);
+  border-radius: var(--radius);
+  background: var(--gold);
+  color: #151008;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.progress-track {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  background: var(--gold);
+  transform-origin: left center;
+  transition: width 160ms ease;
+}
+
+.hero {
+  padding: 4.5rem 1rem 2.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero__inner {
+  width: min(100%, var(--max));
+  margin: 0 auto;
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-bottom: 1.3rem;
+  color: var(--subtle);
+  font-size: 0.9rem;
+}
+
+.crumbs a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.crumbs a:hover {
+  color: var(--gold);
+}
+
+.hero__eyebrow {
+  margin-bottom: 0.75rem;
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 980px;
+  margin: 0;
+  font-size: clamp(2.35rem, 8vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: 0;
+}
+
+.hero__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.7rem;
+}
+
+.meta-chip,
+.related-card,
+.stat-chip {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.meta-chip {
+  min-width: 0;
+  padding: 0.85rem 0.95rem;
+}
+
+.meta-chip span {
+  display: block;
+  color: var(--subtle);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.meta-chip strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: 0.98rem;
+}
+
+.meta-chip--badge strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.toolbar-wrap {
+  position: sticky;
+  z-index: 15;
+  top: 4px;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.84), rgba(10, 10, 10, 0.54));
+  backdrop-filter: blur(18px);
+}
+
+:root[data-theme="light"] .toolbar-wrap {
+  background: linear-gradient(180deg, rgba(251, 250, 247, 0.9), rgba(251, 250, 247, 0.62));
+}
+
+.toolbar {
+  width: min(100%, var(--max));
+  margin: 0 auto;
+}
+
+.toolbar__toggle,
+.toolbar__actions button,
+.toolbar__link,
+.error-actions button,
+.search-panel button,
+.resume-card button {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-strong);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 750;
+  text-decoration: none;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.toolbar__toggle:hover,
+.toolbar__actions button:hover,
+.toolbar__link:hover,
+.error-actions button:hover,
+.search-panel button:hover,
+.resume-card button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(212, 160, 23, 0.62);
+}
+
+.toolbar__toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+}
+
+.toolbar__actions {
+  display: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+}
+
+.toolbar.is-open .toolbar__actions {
+  display: grid;
+}
+
+.toolbar__actions button,
+.toolbar__link {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.75rem;
+  text-align: center;
+}
+
+.toolbar__actions [aria-pressed="true"] {
+  border-color: rgba(212, 160, 23, 0.76);
+  background: var(--gold-soft);
+  color: var(--gold);
+}
+
+.page-shell {
+  display: grid;
+  width: min(100% - 2rem, var(--max));
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 1rem auto 4rem;
+}
+
+.status-panel,
+.worksheet-card,
+.toc,
+.questions,
+.related {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.status-panel {
+  padding: 1rem;
+}
+
+.status-panel[hidden] {
+  display: none;
+}
+
+.skeleton {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.skeleton__line,
+.skeleton__block,
+.skeleton__grid div {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.skeleton__line {
+  width: 65%;
+  height: 1.15rem;
+}
+
+.skeleton__line--wide {
+  width: 88%;
+  height: 2.2rem;
+}
+
+.skeleton__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.7rem;
+}
+
+.skeleton__grid div {
+  height: 4rem;
+}
+
+.skeleton__block {
+  height: 18rem;
+}
+
+.skeleton__line::after,
+.skeleton__block::after,
+.skeleton__grid div::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-100%);
+  animation: shimmer 1.35s infinite;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+}
+
+.error-box {
+  display: grid;
+  gap: 0.7rem;
+  padding: 1rem;
+}
+
+.error-box h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.error-box p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.error-actions button {
+  padding: 0.65rem 0.9rem;
+}
+
+.toc,
+.questions {
+  padding: 1rem;
+}
+
+.toc h2,
+.questions h2,
+.related h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+}
+
+.toc ol,
+.questions ol {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toc a,
+.questions a {
+  display: block;
+  border-left: 3px solid transparent;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.toc a:hover,
+.toc a.is-active,
+.questions a:hover,
+.questions a.is-active {
+  border-left-color: var(--gold);
+  background: var(--gold-soft);
+  color: var(--text);
+}
+
+.toc a[data-level="3"] {
+  padding-left: 1.25rem;
+  font-size: 0.94rem;
+}
+
+.worksheet-card {
+  overflow: hidden;
+}
+
+.worksheet-content {
+  min-width: 0;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  font-size: var(--reader-font-size, 1rem);
+  line-height: var(--reader-line-height, 1.65);
+  overflow-wrap: break-word;
+}
+
+.worksheet-content > *:first-child {
+  margin-top: 0;
+}
+
+.worksheet-content h1,
+.worksheet-content h2,
+.worksheet-content h3,
+.worksheet-content h4 {
+  scroll-margin-top: 7.5rem;
+  line-height: 1.18;
+}
+
+.worksheet-content h2 {
+  margin-top: 2.2rem;
+  color: var(--gold);
+}
+
+.worksheet-content a {
+  color: var(--gold);
+}
+
+.worksheet-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  break-inside: avoid;
+}
+
+.worksheet-content table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.worksheet-content .table-scroll {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.worksheet-content thead {
+  display: table-header-group;
+}
+
+.worksheet-content th,
+.worksheet-content td {
+  border: 1px solid var(--border);
+  padding: 0.65rem;
+  vertical-align: top;
+}
+
+.worksheet-content th {
+  background: var(--gold-soft);
+  color: var(--text);
+  text-align: left;
+}
+
+.worksheet-content pre,
+.worksheet-content code {
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+
+.worksheet-content figure,
+.worksheet-content mjx-container,
+.worksheet-content .MathJax {
+  break-inside: avoid;
+}
+
+.worksheet-content mark.search-mark {
+  border-radius: 0.2rem;
+  background: rgba(212, 160, 23, 0.38);
+  color: inherit;
+  padding: 0 0.12rem;
+}
+
+.worksheet-content mark.search-mark.is-active {
+  background: var(--gold);
+  color: #151008;
+}
+
+.worksheet-content .question-anchor {
+  scroll-margin-top: 7.5rem;
+}
+
+.related {
+  padding: 1rem;
+}
+
+.related__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.8rem;
+}
+
+.related-card {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  padding: 0.9rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.related-card strong {
+  overflow-wrap: anywhere;
+}
+
+.related-card span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.back-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 14;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0.75rem;
+  transform: translateY(140%);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--gold);
+  color: #151008;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  font-weight: 900;
+  opacity: 0;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.back-to-top.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.search-panel,
+.resume-card {
+  position: fixed;
+  z-index: 25;
+  right: 1rem;
+  left: 1rem;
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.search-panel {
+  top: 4.2rem;
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem;
+}
+
+.search-panel[hidden],
+.resume-card[hidden] {
+  display: none;
+}
+
+.search-panel label {
+  font-size: 0.82rem;
+  font-weight: 850;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.search-panel__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+.search-panel input {
+  min-height: 44px;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  color: var(--text);
+  padding: 0.65rem 0.75rem;
+}
+
+.search-panel p,
+.resume-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.resume-card {
+  bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem;
+}
+
+.resume-card div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.resume-card button,
+.search-panel button {
+  padding: 0.55rem 0.8rem;
+}
+
+.pdf-export {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 794px;
+  min-height: 1123px;
+  background: #ffffff;
+  color: #111111;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.55;
+}
+
+.pdf-export__header,
+.pdf-export__footer {
+  display: flex;
+  justify-content: space-between;
+  border-color: #dddddd;
+  color: #3b3426;
+  font-size: 0.82rem;
+}
+
+.pdf-export__header {
+  border-bottom: 1px solid #dddddd;
+  padding: 0 0 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.pdf-export__footer {
+  border-top: 1px solid #dddddd;
+  padding: 0.75rem 0 0;
+  margin-top: 1rem;
+}
+
+.fade-in {
+  animation: fadeIn 260ms ease both;
+}
+
+@media (min-width: 760px) {
+  .toolbar__toggle {
+    display: none;
+  }
+
+  .toolbar__actions {
+    display: flex;
+    flex-wrap: wrap;
+    padding-top: 0;
+  }
+
+  .page-shell {
+    grid-template-columns: 240px minmax(0, 1fr) 190px;
+    align-items: start;
+  }
+
+  .status-panel,
+  .worksheet-card,
+  .related {
+    grid-column: 2 / 3;
+  }
+
+  .toc {
+    position: sticky;
+    top: 5.8rem;
+    grid-column: 1;
+  }
+
+  .questions {
+    position: sticky;
+    top: 5.8rem;
+    grid-column: 3;
+  }
+
+  .toc[hidden] + .worksheet-card,
+  .toc[hidden] ~ .related,
+  .page-shell > .status-panel:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .search-panel__row {
+    grid-template-columns: minmax(220px, 1fr) auto auto auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .hero {
+    padding-top: 3.3rem;
+  }
+
+  .hero__meta,
+  .skeleton__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .page-shell {
+    width: min(100% - 1rem, var(--max));
+  }
+
+  .search-panel,
+  .resume-card {
+    right: 0.5rem;
+    left: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@page {
+  margin: 16mm;
+}
+
+@media print {
+  :root {
+    color-scheme: light;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+
+  .skip-link,
+  .progress-track,
+  .toolbar-wrap,
+  .toc,
+  .questions,
+  .related,
+  .back-to-top,
+  .search-panel,
+  .resume-card,
+  .status-panel,
+  button {
+    display: none !important;
+  }
+
+  .hero {
+    padding: 0 0 1rem;
+    border-bottom: 1px solid #cccccc;
+  }
+
+  .page-shell {
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
+
+  .worksheet-card {
+    border: 0;
+    box-shadow: none;
+  }
+
+  .worksheet-content {
+    padding: 0;
+  }
+
+  .worksheet-content h2 {
+    break-before: page;
+  }
+
+  .worksheet-content table,
+  .worksheet-content tr,
+  .worksheet-content img,
+  .worksheet-content figure,
+  .worksheet-content mjx-container,
+  .worksheet-content pre {
+    break-inside: avoid;
+  }
+
+  .worksheet-content thead {
+    display: table-header-group;
+  }
+
+  .worksheet-content tfoot {
+    display: table-footer-group;
+  }
+}
+
+/* AI Assistant Styles */
+.ai-btn-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold);
+  background: var(--gold-soft);
+  border: 1px solid rgba(212, 160, 23, 0.4);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  vertical-align: middle;
+}
+
+.ai-btn-inline:hover {
+  background: var(--gold);
+  color: #151008;
+}
+
+.ai-panel {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background: var(--panel-strong);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 300ms ease;
+}
+
+.ai-panel.is-open {
+  transform: translateX(0);
+}
+
+.ai-panel[hidden] {
+  display: none;
+}
+
+.ai-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-panel__header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.ai-panel__header button {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  padding: 0.5rem;
+}
+
+.ai-panel__content {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.ai-panel__context {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--gold);
+}
+
+.ai-panel__actions {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ai-panel__actions button {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text);
+  text-align: left;
+  font-weight: 600;
+  transition: border-color 150ms ease;
+}
+
+.ai-panel__actions button:hover {
+  border-color: var(--gold);
+}
+
+.ai-panel__response {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js" defer></script>
+    <script>
+"use strict";
+
+/* Utilities */
+class Utils {
+  /** Returns the current worksheet id from the URL query string. */
+  static getWorksheetId() {
+    return new URLSearchParams(window.location.search).get("id")?.trim() || "";
+  }
+
+  /** Produces a safe text value for API fields that may be missing or malformed. */
+  static text(value, fallback = "Not specified") {
+    return typeof value === "string" && value.trim() ? value.trim() : fallback;
+  }
+
+  /** Produces a safe number-like label for API fields that may be missing. */
+  static count(value, fallback = "Not specified") {
+    return Number.isFinite(Number(value)) && Number(value) >= 0 ? String(Number(value)) : fallback;
+  }
+
+  /** Parses a date value and returns a reader-friendly label. */
+  static date(value) {
+    const date = value ? new Date(value) : null;
+    if (!date || Number.isNaN(date.getTime())) return "Not specified";
+    return new Intl.DateTimeFormat("en", { year: "numeric", month: "short", day: "numeric" }).format(date);
+  }
+
+  /** Estimates reading minutes from plain text content. */
+  static readingTime(html) {
+    const text = Utils.htmlToText(html);
+    const words = text.split(/\s+/).filter(Boolean).length;
+    const minutes = Math.max(1, Math.ceil(words / 220));
+    return `${minutes} min read`;
+  }
+
+  /** Converts HTML into plain text without executing scripts. */
+  static htmlToText(html) {
+    const doc = new DOMParser().parseFromString(String(html || ""), "text/html");
+    return doc.body.textContent || "";
+  }
+
+  /** Creates a stable slug from heading text. */
+  static slug(text, index) {
+    const base = String(text || "section").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    return `${base || "section"}-${index}`;
+  }
+
+  /** Debounces frequent UI work to reduce layout churn. */
+  static debounce(callback, delay = 120) {
+    let timer = 0;
+    return (...args) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => callback(...args), delay);
+    };
+  }
+
+  /** Safely writes plain text into a DOM node. */
+  static setText(node, value) {
+    if (node) node.textContent = value;
+  }
+
+  /** Creates an element with optional class names and text content. */
+  static el(tag, className = "", text = "") {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  /** Returns true when worksheet HTML includes TeX-style math delimiters. */
+  static needsMathJax(content) {
+    return /\\\(|\\\[|\$\$/.test(String(content || ""));
+  }
+
+  /** Normalizes a string for case-insensitive matching. */
+  static key(value) {
+    return Utils.text(value, "").toLowerCase();
+  }
+
+  /** Escapes text for use in a regular expression. */
+  static escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  /** Produces a safe download filename for worksheet exports. */
+  static filename(data, id) {
+    const parts = [data.className, data.chapter, data.title || id]
+      .map((part) => Utils.text(part, "").replace(/[^a-z0-9]+/gi, ""))
+      .filter(Boolean);
+    return `${parts.join("-") || `Worksheet-${id}`}.pdf`;
+  }
+}
+
+/* Analytics */
+class Analytics {
+  /** Sends an analytics event only when gtag is available. */
+  static track(name, params = {}) {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", name, params);
+    }
+  }
+}
+
+/* Storage */
+class StorageService {
+  /** Reads a JSON value from localStorage without throwing. */
+  static get(key, fallback = null) {
+    try {
+      const raw = window.localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  /** Writes a JSON value to localStorage without interrupting the UI. */
+  static set(key, value) {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  /** Returns the cache key for a worksheet id. */
+  static worksheetKey(id) {
+    return `worksheet_${id}`;
+  }
+
+  /** Returns the reading position key for a worksheet id. */
+  static scrollKey(id) {
+    return `worksheet_scroll_${id}`;
+  }
+
+  /** Reads a cached worksheet payload by id. */
+  static getWorksheet(id) {
+    return StorageService.get(StorageService.worksheetKey(id));
+  }
+
+  /** Saves a worksheet payload by id. */
+  static setWorksheet(id, data) {
+    return StorageService.set(StorageService.worksheetKey(id), { data, cachedAt: Date.now() });
+  }
+
+  /** Lists cached worksheets for fallback related content discovery. */
+  static listWorksheets() {
+    const items = [];
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+      const key = window.localStorage.key(index);
+      if (key && key.startsWith("worksheet_") && !key.startsWith("worksheet_scroll_")) {
+        const item = StorageService.get(key);
+        if (item?.data) items.push(item.data);
+      }
+    }
+    return items;
+  }
+
+  /** Saves the current scroll position for a worksheet. */
+  static setScroll(id, position) {
+    return StorageService.set(StorageService.scrollKey(id), { position, savedAt: Date.now() });
+  }
+
+  /** Reads the saved scroll position for a worksheet. */
+  static getScroll(id) {
+    return StorageService.get(StorageService.scrollKey(id));
+  }
+
+  /** Reads the saved bookmark id list. */
+  static bookmarks() {
+    return StorageService.get("cinephysics_bookmarks", []);
+  }
+
+  /** Checks whether a worksheet id is bookmarked. */
+  static isBookmarked(id) {
+    return StorageService.bookmarks().includes(id);
+  }
+
+  /** Toggles a worksheet bookmark and returns the new state. */
+  static toggleBookmark(id) {
+    const bookmarks = StorageService.bookmarks();
+    const next = bookmarks.includes(id) ? bookmarks.filter((item) => item !== id) : [...bookmarks, id];
+    StorageService.set("cinephysics_bookmarks", next);
+    return next.includes(id);
+  }
+}
+
+/* API */
+class WorksheetAPI {
+  /** Selects the correct API origin for development or production. */
+  static origin() {
+    const isLocal = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
+    return isLocal ? "http://localhost:3000" : "https://cinephysics-api.vercel.app";
+  }
+
+  /** Builds a fully qualified API URL. */
+  static url(path, params = {}) {
+    const url = new URL(path, WorksheetAPI.origin());
+    Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+    return url.href;
+  }
+
+  /** Fetches JSON with timeout and abort support. */
+  static async fetchJSON(url, timeoutMs = 10000) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { signal: controller.signal, headers: { Accept: "application/json" } });
+      if (response.status === 404) throw new WorksheetError("Worksheet not found", "not-found");
+      if (!response.ok) throw new WorksheetError("Server error", "server");
+      return await response.json();
+    } catch (error) {
+      if (error.name === "AbortError") throw new WorksheetError("Server timeout", "timeout");
+      if (!navigator.onLine) throw new WorksheetError("Offline mode", "offline");
+      if (error instanceof WorksheetError) throw error;
+      throw new WorksheetError("Unable to load worksheet", "network");
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+
+  /** Fetches a worksheet by id. */
+  static fetchWorksheet(id) {
+    return WorksheetAPI.fetchJSON(WorksheetAPI.url("/api/worksheet", { id }));
+  }
+
+  /** Fetches the worksheet library for API-backed related worksheets. */
+  static fetchWorksheets() {
+    return WorksheetAPI.fetchJSON(WorksheetAPI.url("/api/worksheets"), 8000);
+  }
+
+  /** Fetches backend worksheet statistics when the endpoint is available. */
+  static fetchStats(id) {
+    return WorksheetAPI.fetchJSON(WorksheetAPI.url("/api/worksheet/stats", { id }), 6000);
+  }
+
+  /** Sends a backend metric event without blocking the UI. */
+  static trackMetric(id, event) {
+    fetch(WorksheetAPI.url("/api/worksheet/stats", { id }), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event }),
+      keepalive: true
+    }).catch(() => {});
+  }
+}
+
+/* Error type */
+class WorksheetError extends Error {
+  /** Creates a typed worksheet loading error. */
+  constructor(message, code) {
+    super(message);
+    this.code = code;
+  }
+}
+
+/* Security */
+class Sanitizer {
+  /** Sanitizes trusted worksheet HTML with DOMPurify when available and a strict fallback otherwise. */
+  static worksheetHTML(html) {
+    const dirty = String(html || "");
+    if (window.DOMPurify?.sanitize) {
+      return window.DOMPurify.sanitize(dirty, {
+        USE_PROFILES: { html: true },
+        ADD_TAGS: ["mjx-container"],
+        ADD_ATTR: ["aria-label", "aria-hidden", "role", "data-question-number"],
+        FORBID_TAGS: ["script", "iframe", "object", "embed", "form", "input", "button"],
+        FORBID_ATTR: ["srcdoc"]
+      });
+    }
+    const doc = new DOMParser().parseFromString(dirty, "text/html");
+    doc.querySelectorAll("script, iframe, object, embed, form, input, button, link[rel='import']").forEach((node) => node.remove());
+    doc.querySelectorAll("*").forEach((node) => {
+      [...node.attributes].forEach((attr) => {
+        const name = attr.name.toLowerCase();
+        const value = attr.value.trim().toLowerCase();
+        if (name.startsWith("on") || value.startsWith("javascript:") || value.startsWith("data:text/html") || name === "srcdoc") {
+          node.removeAttribute(attr.name);
+        }
+      });
+    });
+    return doc.body.innerHTML;
+  }
+}
+
+/* SEO */
+class SEOManager {
+  /** Updates document metadata, social tags, canonical URL, and JSON-LD. */
+  static update(data, id) {
+    const title = `${Utils.text(data.title, "Worksheet")} | CinePhysicsHQ`;
+    const description = `${Utils.text(data.className, "Class")} ${Utils.text(data.chapter, "chapter")} worksheet with ${Utils.count(data.questionCount, "multiple")} questions.`;
+    const url = new URL(window.location.href);
+    url.searchParams.set("id", id);
+
+    document.title = title;
+    SEOManager.setMeta("name", "description", description);
+    SEOManager.setMeta("property", "og:title", title);
+    SEOManager.setMeta("property", "og:description", description);
+    SEOManager.setMeta("property", "og:url", url.href);
+    SEOManager.setMeta("name", "twitter:title", title);
+    SEOManager.setMeta("name", "twitter:description", description);
+    SEOManager.setCanonical(url.href);
+    SEOManager.setJsonLd(data, url.href);
+  }
+
+  /** Sets or creates a meta tag by attribute and value. */
+  static setMeta(attribute, key, content) {
+    let node = document.head.querySelector(`meta[${attribute}="${key}"]`);
+    if (!node) {
+      node = document.createElement("meta");
+      node.setAttribute(attribute, key);
+      document.head.appendChild(node);
+    }
+    node.setAttribute("content", content);
+  }
+
+  /** Sets the canonical link href. */
+  static setCanonical(href) {
+    const node = document.head.querySelector("link[rel='canonical']");
+    if (node) node.setAttribute("href", href);
+  }
+
+  /** Writes JSON-LD for educational worksheet search context. */
+  static setJsonLd(data, url) {
+    document.getElementById("worksheet-jsonld")?.remove();
+    const script = document.createElement("script");
+    script.id = "worksheet-jsonld";
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "EducationalCreativeWork",
+      name: Utils.text(data.title, "CinePhysicsHQ Worksheet"),
+      educationalLevel: Utils.text(data.className, "School"),
+      about: Utils.text(data.chapter, "Physics"),
+      learningResourceType: "Worksheet",
+      datePublished: data.generatedAt || undefined,
+      url
+    });
+    document.head.appendChild(script);
+  }
+}
+
+/* PDF */
+class PDFService {
+  /** Exports the worksheet through html2pdf.js when present or loaded, then falls back to print. */
+  static async export(app) {
+    Analytics.track("worksheet_download", { worksheet_id: app.id });
+    WorksheetAPI.trackMetric(app.id, "download");
+    try {
+      await PDFService.ensureLibrary();
+      if (!window.html2pdf) throw new Error("PDF library unavailable");
+      const wrapper = PDFService.createPrintableClone(app);
+      await window.html2pdf()
+        .set({
+          margin: [16, 12, 18, 12],
+          filename: Utils.filename(app.data || {}, app.id),
+          image: { type: "jpeg", quality: 0.96 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+          pagebreak: { mode: ["css", "legacy"], avoid: ["tr", "figure", "mjx-container"] }
+        })
+        .from(wrapper)
+        .save();
+      wrapper.remove();
+    } catch {
+      window.print();
+    }
+  }
+
+  /** Loads html2pdf.js on demand for real PDF downloads. */
+  static ensureLibrary() {
+    if (window.html2pdf) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const existing = document.querySelector("script[data-html2pdf]");
+      if (existing) {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js";
+      script.async = true;
+      script.dataset.html2pdf = "true";
+      script.addEventListener("load", resolve, { once: true });
+      script.addEventListener("error", reject, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  /** Creates a branded clone for PDF export without mutating the reader view. */
+  static createPrintableClone(app) {
+    const wrapper = Utils.el("section", "pdf-export");
+    const header = Utils.el("header", "pdf-export__header");
+    header.append(Utils.el("strong", "", "CinePhysicsHQ"), Utils.el("span", "", Utils.text(app.data?.title, "Worksheet")));
+    const content = app.content.cloneNode(true);
+    const footer = Utils.el("footer", "pdf-export__footer", "CinePhysicsHQ worksheet export");
+    wrapper.append(header, content, footer);
+    document.body.appendChild(wrapper);
+    return wrapper;
+  }
+}
+
+/* Rendering */
+class WorksheetRenderer {
+  /** Creates a renderer bound to the document UI. */
+  constructor(app) {
+    this.app = app;
+    this.headingObserver = null;
+    this.imageObserver = null;
+    this.questionObserver = null;
+  }
+
+  /** Renders worksheet metadata and content. */
+  render(data, fromCache = false) {
+    this.app.data = data;
+    this.app.search.clear(false);
+    this.renderHero(data);
+    this.renderContent(data);
+    this.renderTOC();
+    this.renderQuestions();
+    this.app.applyReaderPrefs();
+    this.app.updateBookmarkState();
+    SEOManager.update(data, this.app.id);
+    this.app.status.hidden = true;
+    this.app.card.hidden = false;
+    this.app.card.classList.add("fade-in");
+    if (!fromCache) StorageService.setWorksheet(this.app.id, data);
+    if (Utils.needsMathJax(data.content)) this.loadMathJax();
+    this.app.loadRelated(data);
+    this.app.loadStats();
+    this.app.offerResume();
+  }
+
+  /** Renders the hero title and stat chips with escaped text only. */
+  renderHero(data, stats = null) {
+    Utils.setText(this.app.title, Utils.text(data.title, "Untitled worksheet"));
+    Utils.setText(this.app.classLabel, Utils.text(data.className, "Class not specified"));
+    const items = [
+      ["Class", Utils.text(data.className)],
+      ["Chapter", Utils.text(data.chapter)],
+      ["Board", Utils.text(data.board)],
+      ["Difficulty", Utils.text(data.difficulty), true],
+      ["Questions", Utils.count(data.questionCount)],
+      ["Estimated Time", Utils.text(data.estimatedTime)],
+      ["Published", Utils.date(data.generatedAt)],
+      ["Reading Time", Utils.readingTime(data.content)]
+    ];
+    if (stats) {
+      items.push(["Views", Utils.count(stats.views, "0")], ["Downloads", Utils.count(stats.downloads, "0")], ["Likes", Utils.count(stats.likes, "0")]);
+    }
+    const fragment = document.createDocumentFragment();
+    items.forEach(([label, value, badge]) => {
+      const chip = Utils.el("div", badge ? "meta-chip meta-chip--badge" : "meta-chip");
+      chip.append(Utils.el("span", "", label), Utils.el("strong", "", value));
+      fragment.appendChild(chip);
+    });
+    this.app.meta.replaceChildren(fragment);
+  }
+
+  /** Sanitizes and renders worksheet HTML in the content surface. */
+  renderContent(data) {
+    this.app.content.innerHTML = Sanitizer.worksheetHTML(data.content || "<p>Worksheet content is unavailable.</p>");
+    this.prepareContentImages();
+    this.prepareTables();
+  }
+
+  /** Wraps wide tables and preserves header repetition for print/PDF. */
+  prepareTables() {
+    [...this.app.content.querySelectorAll("table")].forEach((table) => {
+      if (!table.parentElement?.classList.contains("table-scroll")) {
+        const wrapper = Utils.el("div", "table-scroll");
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+      if (!table.querySelector("thead")) {
+        const firstRow = table.querySelector("tr");
+        if (firstRow?.querySelector("th")) {
+          const thead = document.createElement("thead");
+          thead.appendChild(firstRow);
+          table.insertBefore(thead, table.firstChild);
+        }
+      }
+    });
+  }
+
+  /** Builds a table of contents from h2 and h3 headings. */
+  renderTOC() {
+    const headings = [...this.app.content.querySelectorAll("h2, h3")];
+    if (!headings.length) {
+      this.app.toc.hidden = true;
+      this.app.tocList.replaceChildren();
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    headings.forEach((heading, index) => {
+      if (!heading.id) heading.id = Utils.slug(heading.textContent, index);
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = `#${heading.id}`;
+      link.dataset.level = heading.tagName === "H3" ? "3" : "2";
+      link.textContent = heading.textContent || `Section ${index + 1}`;
+      item.appendChild(link);
+      fragment.appendChild(item);
+    });
+    this.app.tocList.replaceChildren(fragment);
+    this.app.toc.hidden = false;
+    this.app.toc.classList.add("fade-in");
+    this.observeHeadings(headings);
+  }
+
+  /** Detects numbered questions and creates a question navigator and AI buttons. */
+  renderQuestions() {
+    const candidates = [...this.app.content.querySelectorAll("p, li, h2, h3, h4")];
+    const seen = new Set();
+    const questions = [];
+    
+    candidates.forEach((node) => {
+      const text = (node.textContent || "").trim();
+      const match = text.match(/^(?:Q(?:uestion)?\.?\s*)?(\d{1,3})(?:[\).:-]|\s+)\s*/i);
+      if (!match || seen.has(match[1])) return;
+      
+      seen.add(match[1]);
+      node.classList.add("question-anchor");
+      node.id = node.id || `question-${match[1]}`;
+      questions.push({ id: node.id, label: `Question ${match[1]}` });
+
+      // Inject the AI button directly into the DOM next to the question text
+      const aiBtn = Utils.el("button", "ai-btn-inline", "🤖 Ask AI");
+      aiBtn.type = "button";
+      aiBtn.dataset.questionText = text; // Store the text for the AI context
+      node.appendChild(aiBtn);
+    });
+
+    if (!questions.length) {
+      this.app.questions.hidden = true;
+      this.app.questionsList.replaceChildren();
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    questions.forEach((question) => {
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = `#${question.id}`;
+      link.textContent = question.label;
+      item.appendChild(link);
+      fragment.appendChild(item);
+    });
+    this.app.questionsList.replaceChildren(fragment);
+    this.app.questions.hidden = false;
+    this.observeQuestions(candidates.filter((node) => node.classList.contains("question-anchor")));
+  }
+
+  /** Renders related worksheets from an API result or cached fallback. */
+  renderRelated(data, worksheets) {
+    const related = worksheets
+      .filter((item) => Utils.text(item.worksheetId || item.id, "") !== this.app.id)
+      .filter((item) => Utils.key(item.className) === Utils.key(data.className))
+      .filter((item) => Utils.key(item.chapter) === Utils.key(data.chapter))
+      .sort((a, b) => new Date(b.generatedAt || b.createdAt || 0) - new Date(a.generatedAt || a.createdAt || 0))
+      .slice(0, 4);
+    if (!related.length) {
+      this.app.related.hidden = true;
+      this.app.relatedList.replaceChildren();
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    related.forEach((item) => {
+      const id = Utils.text(item.worksheetId || item.id, "");
+      const link = Utils.el("a", "related-card");
+      link.href = `worksheet.html?id=${encodeURIComponent(id)}`;
+      link.append(
+        Utils.el("strong", "", Utils.text(item.title, "Untitled worksheet")),
+        Utils.el("span", "", `${Utils.text(item.className)} - ${Utils.text(item.chapter)}`),
+        Utils.el("span", "", Utils.date(item.generatedAt || item.createdAt))
+      );
+      fragment.appendChild(link);
+    });
+    this.app.relatedList.replaceChildren(fragment);
+    this.app.related.hidden = false;
+    this.app.related.classList.add("fade-in");
+  }
+
+  /** Adds lazy loading and safe alt text to worksheet images. */
+  prepareContentImages() {
+    const images = [...this.app.content.querySelectorAll("img")];
+    images.forEach((image, index) => {
+      image.loading = "lazy";
+      image.decoding = "async";
+      if (!image.getAttribute("alt")) image.setAttribute("alt", `Worksheet illustration ${index + 1}`);
+    });
+    if ("IntersectionObserver" in window) {
+      this.imageObserver?.disconnect();
+      this.imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("fade-in");
+            this.imageObserver.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: "180px" });
+      images.forEach((image) => this.imageObserver.observe(image));
+    }
+  }
+
+  /** Highlights the current heading as readers scroll. */
+  observeHeadings(headings) {
+    this.headingObserver?.disconnect();
+    const links = [...this.app.tocList.querySelectorAll("a")];
+    this.headingObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          links.forEach((link) => link.classList.toggle("is-active", link.hash === `#${entry.target.id}`));
+        }
+      });
+    }, { rootMargin: "-18% 0px -70% 0px", threshold: 0.01 });
+    headings.forEach((heading) => this.headingObserver.observe(heading));
+  }
+
+  /** Highlights the current question as readers scroll. */
+  observeQuestions(questions) {
+    this.questionObserver?.disconnect();
+    const links = [...this.app.questionsList.querySelectorAll("a")];
+    this.questionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          links.forEach((link) => link.classList.toggle("is-active", link.hash === `#${entry.target.id}`));
+        }
+      });
+    }, { rootMargin: "-18% 0px -70% 0px", threshold: 0.01 });
+    questions.forEach((question) => this.questionObserver.observe(question));
+  }
+
+  /** Lazy loads MathJax only when math delimiters are present. */
+  loadMathJax() {
+    if (window.MathJax?.typesetPromise) {
+      window.MathJax.typesetPromise([this.app.content]);
+      return;
+    }
+    window.MathJax = { tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"], ["$$", "$$"]] } };
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
+    script.async = true;
+    document.head.appendChild(script);
+  }
+}
+
+/* Search */
+class WorksheetSearch {
+  /** Creates a search controller for the worksheet content. */
+  constructor(app) {
+    this.app = app;
+    this.marks = [];
+    this.activeIndex = -1;
+  }
+
+  /** Opens the search panel and focuses the input. */
+  open() {
+    this.app.searchPanel.hidden = false;
+    this.app.searchInput.focus();
+    this.app.searchInput.select();
+  }
+
+  /** Closes the search panel and clears highlights. */
+  close() {
+    this.clear(true);
+    this.app.searchPanel.hidden = true;
+    this.app.content.focus({ preventScroll: true });
+  }
+
+  /** Runs a fresh search and highlights every match. */
+  run(query) {
+    this.clear(false);
+    const term = query.trim();
+    if (!term) {
+      Utils.setText(this.app.searchCount, "No search active");
+      return;
+    }
+    const pattern = new RegExp(Utils.escapeRegExp(term), "gi");
+    const walker = document.createTreeWalker(this.app.content, NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) => {
+        if (!node.nodeValue || !pattern.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+        pattern.lastIndex = 0;
+        const parent = node.parentElement;
+        if (!parent || ["SCRIPT", "STYLE", "MARK"].includes(parent.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => this.markNode(node, pattern));
+    this.marks = [...this.app.content.querySelectorAll("mark.search-mark")];
+    this.activeIndex = this.marks.length ? 0 : -1;
+    this.updateActive();
+  }
+
+  /** Wraps all text matches in mark elements. */
+  markNode(node, pattern) {
+    const fragment = document.createDocumentFragment();
+    const text = node.nodeValue;
+    let lastIndex = 0;
+    text.replace(pattern, (match, offset) => {
+      fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)));
+      fragment.appendChild(Utils.el("mark", "search-mark", match));
+      lastIndex = offset + match.length;
+      return match;
+    });
+    fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+    node.parentNode.replaceChild(fragment, node);
+  }
+
+  /** Moves to the next search result. */
+  next() {
+    if (!this.marks.length) return;
+    this.activeIndex = (this.activeIndex + 1) % this.marks.length;
+    this.updateActive();
+  }
+
+  /** Moves to the previous search result. */
+  previous() {
+    if (!this.marks.length) return;
+    this.activeIndex = (this.activeIndex - 1 + this.marks.length) % this.marks.length;
+    this.updateActive();
+  }
+
+  /** Updates active result styling and count text. */
+  updateActive() {
+    this.marks.forEach((mark, index) => mark.classList.toggle("is-active", index === this.activeIndex));
+    if (!this.marks.length) {
+      Utils.setText(this.app.searchCount, "No results");
+      return;
+    }
+    Utils.setText(this.app.searchCount, `${this.activeIndex + 1} of ${this.marks.length}`);
+    this.marks[this.activeIndex].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  /** Removes search highlights and restores text nodes. */
+  clear(resetInput) {
+    this.marks.forEach((mark) => mark.replaceWith(document.createTextNode(mark.textContent || "")));
+    this.app.content.normalize();
+    this.marks = [];
+    this.activeIndex = -1;
+    if (resetInput) this.app.searchInput.value = "";
+    Utils.setText(this.app.searchCount, "No search active");
+  }
+}
+
+/* AI Assistant Controller */
+class AIAssistant {
+  constructor() {
+    this.panel = document.getElementById("ai-panel");
+    this.closeBtn = document.getElementById("ai-close");
+    this.contextText = document.getElementById("ai-context-text");
+    this.responseArea = document.getElementById("ai-response-area");
+    this.actionButtons = this.panel.querySelectorAll("[data-ai-action]");
+    
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    // Listen for clicks on the newly injected inline AI buttons
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("ai-btn-inline")) {
+        const questionText = e.target.dataset.questionText;
+        this.openPanel(questionText);
+      }
+    });
+
+    this.closeBtn.addEventListener("click", () => this.closePanel());
+
+    this.actionButtons.forEach(btn => {
+      btn.addEventListener("click", (e) => this.handleAction(e.target.dataset.aiAction));
+    });
+  }
+
+  openPanel(questionText) {
+    this.panel.hidden = false;
+    // Brief timeout allows display:block to apply before animating transform
+    setTimeout(() => this.panel.classList.add("is-open"), 10);
+    this.contextText.textContent = `"${questionText.substring(0, 80)}..."`;
+    this.responseArea.hidden = true;
+    this.responseArea.innerHTML = "";
+  }
+
+  closePanel() {
+    this.panel.classList.remove("is-open");
+    setTimeout(() => { this.panel.hidden = true; }, 300);
+  }
+
+  async handleAction(actionType) {
+    this.responseArea.hidden = false;
+    this.responseArea.innerHTML = "<p><em>Thinking... 🤖</em></p>";
+    
+    // TODO: Connect to your actual backend API here.
+    // Simulating a network request for now:
+    setTimeout(() => {
+      this.responseArea.innerHTML = `
+        <p><strong>Response for: ${actionType}</strong></p>
+        <p>This is where the AI generated content will appear based on the user's request. You can hook this up to your API endpoints.</p>
+      `;
+    }, 1500);
+  }
+}
+
+/* Application */
+class WorksheetApp {
+  /** Initializes DOM references and the renderer. */
+  constructor() {
+    this.id = Utils.getWorksheetId();
+    this.data = null;
+    this.title = document.getElementById("worksheet-title");
+    this.classLabel = document.getElementById("worksheet-class");
+    this.meta = document.getElementById("hero-meta");
+    this.status = document.getElementById("status-panel");
+    this.card = document.getElementById("worksheet-card");
+    this.content = document.getElementById("worksheet-content");
+    this.toc = document.getElementById("toc");
+    this.tocList = document.getElementById("toc-list");
+    this.questions = document.getElementById("questions");
+    this.questionsList = document.getElementById("questions-list");
+    this.related = document.getElementById("related");
+    this.relatedList = document.getElementById("related-list");
+    this.progress = document.getElementById("reading-progress");
+    this.backToTop = document.getElementById("back-to-top");
+    this.toolbar = document.querySelector(".toolbar");
+    this.toolbarToggle = document.getElementById("toolbar-toggle");
+    this.bookmarkButton = document.querySelector("[data-action='bookmark']");
+    this.themeButton = document.querySelector("[data-action='theme']");
+    this.focusButton = document.querySelector("[data-action='focus']");
+    this.searchPanel = document.getElementById("search-panel");
+    this.searchInput = document.getElementById("worksheet-search");
+    this.searchCount = document.getElementById("search-count");
+    this.resumeCard = document.getElementById("resume-card");
+    this.renderer = new WorksheetRenderer(this);
+    this.search = new WorksheetSearch(this);
+    this.scrollTracked = false;
+    this.completeTracked = false;
+    this.saveScroll = Utils.debounce(() => StorageService.setScroll(this.id, window.scrollY), 250);
+  }
+
+  /** Starts the application lifecycle. */
+  async init() {
+    this.aiAssistant = new AIAssistant();
+    this.bindEvents();
+    this.applySavedTheme();
+    this.registerServiceWorker();
+    if (!this.validateId()) return;
+    Analytics.track("worksheet_open", { worksheet_id: this.id });
+    WorksheetAPI.trackMetric(this.id, "view");
+    const cached = StorageService.getWorksheet(this.id);
+    if (cached?.data) this.renderer.render(cached.data, true);
+    await this.refreshWorksheet(Boolean(cached?.data));
+  }
+
+  /** Validates the worksheet id before making a network request. */
+  validateId() {
+    if (!/^[a-zA-Z0-9_-]{1,120}$/.test(this.id)) {
+      this.showError("Invalid worksheet ID", "Check the link and try opening the worksheet again.", false);
+      return false;
+    }
+    return true;
+  }
+
+  /** Refreshes worksheet data from the API and handles stale-while-revalidate behavior. */
+  async refreshWorksheet(hasCache) {
+    try {
+      const data = await WorksheetAPI.fetchWorksheet(this.id);
+      this.renderer.render(this.normalize(data), false);
+    } catch (error) {
+      if (!hasCache) {
+        const message = error instanceof WorksheetError ? error.message : "Unable to load worksheet";
+        const detail = this.errorDetail(error);
+        this.showError(message, detail, true);
+      }
+    }
+  }
+
+  /** Normalizes missing worksheet fields into a predictable object. */
+  normalize(data) {
+    return {
+      worksheetId: Utils.text(data?.worksheetId, this.id),
+      title: Utils.text(data?.title, "Untitled worksheet"),
+      className: Utils.text(data?.className, "Class not specified"),
+      chapter: Utils.text(data?.chapter, "Chapter not specified"),
+      board: Utils.text(data?.board, "Board not specified"),
+      difficulty: Utils.text(data?.difficulty, "Not specified"),
+      topics: Array.isArray(data?.topics) ? data.topics : [],
+      questionCount: data?.questionCount ?? 0,
+      estimatedTime: Utils.text(data?.estimatedTime, "Not specified"),
+      generatedAt: data?.generatedAt || "",
+      content: typeof data?.content === "string" && data.content.trim() ? data.content : "<p>Worksheet content is unavailable.</p>",
+      stats: data?.stats && typeof data.stats === "object" ? data.stats : null
+    };
+  }
+
+  /** Loads API-backed related worksheets and falls back to local cache if needed. */
+  async loadRelated(data) {
+    try {
+      const result = await WorksheetAPI.fetchWorksheets();
+      const worksheets = Array.isArray(result) ? result : Array.isArray(result?.worksheets) ? result.worksheets : [];
+      this.renderer.renderRelated(data, worksheets);
+    } catch {
+      this.renderer.renderRelated(data, StorageService.listWorksheets());
+    }
+  }
+
+  /** Loads backend stats and refreshes the hero chips when available. */
+  async loadStats() {
+    const existing = this.data?.stats;
+    if (existing) this.renderer.renderHero(this.data, existing);
+    try {
+      const stats = await WorksheetAPI.fetchStats(this.id);
+      if (stats && this.data) this.renderer.renderHero(this.data, stats);
+    } catch {
+      return;
+    }
+  }
+
+  /** Provides user-friendly details for loading errors. */
+  errorDetail(error) {
+    const code = error instanceof WorksheetError ? error.code : "network";
+    const details = {
+      "not-found": "Worksheet not found. It may have been moved or unpublished.",
+      timeout: "The server took more than 10 seconds to respond.",
+      offline: "You appear to be offline. Reconnect and try again.",
+      server: "The worksheet server returned an unexpected response.",
+      network: "The request could not be completed right now."
+    };
+    return details[code] || details.network;
+  }
+
+  /** Displays a resilient error state with optional retry. */
+  showError(title, detail, canRetry) {
+    const box = Utils.el("div", "error-box");
+    const heading = Utils.el("h2", "", title);
+    const message = Utils.el("p", "", detail);
+    const actions = Utils.el("div", "error-actions");
+    if (canRetry) {
+      const retry = Utils.el("button", "", "Retry");
+      retry.type = "button";
+      retry.addEventListener("click", () => this.refreshWorksheet(false), { passive: true });
+      actions.appendChild(retry);
+    }
+    const library = Utils.el("button", "", "Back to Library");
+    library.type = "button";
+    library.addEventListener("click", () => { window.location.href = "index.html"; }, { passive: true });
+    actions.appendChild(library);
+    box.append(heading, message, actions);
+    this.status.replaceChildren(box);
+    this.status.hidden = false;
+    this.card.hidden = true;
+  }
+
+  /** Binds UI events with passive listeners where appropriate. */
+  bindEvents() {
+    document.addEventListener("click", (event) => this.handleClick(event));
+    window.addEventListener("scroll", () => this.updateProgress(), { passive: true });
+    window.addEventListener("resize", Utils.debounce(() => this.updateProgress()), { passive: true });
+    window.addEventListener("online", () => this.refreshWorksheet(Boolean(this.data)), { passive: true });
+    this.toolbarToggle.addEventListener("click", () => this.toggleToolbar());
+    this.backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    this.searchInput.addEventListener("input", Utils.debounce(() => this.search.run(this.searchInput.value), 120));
+    document.addEventListener("keydown", (event) => this.handleKeyboard(event));
+  }
+
+  /** Handles delegated clicks for toolbar actions and navigation links. */
+  handleClick(event) {
+    const action = event.target.closest("[data-action]")?.dataset.action;
+    if (action) this.runAction(action);
+    const navLink = event.target.closest(".toc a, .questions a");
+    if (navLink) {
+      event.preventDefault();
+      document.querySelector(navLink.hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  /** Handles keyboard shortcuts for common reading controls. */
+  handleKeyboard(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "f") {
+      event.preventDefault();
+      this.search.open();
+    }
+    if (event.key === "Escape") {
+      if (!this.searchPanel.hidden) this.search.close();
+      if (document.fullscreenElement) document.exitFullscreen();
+    }
+    if (event.key === "Enter" && document.activeElement === this.searchInput) {
+      event.preventDefault();
+      event.shiftKey ? this.search.previous() : this.search.next();
+    }
+    if (event.key.toLowerCase() === "b" && !event.altKey && !event.ctrlKey && !event.metaKey) this.toggleBookmark();
+  }
+
+  /** Dispatches toolbar actions to their implementations. */
+  runAction(action) {
+    const actions = {
+      print: () => this.print(),
+      download: () => this.downloadPDF(),
+      share: () => this.share(),
+      bookmark: () => this.toggleBookmark(),
+      copy: () => this.copyLink(),
+      search: () => this.search.open(),
+      "search-next": () => this.search.next(),
+      "search-prev": () => this.search.previous(),
+      "search-close": () => this.search.close(),
+      "font-up": () => this.adjustFont(1),
+      "font-down": () => this.adjustFont(-1),
+      "line-spacing": () => this.toggleLineSpacing(),
+      focus: () => this.toggleFocusMode(),
+      fullscreen: () => this.toggleFullscreen(),
+      theme: () => this.toggleTheme(),
+      resume: () => this.resumeReading(),
+      "resume-dismiss": () => this.dismissResume()
+    };
+    actions[action]?.();
+  }
+
+  /** Toggles the mobile toolbar expansion state. */
+  toggleToolbar() {
+    const open = !this.toolbar.classList.contains("is-open");
+    this.toolbar.classList.toggle("is-open", open);
+    this.toolbarToggle.setAttribute("aria-expanded", String(open));
+  }
+
+  /** Updates reading progress, saved position, back-to-top visibility, and completion analytics. */
+  updateProgress() {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    const percent = Math.min(100, Math.max(0, (window.scrollY / max) * 100));
+    this.progress.style.width = `${percent}%`;
+    this.backToTop.classList.toggle("is-visible", window.scrollY > 520);
+    this.saveScroll();
+    if (!this.scrollTracked && percent > 15) {
+      this.scrollTracked = true;
+      Analytics.track("worksheet_scroll", { worksheet_id: this.id });
+    }
+    if (!this.completeTracked && percent > 92) {
+      this.completeTracked = true;
+      Analytics.track("worksheet_complete", { worksheet_id: this.id });
+    }
+  }
+
+  /** Offers to restore a meaningful saved scroll position. */
+  offerResume() {
+    const saved = StorageService.getScroll(this.id);
+    if (!saved?.position || saved.position < 280 || window.scrollY > 20) return;
+    this.resumeCard.hidden = false;
+  }
+
+  /** Restores the saved scroll position for the worksheet. */
+  resumeReading() {
+    const saved = StorageService.getScroll(this.id);
+    this.resumeCard.hidden = true;
+    if (saved?.position) window.scrollTo({ top: saved.position, behavior: "smooth" });
+  }
+
+  /** Dismisses the resume prompt and starts at the top. */
+  dismissResume() {
+    StorageService.setScroll(this.id, 0);
+    this.resumeCard.hidden = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /** Opens the browser print dialog for clean printing. */
+  print() {
+    Analytics.track("worksheet_print", { worksheet_id: this.id });
+    WorksheetAPI.trackMetric(this.id, "print");
+    window.print();
+  }
+
+  /** Downloads a PDF through the PDF service or falls back to print. */
+  downloadPDF() {
+    PDFService.export(this);
+  }
+
+  /** Shares through the native share sheet or copies the URL as a fallback. */
+  async share() {
+    Analytics.track("worksheet_share", { worksheet_id: this.id });
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: document.title, url: window.location.href });
+        return;
+      } catch {
+        return;
+      }
+    }
+    await this.copyLink();
+  }
+
+  /** Copies the current worksheet URL to the clipboard. */
+  async copyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      Analytics.track("copy_link", { worksheet_id: this.id });
+      this.flashButton("[data-action='copy']", "Copied");
+    } catch {
+      this.showError("Copy failed", "Your browser blocked clipboard access. Use the address bar to copy the link.", false);
+    }
+  }
+
+  /** Toggles the bookmark for the current worksheet. */
+  toggleBookmark() {
+    const bookmarked = StorageService.toggleBookmark(this.id);
+    Analytics.track("worksheet_bookmark", { worksheet_id: this.id, bookmarked });
+    WorksheetAPI.trackMetric(this.id, bookmarked ? "bookmark" : "unbookmark");
+    this.updateBookmarkState();
+  }
+
+  /** Reflects the current bookmark state in the toolbar. */
+  updateBookmarkState() {
+    const bookmarked = StorageService.isBookmarked(this.id);
+    this.bookmarkButton.setAttribute("aria-pressed", String(bookmarked));
+    this.bookmarkButton.textContent = bookmarked ? "Remove Bookmark" : "Bookmark";
+  }
+
+  /** Toggles fullscreen mode for the worksheet page. */
+  async toggleFullscreen() {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    } else {
+      await document.documentElement.requestFullscreen();
+    }
+  }
+
+  /** Applies the saved theme on startup. */
+  applySavedTheme() {
+    const theme = window.localStorage.getItem("cinephysics_theme") || "dark";
+    document.documentElement.dataset.theme = theme;
+    this.themeButton.setAttribute("aria-pressed", String(theme === "dark"));
+  }
+
+  /** Toggles between dark and light reading themes. */
+  toggleTheme() {
+    const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    window.localStorage.setItem("cinephysics_theme", next);
+    this.themeButton.setAttribute("aria-pressed", String(next === "dark"));
+  }
+
+  /** Applies persisted reader preferences to the worksheet content. */
+  applyReaderPrefs() {
+    const prefs = StorageService.get("cinephysics_reader", { font: 100, line: 165, focus: false });
+    this.content.style.setProperty("--reader-font-size", `${Math.min(130, Math.max(85, prefs.font || 100)) / 100}rem`);
+    this.content.style.setProperty("--reader-line-height", String(Math.min(2.1, Math.max(1.45, (prefs.line || 165) / 100))));
+    document.body.classList.toggle("is-focus-mode", Boolean(prefs.focus));
+    this.focusButton.setAttribute("aria-pressed", String(Boolean(prefs.focus)));
+  }
+
+  /** Increases or decreases the worksheet font size. */
+  adjustFont(direction) {
+    const prefs = StorageService.get("cinephysics_reader", { font: 100, line: 165, focus: false });
+    prefs.font = Math.min(130, Math.max(85, (prefs.font || 100) + direction * 5));
+    StorageService.set("cinephysics_reader", prefs);
+    this.applyReaderPrefs();
+  }
+
+  /** Toggles generous line spacing for longer reading sessions. */
+  toggleLineSpacing() {
+    const prefs = StorageService.get("cinephysics_reader", { font: 100, line: 165, focus: false });
+    prefs.line = prefs.line && prefs.line > 170 ? 165 : 190;
+    StorageService.set("cinephysics_reader", prefs);
+    this.applyReaderPrefs();
+  }
+
+  /** Toggles focus mode, hiding supporting panels around the worksheet. */
+  toggleFocusMode() {
+    const prefs = StorageService.get("cinephysics_reader", { font: 100, line: 165, focus: false });
+    prefs.focus = !prefs.focus;
+    StorageService.set("cinephysics_reader", prefs);
+    this.applyReaderPrefs();
+  }
+
+  /** Registers the service worker for offline worksheet assets. */
+  registerServiceWorker() {
+    if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    }
+  }
+
+  /** Temporarily changes a button label to confirm an action. */
+  flashButton(selector, label) {
+    const button = document.querySelector(selector);
+    if (!button) return;
+    const original = button.textContent;
+    button.textContent = label;
+    window.setTimeout(() => { button.textContent = original; }, 1400);
+  }
+}
+
+/** Boots the worksheet app after the document is ready. */
+document.addEventListener("DOMContentLoaded", () => {
+  new WorksheetApp().init();
+});
+
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#worksheet-content">Skip to worksheet</a>
+
+    <div class="progress-track" aria-hidden="true">
+      <div class="progress-bar" id="reading-progress"></div>
+    </div>
+
+    <header class="hero" id="worksheet-hero">
+      <div class="hero__inner">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="index.html">CinePhysicsHQ</a>
+          <span aria-hidden="true">/</span>
+          <span>Worksheet</span>
+        </nav>
+        <div class="hero__eyebrow" id="worksheet-class">Loading worksheet</div>
+        <h1 id="worksheet-title">Preparing your worksheet...</h1>
+        <div class="hero__meta" id="hero-meta" aria-label="Worksheet details"></div>
+      </div>
+    </header>
+
+    <div class="toolbar-wrap" id="toolbar-wrap">
+      <nav class="toolbar" aria-label="Worksheet actions">
+        <button class="toolbar__toggle" id="toolbar-toggle" type="button" aria-expanded="false" aria-controls="toolbar-actions">
+          <span>Actions</span>
+          <span aria-hidden="true">+</span>
+        </button>
+        <div class="toolbar__actions" id="toolbar-actions">
+          <button type="button" data-action="print" aria-label="Print worksheet">Print</button>
+          <button type="button" data-action="download" aria-label="Download worksheet as PDF">Download PDF</button>
+          <button type="button" data-action="share" aria-label="Share worksheet">Share</button>
+          <button type="button" data-action="bookmark" aria-label="Bookmark worksheet" aria-pressed="false">Bookmark</button>
+          <button type="button" data-action="copy" aria-label="Copy worksheet link">Copy Link</button>
+          <button type="button" data-action="search" aria-label="Search inside worksheet">Search</button>
+          <button type="button" data-action="font-up" aria-label="Increase worksheet text size">A+</button>
+          <button type="button" data-action="font-down" aria-label="Decrease worksheet text size">A-</button>
+          <button type="button" data-action="line-spacing" aria-label="Toggle line spacing">Line Spacing</button>
+          <button type="button" data-action="focus" aria-label="Toggle focus mode" aria-pressed="false">Focus Mode</button>
+          <button type="button" data-action="fullscreen" aria-label="Toggle fullscreen">Fullscreen</button>
+          <button type="button" data-action="theme" aria-label="Toggle dark mode" aria-pressed="true">Dark Mode</button>
+          <a class="toolbar__link" href="index.html" aria-label="Back to worksheet library">Back to Library</a>
+        </div>
+      </nav>
+    </div>
+
+    <main class="page-shell">
+      <section class="status-panel" id="status-panel" aria-live="polite">
+        <div class="skeleton" aria-label="Loading worksheet">
+          <div class="skeleton__line skeleton__line--wide"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__grid">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+          <div class="skeleton__block"></div>
+          <div class="skeleton__line skeleton__line--wide"></div>
+          <div class="skeleton__line"></div>
+        </div>
+      </section>
+
+      <aside class="toc" id="toc" aria-labelledby="toc-title" hidden>
+        <h2 id="toc-title">Contents</h2>
+        <ol id="toc-list"></ol>
+      </aside>
+
+      <aside class="questions" id="questions" aria-labelledby="questions-title" hidden>
+        <h2 id="questions-title">Questions</h2>
+        <ol id="questions-list"></ol>
+      </aside>
+
+      <article class="worksheet-card" id="worksheet-card" hidden>
+        <div class="worksheet-content" id="worksheet-content" tabindex="-1"></div>
+      </article>
+
+      <section class="related" id="related" aria-labelledby="related-title" hidden>
+        <h2 id="related-title">Related Worksheets</h2>
+        <div class="related__grid" id="related-list"></div>
+      </section>
+    </main>
+
+    <section class="search-panel" id="search-panel" role="search" aria-label="Search worksheet" hidden>
+      <label for="worksheet-search">Search worksheet</label>
+      <div class="search-panel__row">
+        <input id="worksheet-search" type="search" autocomplete="off" placeholder="Find text">
+        <button type="button" data-action="search-prev" aria-label="Previous search result">Previous</button>
+        <button type="button" data-action="search-next" aria-label="Next search result">Next</button>
+        <button type="button" data-action="search-close" aria-label="Close search">Close</button>
+      </div>
+      <p id="search-count" aria-live="polite">No search active</p>
+    </section>
+
+    <section class="resume-card" id="resume-card" aria-live="polite" hidden>
+      <p>Continue where you left off?</p>
+      <div>
+        <button type="button" data-action="resume">Continue</button>
+        <button type="button" data-action="resume-dismiss">Start at top</button>
+      </div>
+    </section>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">Top</button>
+
+    <aside class="ai-panel" id="ai-panel" aria-hidden="true" hidden>
+      <div class="ai-panel__header">
+        <h3>🤖 AI Assistant</h3>
+        <button type="button" id="ai-close" aria-label="Close AI panel">✖</button>
+      </div>
+      <div class="ai-panel__content">
+        <p class="ai-panel__context" id="ai-context-text">Loading question context...</p>
+        
+        <div class="ai-panel__actions">
+          <button type="button" data-ai-action="explain">Explain this question</button>
+          <button type="button" data-ai-action="hint">Give Hint</button>
+          <button type="button" data-ai-action="similar">Show Similar Question</button>
+          <button type="button" data-ai-action="easier">Generate Easier Version</button>
+          <button type="button" data-ai-action="harder">Generate Harder Version</button>
+        </div>
+
+        <div class="ai-panel__response" id="ai-response-area" hidden>
+          </div>
+      </div>
+    </aside>
+
+    <script type="text/plain" id="embedded-service-worker">
+"use strict";
+
+const CACHE_NAME = "cinephysics-worksheet-v1";
+const SHELL_ASSETS = [
+  "worksheet.html",
+  "worksheet.css",
+  "worksheet.js"
+];
+
+/** Opens the current application cache. */
+const openCache = () => caches.open(CACHE_NAME);
+
+/** Stores a response clone when it is safe to cache. */
+const cacheResponse = async (request, response) => {
+  if (!response || response.status !== 200 || request.method !== "GET") return response;
+  const cache = await openCache();
+  cache.put(request, response.clone());
+  return response;
+};
+
+/** Returns true for requests that should use a network-first worksheet strategy. */
+const isWorksheetRequest = (request) => {
+  const url = new URL(request.url);
+  return url.pathname.includes("/api/worksheet") || url.pathname.endsWith("worksheet.html");
+};
+
+/** Handles shell files with cache-first delivery. */
+const cacheFirst = async (request) => {
+  const cache = await openCache();
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  return cacheResponse(request, await fetch(request));
+};
+
+/** Handles worksheet pages and API data with network-first delivery. */
+const networkFirst = async (request) => {
+  const cache = await openCache();
+  try {
+    return await cacheResponse(request, await fetch(request));
+  } catch {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    if (request.mode === "navigate") return cache.match("worksheet.html");
+    throw new Error("Offline and no cached worksheet response is available.");
+  }
+};
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(openCache().then((cache) => cache.addAll(SHELL_ASSETS)));
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
+  if (isWorksheetRequest(request)) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+  if (SHELL_ASSETS.some((asset) => url.pathname.endsWith(asset))) {
+    event.respondWith(cacheFirst(request));
+  }
+});
+
+    </script>
+  </body>
+</html>
