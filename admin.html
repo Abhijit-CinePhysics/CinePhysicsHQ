@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | CinePhysicsHQ</title>
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES & RESET
+           ========================================================================== */
+        :root {
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(25, 25, 25, 0.6);
+            --card-border: rgba(212, 160, 23, 0.2);
+            --gold: #d4a017;
+            --gold-hover: #b58812;
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --danger: #ff4d4d;
+            --success: #00cc66;
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+        }
+
+        /* ==========================================================================
+           LAYOUT & NAVBAR
+           ========================================================================== */
+        .navbar {
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(10, 10, 10, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            color: var(--gold);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ==========================================================================
+           DASHBOARD STATS
+           ========================================================================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-top: 0.5rem;
+        }
+
+        /* ==========================================================================
+           CONTROLS (SEARCH & FILTERS)
+           ========================================================================== */
+        .controls-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input, .filter-select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-box input:focus, .filter-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(212, 160, 23, 0.3);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #000;
+        }
+
+        .btn-gold {
+            background-color: var(--gold);
+        }
+
+        .btn-gold:hover {
+            background-color: var(--gold-hover);
+            box-shadow: 0 4px 12px rgba(212, 160, 23, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(212, 160, 23, 0.1);
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: rgba(255, 77, 77, 0.1);
+        }
+
+        /* ==========================================================================
+           WORKSHEET GRID & CARDS
+           ========================================================================== */
+        .worksheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .worksheet-card {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: var(--transition);
+        }
+
+        .worksheet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border-color: var(--gold);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-id {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pending { background: rgba(212, 160, 23, 0.2); color: var(--gold); }
+        .badge-approved { background: rgba(0, 204, 102, 0.2); color: var(--success); }
+        .badge-rejected { background: rgba(255, 77, 77, 0.2); color: var(--danger); }
+
+        .card-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .card-meta span strong {
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        /* ==========================================================================
+           MODALS (HTML5 Dialog)
+           ========================================================================== */
+        dialog {
+            margin: auto;
+            padding: 0;
+            border: none;
+            background: transparent;
+            max-width: 800px;
+            width: 90%;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--gold);
+        }
+
+        .preview-body {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* ==========================================================================
+           TOAST NOTIFICATIONS
+           ========================================================================== */
+        #toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: var(--card-bg);
+            border-left: 4px solid var(--gold);
+            color: var(--text-main);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease forwards;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.error { border-left-color: var(--danger); }
+        .toast.success { border-left-color: var(--success); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* ==========================================================================
+           LOADING SKELETON
+           ========================================================================== */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(25,25,25,1) 0%, rgba(40,40,40,1) 50%, rgba(25,25,25,1) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .skeleton-card {
+            height: 250px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .controls-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .card-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <h1>CinePhysicsHQ Admin</h1>
+        <div class="admin-profile">Admin</div>
+    </nav>
+
+    <main class="container">
+        <section class="stats-grid">
+            <div class="stat-card glass">
+                <h3>Pending</h3>
+                <div class="value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card glass">
+                <h3>Approved</h3>
+                <div class="value" id="stat-approved">0</div>
+            </div>
+            <div class="stat-card glass">
+                <h3>Rejected</h3>
+                <div class="value" id="stat-rejected">0</div>
+            </div>
+            <div class="stat-card glass">
+                <h3>Total</h3>
+                <div class="value" id="stat-total">0</div>
+            </div>
+        </section>
+
+        <section class="controls-bar glass">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search by ID, Title, Chapter, Topics...">
+            </div>
+            <select class="filter-select" id="filter-status">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <select class="filter-select" id="filter-class">
+                <option value="">All Classes</option>
+                <option value="11">Class 11</option>
+                <option value="12">Class 12</option>
+            </select>
+            <select class="filter-select" id="filter-difficulty">
+                <option value="">All Difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button class="btn btn-gold" id="btn-refresh">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
+                Refresh
+            </button>
+        </section>
+
+        <section id="worksheet-container" class="worksheet-grid">
+            </section>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <dialog id="modal-preview">
+        <div class="modal-content glass">
+            <button class="close-modal" id="close-preview">&times;</button>
+            <h2 id="preview-title" style="color: var(--gold); margin-bottom: 1rem;">Worksheet Preview</h2>
+            
+            <div class="card-meta" style="margin-bottom: 1rem;" id="preview-meta">
+                </div>
+
+            <div class="preview-body" id="preview-body">
+                </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="preview-btn-reject">Reject</button>
+                <button class="btn btn-gold" id="preview-btn-approve">Approve</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="modal-confirm">
+        <div class="modal-content glass" style="max-width: 400px; text-align: center;">
+            <h2 style="color: var(--danger); margin-bottom: 1rem;">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this worksheet? This action cannot be undone.</p>
+            <div class="modal-actions" style="justify-content: center; margin-top: 1.5rem;">
+                <button class="btn btn-outline" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        /**
+         * CONFIGURATION
+         */
+        const CONFIG = {
+            apiBase: 'https://cinephysics-api.vercel.app/api', 
+            endpoints: {
+                pending: '/admin/pending',
+                approve: '/admin/approve',
+                reject:  '/admin/reject',
+                delete:  '/admin/delete',
+                worksheet: '/worksheet',
+                stats: '/admin/stats' // NEW: Stats endpoint
+            },
+            // FUTURE READY: Place to easily grab auth tokens when implemented
+            getHeaders: () => ({
+                'Content-Type': 'application/json',
+                // 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` 
+            })
+        };
+
+        /**
+         * UTILITIES
+         */
+        const Utilities = {
+            formatDate: (dateString) => {
+                if(!dateString) return 'N/A';
+                // Handles Firestore timestamps or ISO strings safely
+                const date = new Date(dateString); 
+                return isNaN(date) ? 'N/A' : date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+            },
+            debounce: (func, delay) => {
+                let timeoutId;
+                return (...args) => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => { func.apply(null, args); }, delay);
+                };
+            }
+        };
+
+        /**
+         * TOAST NOTIFICATIONS
+         */
+        const Toast = {
+            container: document.getElementById('toast-container'),
+            show: (message, type = 'success') => {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                
+                Toast.container.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.style.animation = 'fadeOut 0.3s ease forwards';
+                    toast.addEventListener('animationend', () => toast.remove());
+                }, 3000);
+            },
+            error: (msg) => Toast.show(msg, 'error'),
+            success: (msg) => Toast.show(msg, 'success')
+        };
+
+        /**
+         * API SERVICE
+         */
+        const AdminAPI = {
+            async fetchStats() {
+                try {
+                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.stats}`, {
+                        headers: CONFIG.getHeaders()
+                    });
+                    if (!response.ok) throw new Error('Stats endpoint failed');
+                    return await response.json();
+                } catch (error) {
+                    console.warn("Stats API not ready yet. Defaulting to zeros.", error);
+                    return { pending: 0, approved: 0, rejected: 0, total: 0 };
+                }
+            },
+            async fetchPending() {
+                try {
+                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.pending}`, {
+                        headers: CONFIG.getHeaders()
+                    });
+                    if (!response.ok) throw new Error('Failed to fetch worksheets');
+                    return await response.json();
+                } catch (error) {
+                    Toast.error('Network error while fetching data.');
+                    console.error(error);
+                    return { success: false, worksheets: [] };
+                }
+            },
+            async action(endpoint, worksheetId) {
+                try {
+                    const response = await fetch(`${CONFIG.apiBase}${endpoint}`, {
+                        method: 'POST',
+                        headers: CONFIG.getHeaders(),
+                        body: JSON.stringify({ worksheetId })
+                    });
+                    if (!response.ok) throw new Error(`API error during action`);
+                    return true;
+                } catch (error) {
+                    Toast.error(`Action failed: Check if backend route exists.`);
+                    console.error(error);
+                    return false;
+                }
+            },
+            async getWorksheet(worksheetId) {
+                try {
+                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.worksheet}?id=${worksheetId}`, {
+                        headers: CONFIG.getHeaders()
+                    });
+                    if (!response.ok) throw new Error('Failed to load worksheet details');
+                    return await response.json();
+                } catch (error) {
+                    Toast.error('API error while fetching worksheet.');
+                    console.error(error);
+                    return null;
+                }
+            }
+        };
+
+        /**
+         * MODAL CONTROLLER
+         */
+        const Modal = {
+            preview: document.getElementById('modal-preview'),
+            confirm: document.getElementById('modal-confirm'),
+            currentDeleteId: null,
+            currentPreviewId: null,
+
+            init() {
+                document.getElementById('close-preview').addEventListener('click', () => Modal.preview.close());
+                document.getElementById('confirm-cancel').addEventListener('click', () => Modal.confirm.close());
+                
+                document.getElementById('confirm-delete').addEventListener('click', async () => {
+                    if (Modal.currentDeleteId) {
+                        Modal.confirm.close();
+                        const success = await AdminAPI.action(CONFIG.endpoints.delete, Modal.currentDeleteId);
+                        if (success) {
+                            Toast.success('Deleted successfully');
+                            Dashboard.loadData();
+                        }
+                    }
+                });
+
+                document.getElementById('preview-btn-approve').addEventListener('click', async () => {
+                    if (Modal.currentPreviewId) {
+                        Modal.preview.close();
+                        await Dashboard.handleAction('approve', Modal.currentPreviewId);
+                    }
+                });
+
+                document.getElementById('preview-btn-reject').addEventListener('click', async () => {
+                    if (Modal.currentPreviewId) {
+                        Modal.preview.close();
+                        await Dashboard.handleAction('reject', Modal.currentPreviewId);
+                    }
+                });
+            },
+            
+            async openPreview(worksheetId, cachedData) {
+                Modal.currentPreviewId = worksheetId;
+                const titleEl = document.getElementById('preview-title');
+                const metaEl = document.getElementById('preview-meta');
+                const bodyEl = document.getElementById('preview-body');
+
+                titleEl.textContent = cachedData.title || `Worksheet ${worksheetId}`;
+                bodyEl.innerHTML = `<div class="skeleton" style="height: 200px; width: 100%;"></div>`;
+                
+                Modal.preview.showModal();
+
+                const data = await AdminAPI.getWorksheet(worksheetId);
+                if (data) {
+                    metaEl.innerHTML = `
+                        <span><strong>Class:</strong> ${data.className || 'N/A'}</span>
+                        <span><strong>Chapter:</strong> ${data.chapter || 'N/A'}</span>
+                        <span><strong>Board:</strong> ${data.board || 'N/A'}</span>
+                        <span><strong>Difficulty:</strong> ${data.difficulty || 'N/A'}</span>
+                        <span><strong>Questions:</strong> ${data.questionCount || 0}</span>
+                        <span><strong>Generated:</strong> ${Utilities.formatDate(data.generatedAt)}</span>
+                    `;
+                    bodyEl.innerHTML = data.worksheetHTML || '<p style="color: var(--text-muted)">No HTML content provided.</p>';
+                } else {
+                    bodyEl.innerHTML = '<p style="color: var(--danger)">Failed to load preview.</p>';
+                }
+            },
+
+            openConfirmDelete(worksheetId) {
+                Modal.currentDeleteId = worksheetId;
+                Modal.confirm.showModal();
+            }
+        };
+
+        /**
+         * UI RENDERER
+         */
+        const AdminUI = {
+            container: document.getElementById('worksheet-container'),
+            
+            renderSkeletons(count = 6) {
+                AdminUI.container.innerHTML = Array(count).fill(
+                    `<div class="worksheet-card glass skeleton-card skeleton"></div>`
+                ).join('');
+            },
+
+            renderEmpty() {
+                AdminUI.container.innerHTML = `
+                    <div class="empty-state glass">
+                        No pending worksheets found matching your criteria.
+                    </div>`;
+            },
+
+            updateStats(stats) {
+                // Now consumes the object from the backend API
+                document.getElementById('stat-total').textContent = stats.total || 0;
+                document.getElementById('stat-pending').textContent = stats.pending || 0;
+                document.getElementById('stat-approved').textContent = stats.approved || 0;
+                document.getElementById('stat-rejected').textContent = stats.rejected || 0;
+            },
+
+            renderCards(data) {
+                if (!data || data.length === 0) {
+                    AdminUI.renderEmpty();
+                    return;
+                }
+
+                AdminUI.container.innerHTML = data.map(sheet => {
+                    const status = (sheet.status || 'pending').toLowerCase();
+                    return `
+                    <div class="worksheet-card glass">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">${sheet.title || 'Untitled Worksheet'}</div>
+                                <div class="card-id">ID: ${sheet.worksheetId}</div>
+                            </div>
+                            <span class="badge badge-${status}">${status}</span>
+                        </div>
+                        
+                        <div class="card-meta">
+                            <span><strong>Class:</strong> ${sheet.className || '-'}</span>
+                            <span><strong>Chapter:</strong> ${sheet.chapter || '-'}</span>
+                            <span><strong>Board:</strong> ${sheet.board || '-'}</span>
+                            <span><strong>Difficulty:</strong> ${sheet.difficulty || '-'}</span>
+                            <span><strong>Questions:</strong> ${sheet.questionCount || 0}</span>
+                            <span><strong>Date:</strong> ${Utilities.formatDate(sheet.generatedAt)}</span>
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn btn-outline btn-preview" data-id="${sheet.worksheetId}">Preview</button>
+                            <button class="btn btn-outline btn-approve" data-id="${sheet.worksheetId}" style="color:var(--success); border-color:var(--success)">Approve</button>
+                            <button class="btn btn-outline btn-reject" data-id="${sheet.worksheetId}">Reject</button>
+                            <button class="btn btn-danger btn-delete" data-id="${sheet.worksheetId}">Delete</button>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Attach event listeners mapping ID properly
+                document.querySelectorAll('.btn-preview').forEach(btn => 
+                    btn.addEventListener('click', (e) => {
+                        const worksheetId = e.target.dataset.id;
+                        const itemData = Dashboard.state.allData.find(item => item.worksheetId === worksheetId);
+                        Modal.openPreview(worksheetId, itemData);
+                    })
+                );
+                document.querySelectorAll('.btn-approve').forEach(btn => 
+                    btn.addEventListener('click', (e) => Dashboard.handleAction('approve', e.target.dataset.id))
+                );
+                document.querySelectorAll('.btn-reject').forEach(btn => 
+                    btn.addEventListener('click', (e) => Dashboard.handleAction('reject', e.target.dataset.id))
+                );
+                document.querySelectorAll('.btn-delete').forEach(btn => 
+                    btn.addEventListener('click', (e) => Modal.openConfirmDelete(e.target.dataset.id))
+                );
+            }
+        };
+
+        /**
+         * CORE DASHBOARD CONTROLLER
+         */
+        const Dashboard = {
+            state: {
+                allData: [],
+                filteredData: []
+            },
+
+            init() {
+                Modal.init();
+                Dashboard.bindEvents();
+                Dashboard.loadData();
+            },
+
+            bindEvents() {
+                document.getElementById('btn-refresh').addEventListener('click', Dashboard.loadData);
+                
+                const filterChangeHandler = () => Dashboard.applyFilters();
+                document.getElementById('filter-status').addEventListener('change', filterChangeHandler);
+                document.getElementById('filter-class').addEventListener('change', filterChangeHandler);
+                document.getElementById('filter-difficulty').addEventListener('change', filterChangeHandler);
+                
+                document.getElementById('search-input').addEventListener('input', 
+                    Utilities.debounce(filterChangeHandler, 300)
+                );
+            },
+
+            async loadData() {
+                AdminUI.renderSkeletons();
+                
+                // Fetch stats and worksheets concurrently for performance
+                const [stats, response] = await Promise.all([
+                    AdminAPI.fetchStats(),
+                    AdminAPI.fetchPending()
+                ]);
+
+                // 1. Process Response Array
+                Dashboard.state.allData = (response && response.worksheets) ? response.worksheets : [];
+                
+                // 2. Update Stats
+                AdminUI.updateStats(stats);
+                
+                // 3. Render filtered UI
+                Dashboard.applyFilters();
+            },
+
+            applyFilters() {
+                const searchQ = document.getElementById('search-input').value.toLowerCase();
+                const statusF = document.getElementById('filter-status').value;
+                const classF = document.getElementById('filter-class').value;
+                const diffF = document.getElementById('filter-difficulty').value;
+
+                Dashboard.state.filteredData = Dashboard.state.allData.filter(item => {
+                    // Adjusted search to match worksheetId
+                    const searchStr = `${item.worksheetId} ${item.title} ${item.chapter} ${item.topics?.join(' ')}`.toLowerCase();
+                    const matchesSearch = searchStr.includes(searchQ);
+
+                    const matchesStatus = statusF ? (item.status || 'pending').toLowerCase() === statusF : true;
+                    const matchesClass = classF ? String(item.className) === classF : true;
+                    const matchesDiff = diffF ? (item.difficulty || '').toLowerCase() === diffF : true;
+
+                    return matchesSearch && matchesStatus && matchesClass && matchesDiff;
+                });
+
+                AdminUI.renderCards(Dashboard.state.filteredData);
+            },
+
+            async handleAction(actionType, worksheetId) {
+                const endpoints = {
+                    'approve': CONFIG.endpoints.approve,
+                    'reject': CONFIG.endpoints.reject
+                };
+
+                const success = await AdminAPI.action(endpoints[actionType], worksheetId);
+                
+                if (success) {
+                    Toast.success(`${actionType.charAt(0).toUpperCase() + actionType.slice(1)}d successfully`);
+                    Dashboard.loadData(); 
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', Dashboard.init);
+
+    </script>
+</body>
+</html>
