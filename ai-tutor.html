@@ -5,86 +5,193 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Physics Tutor | CinePhysicsHQ</title>
     
+    <!-- Fonts: Syne, Inter, Space Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <!-- Icons (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- MathJax for Physics Equations -->
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/ai-tutor.css">
 </head>
 <body>
-    <div class="bg-grid"></div>
-
-    <header class="glass-header">
-        <div class="logo">CinePhysicsHQ</div>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="#">Worksheets</a>
-            <a href="#">Labs</a>
-        </nav>
-    </header>
-
-    <section class="hero">
-        <h1>AI Physics Tutor</h1>
-        <p>Ask physics questions, solve numericals, derive formulas, explain concepts and generate practice questions instantly.</p>
-    </section>
-
-    <main class="tutor-container glass-panel">
+    <div class="app-container">
         
-        <aside class="sidebar">
+        <!-- Left Sidebar -->
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h3>Chat History</h3>
-                <button id="exportBtn" class="icon-btn" title="Export Conversation">📥 Export</button>
+                <div class="logo">
+                    <i data-lucide="atom" class="logo-icon"></i>
+                    <span>CinePhysicsHQ</span>
+                </div>
+                <button class="icon-btn mobile-close" id="closeSidebar">
+                    <i data-lucide="x"></i>
+                </button>
             </div>
-            <ul id="historyList" class="history-list">
+            
+            <button class="new-chat-btn" id="newChatBtn">
+                <i data-lucide="plus"></i> New Chat
+            </button>
+            
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" placeholder="Search conversations...">
+            </div>
+            
+            <div class="sidebar-section">
+                <h3>Recent Chats</h3>
+                <ul class="chat-history-list" id="historyList">
+                    <!-- History items injected via JS -->
                 </ul>
+            </div>
+            
+            <div class="sidebar-footer">
+                <button class="sidebar-action" id="exportAllBtn"><i data-lucide="download"></i> Export Chat</button>
+                <button class="sidebar-action text-danger" id="deleteAllBtn"><i data-lucide="trash-2"></i> Delete Chat</button>
+                <div class="divider"></div>
+                <button class="sidebar-action"><i data-lucide="settings"></i> Settings</button>
+                <button class="sidebar-action"><i data-lucide="moon"></i> Dark Theme</button>
+            </div>
         </aside>
 
-        <section class="chat-interface">
+        <!-- Right Panel (Main Chat Area) -->
+        <main class="chat-panel">
             
-            <div id="chatWindow" class="chat-window">
-                <div class="message ai-message">
-                    <div class="message-content">
-                        <p>Hello! I am your CinePhysics AI Tutor. How can I help you master physics today?</p>
-                        
-                        <div class="quick-prompts">
-                            <button class="chip">Explain Lorentz Force</button>
-                            <button class="chip">Solve this numerical</button>
-                            <button class="chip">Generate 10 MCQs</button>
-                            <button class="chip">Derive Gauss Law</button>
-                            <button class="chip">Explain Dimensional Analysis</button>
-                            <button class="chip">Teach like Class 11</button>
-                            <button class="chip">Teach like JEE Advanced</button>
-                            <button class="chip">Create Revision Notes</button>
+            <!-- Sticky Header -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <button class="icon-btn mobile-menu-btn" id="openSidebar">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="tutor-info">
+                        <h2>AI Physics Tutor</h2>
+                        <div class="status">
+                            <span class="status-dot"></span> Online
+                        </div>
+                        <p class="subtitle">Ask questions. Solve numericals. Derive formulas. Generate worksheets.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Scrollable Chat Interface -->
+            <div class="chat-window" id="chatWindow">
+                
+                <!-- Welcome Screen (Visible initially) -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-hero">
+                        <div class="ai-icon-large">
+                            <i data-lucide="bot"></i>
+                        </div>
+                        <h1>Welcome to CinePhysics AI Tutor</h1>
+                        <p>Learn Physics interactively with AI.</p>
+                    </div>
+
+                    <div class="capabilities-grid">
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> Explain concepts</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> Solve numericals</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> Derive formulas</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> Generate worksheets</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> Generate MCQs</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> CBSE & NCERT</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> JEE Preparation</div>
+                        <div class="cap-card"><i data-lucide="check-circle-2"></i> NEET Preparation</div>
+                    </div>
+
+                    <div class="quick-prompts-section">
+                        <h3>Try asking about:</h3>
+                        <div class="quick-prompts-grid">
+                            <button class="prompt-card">
+                                <span class="prompt-icon">⚡</span>
+                                <span class="prompt-text">Explain Lorentz Force</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">🧮</span>
+                                <span class="prompt-text">Solve Numerical</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">📚</span>
+                                <span class="prompt-text">Generate 10 MCQs</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">📐</span>
+                                <span class="prompt-text">Derive Gauss Law</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">🎯</span>
+                                <span class="prompt-text">Explain Dimensional Analysis</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">🎓</span>
+                                <span class="prompt-text">Teach Like Class 11</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">🚀</span>
+                                <span class="prompt-text">Teach Like JEE Advanced</span>
+                            </button>
+                            <button class="prompt-card">
+                                <span class="prompt-icon">📝</span>
+                                <span class="prompt-text">Revision Notes</span>
+                            </button>
                         </div>
                     </div>
                 </div>
-                </div>
 
-            <div id="loadingIndicator" class="loading-indicator hidden">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
+                <!-- Chat messages will be injected here -->
+                <div class="messages-container" id="messagesContainer"></div>
+
+                <!-- Loading Indicator -->
+                <div class="message ai-message loading-indicator hidden" id="loadingIndicator">
+                    <div class="avatar"><i data-lucide="bot"></i></div>
+                    <div class="message-content glass-card">
+                        <div class="thinking-text">Thinking</div>
+                        <div class="typing-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="input-area">
-                <div class="input-wrapper">
-                    <button id="attachBtn" class="icon-btn" title="Attach Image (Future Feature)">📎</button>
-                    <textarea id="promptInput" placeholder="Type your physics question here... (Ctrl + Enter to send)" rows="1"></textarea>
-                    <button id="voiceBtn" class="icon-btn disabled" title="Voice - Coming Soon">🎤</button>
-                    <button id="sendBtn" class="primary-btn">Send</button>
+            <!-- Sticky Input Area -->
+            <div class="input-container">
+                <div class="input-box glass-card">
+                    <button class="icon-btn attachment-btn" title="Attach image">
+                        <i data-lucide="paperclip"></i>
+                    </button>
+                    
+                    <textarea 
+                        id="promptInput" 
+                        placeholder="Ask anything about Physics... (Ctrl+Enter to send)" 
+                        rows="1"
+                    ></textarea>
+                    
+                    <button class="icon-btn voice-btn disabled" title="Voice coming soon" disabled>
+                        <i data-lucide="mic"></i>
+                    </button>
+                    
+                    <button class="send-btn" id="sendBtn" title="Send message">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+                <div class="input-footer">
+                    AI can make mistakes. Verify important physics concepts.
                 </div>
             </div>
 
-        </section>
-    </main>
+        </main>
+    </div>
 
-    <footer>
-        <p>&copy; 2026 CinePhysicsHQ. All rights reserved.</p>
-    </footer>
-
+    <!-- Initialize Icons -->
+    <script>lucide.createIcons();</script>
+    
+    <!-- JS Modules -->
     <script type="module" src="js/ai-tutor.js"></script>
 </body>
 </html>
