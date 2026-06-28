@@ -331,15 +331,16 @@
 
     <script>
         /**
-         * Global State
+         * Global State & Cache Configuration
          */
         let allWorksheets = [];
         let filteredWorksheets = [];
         
         let currentPage = 1;
         const ITEMS_PER_PAGE = 20;
+        const CACHE_VERSION = 1; // Increment when data schema changes
 
-        // Intl.Collator for natural numeric string sorting (e.g., Worksheet 2 before Worksheet 10)
+        // Intl.Collator for natural numeric string sorting
         const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
         /**
@@ -389,6 +390,15 @@
         function getStars(rating) {
             const r = Math.round(Math.max(0, Math.min(5, rating)));
             return '★'.repeat(r) + '☆'.repeat(5 - r);
+        }
+
+        function trackEvent(eventName, worksheetId, worksheetTitle) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, { 
+                    worksheet_id: worksheetId, 
+                    worksheet_title: worksheetTitle 
+                });
+            }
         }
 
         /**
@@ -457,19 +467,20 @@
         }
 
         /**
-         * Fetch Data (Stale-While-Revalidate Pattern)
+         * Fetch Data (Version-based Stale-While-Revalidate)
          */
         async function fetchWorksheets() {
             let hasRenderedCache = false;
+            let cacheData = null;
 
-            // 1. Instantly paint the UI with cached data if available
+            // 1. Instant UI Paint from Cache
             const cached = localStorage.getItem("worksheetCache");
             if (cached) {
                 try {
-                    const parsedCache = JSON.parse(cached);
-                    allWorksheets = parsedCache.worksheets || [];
+                    cacheData = JSON.parse(cached);
+                    allWorksheets = cacheData.worksheets || [];
                     hasRenderedCache = true;
-                    applyFilters(false); // Render without overriding URL page param
+                    applyFilters(false);
                     DOM.syncBadge.style.display = 'inline';
                 } catch (e) {
                     console.warn("Invalid cache format.");
@@ -478,7 +489,7 @@
 
             if (!hasRenderedCache) showLoading();
 
-            // 2. Fetch fresh data in the background
+            // 2. Background Sync (Version & Length Check)
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error("API Error");
@@ -486,10 +497,16 @@
                 const data = await response.json();
                 const freshWorksheets = Array.isArray(data?.worksheets) ? data.worksheets : [];
                 
-                // 3. Compare and silently update if data changed
-                if (JSON.stringify(allWorksheets) !== JSON.stringify(freshWorksheets)) {
+                // Compare version/length (O(1) comparison)
+                const needsUpdate = 
+                    !cacheData || 
+                    (data.version && data.version !== cacheData.version) || 
+                    freshWorksheets.length !== (cacheData.worksheets || []).length;
+
+                if (needsUpdate) {
                     allWorksheets = freshWorksheets;
                     localStorage.setItem("worksheetCache", JSON.stringify({
+                        version: data.version || CACHE_VERSION,
                         updated: Date.now(),
                         worksheets: allWorksheets
                     }));
@@ -703,11 +720,8 @@
                 }
                 
                 const btn = e.target.closest('.btn-launch');
-                if (btn && typeof gtag === 'function') {
-                    gtag('event', 'worksheet_open', { 
-                        worksheet_id: btn.dataset.id, 
-                        worksheet_title: btn.dataset.title 
-                    });
+                if (btn) {
+                    trackEvent('worksheet_open', btn.dataset.id, btn.dataset.title);
                 }
             });
 
