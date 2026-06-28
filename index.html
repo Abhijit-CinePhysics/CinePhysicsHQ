@@ -1,7 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Analytics -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CinePhysicsHQ | Interactive Physics Learning Platform</title>
+    
+    <meta name="description" content="CinePhysicsHQ - Interactive physics learning platform with free simulations, AI-powered question banks, and conceptual teaching for Class 11, Class 12, JEE, and NEET">
+    <meta name="keywords" content="physics labs, interactive simulations, dimensional analysis, error analysis, JEE physics, NEET physics, Class 11 physics, Class 12 physics, free physics tools">
+    <meta name="author" content="Abhijit Singh">
+    <link rel="canonical" href="https://abhijit-cinephysics.github.io/CinePhysics/">
+    
+    <meta property="og:title" content="CinePhysicsHQ | Interactive Physics Learning Platform">
+    <meta property="og:description" content="Free physics simulations, interactive labs, AI-powered question banks. Learn physics through exploration, not memorization.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://abhijit-cinephysics.github.io/CinePhysics/">
+    <meta property="og:image" content="https://abhijit-cinephysics.github.io/CinePhysics/assets/og-image.jpg">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CinePhysicsHQ | Interactive Physics Learning">
+    <meta name="twitter:description" content="Free physics simulations, interactive labs, and AI-powered learning.">
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "CinePhysicsHQ",
+      "url": "https://abhijit-cinephysics.github.io/CinePhysics/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://abhijit-cinephysics.github.io/CinePhysics/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-R41EJ3144X"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -9,20 +41,11 @@
       gtag('js', new Date());
       gtag('config', 'G-R41EJ3144X');
     </script>
-<meta name="description" content="CinePhysicsHQ - Interactive physics learning platform with free simulations, AI-powered question banks, and conceptual teaching for Class 11, Class 12, JEE, and NEET">
-<meta name="keywords" content="physics labs, interactive simulations, dimensional analysis, error analysis, JEE physics, NEET physics, Class 11 physics, Class 12 physics, free physics tools">
-<meta name="author" content="Abhijit Singh">
-<meta property="og:title" content="CinePhysicsHQ | Interactive Physics Learning Platform">
-<meta property="og:description" content="Free physics simulations, interactive labs, AI-powered question banks. Learn physics through exploration, not memorization.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://abhijit-cinephysics.github.io/CinePhysics/">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="CinePhysicsHQ - Interactive Physics Simulations, Interactive Labs, and Educational Resources for Class 11, Class 12, JEE, and NEET preparation.">
-    <title>CinePhysicsHQ | Interactive Physics Learning Platform</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+      /* --- PRESERVED THEME & VARIABLES --- */
       :root {
         --bg: #0a0e1a;
         --surface: #0f1424;
@@ -36,15 +59,8 @@
         --success: #00e5a0;
       }
 
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
 
       body {
         background: var(--bg);
@@ -74,35 +90,37 @@
         padding: 0 1.5rem;
       }
 
-      /* HEADER & NAV */
+      /* --- HEADER REDESIGN --- */
       header {
         border-bottom: 1px solid var(--border);
-        padding: 2rem 0;
+        padding: 1.5rem 0;
         background: rgba(10, 14, 26, 0.8);
         backdrop-filter: blur(10px);
         position: sticky;
         top: 0;
         z-index: 100;
+        transition: all 0.3s ease;
+      }
+
+      header.scrolled {
+        background: rgba(10, 14, 26, 0.95);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        padding: 1rem 0;
       }
 
       header .container {
+        max-width: 1400px;
+        margin: auto;
         display: flex;
         justify-content: space-between;
         align-items: center;
       }
 
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .logo-icon {
-        font-size: 1.8rem;
-      }
-
+      .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; margin-right: 2rem;}
+      .logo-icon { font-size: 1.5rem; }
+      
       .logo-text {
-        font-size: 1.1rem;
+        font-size: .95rem;
         font-weight: 800;
         letter-spacing: 0.05em;
         background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
@@ -111,78 +129,111 @@
         background-clip: text;
       }
 
-      nav {
-        display: flex;
-        gap: 2rem;
-        align-items: center;
-      }
-
+      nav { display: flex; align-items: center; gap: 1.2rem; }
+      
       nav a {
         color: var(--text-muted);
         text-decoration: none;
-        font-size: 0.85rem;
+        font-size: .78rem;
         font-family: 'Space Mono', monospace;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: color 0.2s;
-        border-bottom: 2px solid transparent;
-        padding-bottom: 0.25rem;
+        letter-spacing: .04em;
+        white-space: nowrap;
+        transition: all 0.3s ease;
+        position: relative;
+        padding: 0.5rem 0;
       }
 
-      nav a:hover {
-        color: var(--accent);
-        border-bottom-color: var(--accent);
+      nav a::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--accent);
+        transition: width 0.3s ease;
       }
 
-      @media (max-width: 768px) {
-        nav {
-          display: none;
-        }
+      nav a:hover, nav a.active { color: var(--accent); }
+      nav a:hover::after, nav a.active::after { width: 100%; }
+
+      /* Mobile Hamburger Menu */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 200;
       }
 
-      /* HERO */
-      .hero {
-        padding: 5rem 0;
-        text-align: center;
-        margin-bottom: 4rem;
+      .hamburger span {
+        width: 25px;
+        height: 2px;
+        background: var(--text);
+        transition: all 0.3s ease;
       }
 
-      .hero-eyebrow {
+      .mobile-drawer {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 300px;
+        height: 100vh;
+        background: var(--surface);
+        border-left: 1px solid var(--border);
+        padding: 6rem 2rem 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        transition: right 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        z-index: 150;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+      }
+
+      .mobile-drawer.open { right: 0; }
+      .mobile-drawer a {
+        font-size: 1.1rem;
         font-family: 'Space Mono', monospace;
-        font-size: 0.75rem;
+        color: var(--text);
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+      .mobile-drawer a:hover { color: var(--accent); }
+
+      .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        z-index: 140;
+      }
+      .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+      @media (max-width: 992px) {
+        nav { display: none; }
+        .hamburger { display: flex; }
+      }
+
+      /* --- SHARED COMPONENTS (Buttons, Grids, Sections) --- */
+      .section-margin { margin-bottom: 6rem; }
+      
+      .section-header { margin-bottom: 3rem; }
+      .section-label {
+        font-family: 'Space Mono', monospace;
+        font-size: 0.7rem;
         color: var(--accent);
-        letter-spacing: 0.2em;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
         margin-bottom: 1rem;
       }
-
-      .hero h1 {
-        font-size: clamp(2.5rem, 8vw, 4rem);
-        font-weight: 800;
-        line-height: 1.1;
-        margin-bottom: 1.5rem;
-        letter-spacing: -0.02em;
-      }
-
-      .hero h1 .gradient {
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      .hero-subtitle {
-        font-size: 1.2rem;
-        color: var(--text-muted);
-        max-width: 700px;
-        margin: 0 auto 2.5rem;
-        line-height: 1.7;
-      }
-
-      .hero-cta {
-        display: inline-flex;
-        gap: 1rem;
-      }
+      .section-header h2 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+      .section-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; }
 
       .btn {
         padding: 1rem 2rem;
@@ -195,621 +246,265 @@
         transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
         text-decoration: none;
         display: inline-block;
+        text-align: center;
       }
+      .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%); color: var(--bg); }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3); }
+      .btn-secondary { border: 1px solid var(--accent); color: var(--accent); background: transparent; }
+      .btn-secondary:hover { background: rgba(0, 212, 255, 0.1); }
+      .btn-sm { padding: 0.5rem 1rem; font-size: 0.8rem; }
 
-      .btn-primary {
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
-        color: var(--bg);
+      .grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+
+      /* --- HERO (Preserved) --- */
+      .hero { padding: 5rem 0; text-align: center; margin-bottom: 4rem; }
+      .hero-eyebrow { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 1rem; }
+      .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+      .hero h1 .gradient { background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); max-width: 700px; margin: 0 auto 2.5rem; line-height: 1.7; }
+      .hero-cta { display: inline-flex; gap: 1rem; flex-wrap: wrap; justify-content: center;}
+
+      /* --- NEW: Search & Quick Actions --- */
+      .search-container { max-width: 600px; margin: 0 auto 3rem; position: relative; }
+      .search-input {
+        width: 100%; padding: 1.2rem 2rem; border-radius: 50px;
+        background: var(--surface2); border: 1px solid var(--border);
+        color: var(--text); font-size: 1rem; outline: none;
+        transition: border-color 0.3s;
       }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3);
+      .search-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,212,255,0.1); }
+      
+      .quick-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 4rem; }
+      .quick-action-card {
+        background: var(--surface); border: 1px solid var(--border);
+        padding: 1rem 1.5rem; border-radius: 12px; text-decoration: none;
+        color: var(--text); font-weight: 600; font-size: 0.9rem;
+        transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;
       }
+      .quick-action-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
-      .btn-secondary {
-        border: 1px solid var(--accent);
-        color: var(--accent);
-        background: transparent;
+      /* Filters */
+      .filters { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 2rem; scrollbar-width: none; }
+      .filters::-webkit-scrollbar { display: none; }
+      .filter-btn {
+        background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted);
+        padding: 0.5rem 1.2rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; white-space: nowrap; transition: all 0.2s;
       }
+      .filter-btn:hover, .filter-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-      .btn-secondary:hover {
-        background: rgba(0, 212, 255, 0.1);
-      }
-
-      /* LABS SECTION */
-      .labs-section {
-        margin-bottom: 6rem;
-      }
-
-      .section-header {
-        margin-bottom: 3rem;
-      }
-
-      .section-label {
-        font-family: 'Space Mono', monospace;
-        font-size: 0.7rem;
-        color: var(--accent);
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        margin-bottom: 1rem;
-      }
-
-      .section-header h2 {
-        font-size: clamp(2rem, 5vw, 3rem);
-        font-weight: 800;
-        line-height: 1.2;
-        margin-bottom: 0.5rem;
-      }
-
-      .section-header p {
-        color: var(--text-muted);
-        font-size: 1.1rem;
-        max-width: 600px;
-      }
-
-      .labs-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-      }
-
-      .lab-card {
+      /* --- CARDS (Reusable via JS) --- */
+      .card {
         background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 2.5rem;
+        border: 1px solid var(--border); border-radius: 12px; padding: 2rem;
         transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: hidden;
+        display: flex; flex-direction: column; position: relative; overflow: hidden;
       }
-
-      .lab-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
+      .card:hover { border-color: var(--accent); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0, 212, 255, 0.15); }
+      .card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
         background: linear-gradient(90deg, var(--accent) 0%, transparent 100%);
       }
-
-      .lab-card:hover {
-        border-color: var(--accent);
-        transform: translateY(-6px);
-        box-shadow: 0 20px 50px rgba(0, 212, 255, 0.15);
+      .card.featured { border-color: var(--accent-warm); background: linear-gradient(135deg, rgba(255, 157, 0, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%); }
+      .card.featured::before { background: linear-gradient(90deg, var(--accent-warm) 0%, var(--accent-alt) 100%); }
+      
+      .badge {
+        position: absolute; top: 1.5rem; right: 1.5rem; background: var(--accent-warm);
+        color: var(--bg); padding: 0.4rem 0.9rem; border-radius: 20px;
+        font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
       }
+      
+      .card-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+      .card-meta { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem; }
+      .card h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.8rem; line-height: 1.3; }
+      .card-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; flex-grow: 1; }
 
-      .lab-card.featured {
-        grid-column: span 1;
-        border-color: var(--accent-warm);
-        background: linear-gradient(135deg, rgba(255, 157, 0, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+      /* AI Tutor Specifics */
+      .ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+      .ai-card { text-align: center; padding: 2rem 1.5rem; }
+      .ai-card .card-icon { font-size: 3rem; background: linear-gradient(135deg, var(--accent-alt), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+      /* Dynamic Stats */
+      .stats-container {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 3rem; padding: 3rem;
+        background: rgba(0, 212, 255, 0.05); border: 1px solid var(--border); border-radius: 12px;
       }
+      .stat-item { text-align: center; }
+      .stat-number { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem; }
+      .stat-label { font-size: 0.85rem; color: var(--text-muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
 
-      .lab-card.featured::before {
-        background: linear-gradient(90deg, var(--accent-warm) 0%, var(--accent-alt) 100%);
-      }
-
-      .lab-badge {
-        position: absolute;
-        top: 1.5rem;
-        right: 1.5rem;
-        background: var(--accent-warm);
-        color: var(--bg);
-        padding: 0.4rem 0.9rem;
-        border-radius: 20px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-      }
-
-      .lab-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        display: block;
-      }
-
-      .lab-category {
-        font-family: 'Space Mono', monospace;
-        font-size: 0.65rem;
-        color: var(--text-muted);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        margin-bottom: 0.75rem;
-      }
-
-      .lab-card h3 {
-        font-size: 1.5rem;
-        font-weight: 800;
-        margin-bottom: 0.8rem;
-        line-height: 1.3;
-      }
-
-      .lab-description {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        margin-bottom: 1.5rem;
-        flex-grow: 1;
-        line-height: 1.7;
-      }
-
-      .lab-features {
-        list-style: none;
-        margin-bottom: 2rem;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-      }
-
-      .lab-features li {
-        padding-left: 1.5rem;
-        margin-bottom: 0.5rem;
-        position: relative;
-      }
-
-      .lab-features li::before {
-        content: '✓';
-        position: absolute;
-        left: 0;
-        color: var(--success);
-        font-weight: 700;
-      }
-
-      /* VIDEO SECTION */
+      /* Video Section Preserved & Optimized */
       .video-section {
         background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 3rem;
-        margin-bottom: 6rem;
+        border: 1px solid var(--border); border-radius: 16px; padding: 3rem;
       }
+      .video-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; align-items: start; }
+      .video-thumbnail { width: 100%; aspect-ratio: 16 / 9; background: var(--surface2); border-radius: 12px; overflow: hidden; margin-bottom: 1rem; position: relative; }
+      .video-thumbnail img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+      .video-thumbnail:hover img { transform: scale(1.05); }
+      .recent-videos { display: flex; flex-direction: column; gap: 1rem; }
+      .recent-video-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-decoration: none; color: var(--text); display: flex; gap: 1rem; align-items: center;}
+      .recent-video-item img { width: 100px; border-radius: 6px; aspect-ratio: 16/9; object-fit: cover;}
+      .recent-video-item:hover { border-color: var(--accent); background: var(--surface2); }
 
-      .video-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 3rem;
-        align-items: center;
+      /* Loading Skeletons */
+      .skeleton { background: var(--surface2); border-radius: 8px; overflow: hidden; position: relative; }
+      .skeleton::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+        animation: loading 1.5s infinite;
       }
+      @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+      .skeleton-text { height: 1rem; margin-bottom: 0.5rem; width: 80%; }
+      .skeleton-title { height: 1.5rem; margin-bottom: 1rem; width: 60%; }
+      .skeleton-img { height: 150px; width: 100%; margin-bottom: 1rem; }
 
-      .featured-video {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-      }
-
-      .video-thumbnail {
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        background: var(--surface);
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        overflow: hidden;
-      }
-
-      .video-thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .recent-videos {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .recent-video-item {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 1rem;
-        text-decoration: none;
-        color: var(--text);
-        transition: all 0.2s;
-      }
-
-      .recent-video-item:hover {
-        border-color: var(--accent);
-        background: var(--surface2);
-      }
-
-      .recent-video-item p {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-      }
+      /* CTA & FOOTER */
+      .cta-section { background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border: 1px solid var(--border); border-radius: 16px; padding: 4rem 2rem; text-align: center; }
+      footer { border-top: 1px solid var(--border); padding: 4rem 0; text-align: center; color: var(--text-muted); }
+      .contact-links { display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; }
+      .contact-links a { color: var(--accent); text-decoration: none; }
 
       @media (max-width: 768px) {
-        .video-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-
-      /* STATS */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 2rem;
-        padding: 3rem;
-        background: rgba(0, 212, 255, 0.05);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        margin-bottom: 6rem;
-      }
-
-      .stat {
-        text-align: center;
-      }
-
-      .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.5rem;
-      }
-
-      .stat-label {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-family: 'Space Mono', monospace;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-      }
-
-      /* CURRICULUM */
-      .curriculum-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 2rem;
-        margin-bottom: 6rem;
-      }
-
-      .curriculum-card {
-        background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        text-decoration: none;
-        color: var(--text);
-        transition: all 0.3s;
-      }
-
-      .curriculum-card:hover {
-        border-color: var(--accent);
-        transform: translateY(-4px);
-        box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1);
-      }
-
-      .curriculum-card h3 {
-        font-size: 1.8rem;
-        font-weight: 800;
-        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      /* CTA */
-      .cta-section {
-        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 4rem 2rem;
-        text-align: center;
-        margin-bottom: 4rem;
-      }
-
-      .cta-section h2 {
-        font-size: 2.2rem;
-        margin-bottom: 1rem;
-      }
-
-      .cta-section p {
-        color: var(--text-muted);
-        margin-bottom: 2rem;
-        max-width: 600px;
-        margin-left: auto;
-        margin-right: auto;
-        font-size: 1.1rem;
-      }
-
-      /* FOOTER */
-      footer {
-        border-top: 1px solid var(--border);
-        padding: 4rem 0;
-        text-align: center;
-        color: var(--text-muted);
-      }
-
-      footer h3 {
-        color: var(--text);
-        margin-bottom: 1rem;
-      }
-
-      .contact-links {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        margin: 2rem 0;
-        flex-wrap: wrap;
-      }
-
-      .contact-links a {
-        color: var(--accent);
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-
-      .contact-links a:hover {
-        color: var(--accent-warm);
-      }
-
-      footer p {
-        font-size: 0.85rem;
-        margin-top: 2rem;
-      }
-
-      /* ANIMATIONS */
-      @media (prefers-reduced-motion: no-preference) {
-        .lab-card {
-          animation: slideUp 0.6s ease-out backwards;
-        }
-
-        .lab-card:nth-child(1) { animation-delay: 0.1s; }
-        .lab-card:nth-child(2) { animation-delay: 0.2s; }
-        .lab-card:nth-child(3) { animation-delay: 0.3s; }
-        .lab-card:nth-child(4) { animation-delay: 0.4s; }
-
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      }
-
-      /* RESPONSIVE */
-      @media (max-width: 768px) {
-        .hero {
-          padding: 3rem 0;
-        }
-
-        .labs-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .video-section {
-          padding: 2rem;
-        }
-
-        .stats-grid {
-          padding: 2rem;
-          gap: 1.5rem;
-        }
-
-        .cta-section {
-          padding: 2.5rem 1.5rem;
-        }
-
-        footer {
-          padding: 2rem 0;
-        }
+        .video-grid { grid-template-columns: 1fr; }
+        .hero { padding: 3rem 0; }
+        .stats-container { flex-direction: column; gap: 1.5rem; padding: 2rem; }
       }
     </style>
-    
 </head>
 <body>
 
-<!-- HEADER -->
-<header>
+<header id="main-header">
   <div class="container">
-    <div class="logo">
+    <a href="#" class="logo" aria-label="CinePhysicsHQ Home">
       <div class="logo-icon">⚡</div>
       <div class="logo-text">CinePhysicsHQ</div>
-    </div>
-    <nav>
-      <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/worksheet-builder.html">Worksheet Generator</a>
-      <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ//CinePhysicsHQ-Labs/">Labs</a>
-      <a href="#videos">Videos</a>
-      <a href="#curriculum">Classes</a>
-      <a href="#contact">Contact</a>
-      <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/about.html">About</a>
+    </a>
+    
+    <nav aria-label="Main navigation">
+      <a href="#labs" class="nav-link">Labs</a>
+      <a href="#worksheets" class="nav-link">Worksheets</a>
+      <a href="#qbanks" class="nav-link">Question Banks</a>
+      <a href="#ai-tutor" class="nav-link">AI Tutor</a>
+      <a href="#teacher" class="nav-link">Teacher</a>
+      <a href="#videos" class="nav-link">Videos</a>
+      <a href="about.html" class="nav-link">About</a>
     </nav>
+
+    <button class="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="mobile-nav">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<!-- HERO -->
+<div class="drawer-overlay" aria-hidden="true"></div>
+<div id="mobile-nav" class="mobile-drawer" aria-hidden="true">
+  <a href="#labs" class="mobile-link">Labs</a>
+  <a href="#worksheets" class="mobile-link">Worksheets</a>
+  <a href="#qbanks" class="mobile-link">Question Banks</a>
+  <a href="#ai-tutor" class="mobile-link">AI Tutor</a>
+  <a href="#teacher" class="mobile-link">Teacher</a>
+  <a href="#videos" class="mobile-link">Videos</a>
+  <a href="about.html" class="mobile-link">About</a>
+</div>
+
 <section class="hero">
   <div class="container">
     <div class="hero-eyebrow">Interactive Physics Learning</div>
     <h1>Physics You Can <span class="gradient">See & Interact With</span></h1>
-    <p class="hero-subtitle">Master complex concepts through interactive simulations, visual demonstrations, and hands-on virtual laboratories. Learn physics through exploration, not memorization.</p>
-    <div class="hero-cta">
-      <a href="#labs" class="btn btn-primary">Explore Labs →</a>
-      <a href="https://www.youtube.com/@CinePhysicsHQ" target="_blank" class="btn btn-secondary">Watch Videos</a>
+    <p class="hero-subtitle">Master complex concepts through interactive simulations, visual demonstrations, and hands-on virtual laboratories.</p>
+    
+    <div class="search-container">
+      <input type="text" class="search-input" placeholder="Search Labs, Worksheets, Topics..." aria-label="Global Search">
+    </div>
+
+    <div class="quick-actions">
+      <a href="#" class="quick-action-card">✨ Generate Worksheet</a>
+      <a href="#labs" class="quick-action-card">🧪 Explore Labs</a>
+      <a href="#ai-tutor" class="quick-action-card">🤖 Ask AI Tutor</a>
+      <a href="#qbanks" class="quick-action-card">📚 Question Banks</a>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<section class="container">
-  <div class="stats-grid">
-    <div class="stat">
-      <div class="stat-number">4</div>
-      <div class="stat-label">Interactive Labs</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">19+</div>
-      <div class="stat-label">Lab Sections</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">Free</div>
-      <div class="stat-label">No Login</div>
-    </div>
-    <div class="stat">
-      <div class="stat-number">JEE Ready</div>
-      <div class="stat-label">Exam Focused</div>
-    </div>
+<section class="container section-margin">
+  <div id="stats-container" class="stats-container">
+    <div class="stat-item"><div class="skeleton skeleton-title"></div></div>
   </div>
 </section>
 
-<!-- LABS -->
-<section class="labs-section" id="labs">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-label">🧪 Interactive Labs</div>
-      <h2>Master Physics Concepts</h2>
-      <p>Browser-based simulations designed for Class 11, Class 12, JEE, and NEET preparation.</p>
-    </div>
-
-    <div class="labs-grid">
-      <!-- Featured Lab -->
-      <div class="lab-card featured">
-        <div class="lab-badge">Featured</div>
-        <div class="lab-icon">📊</div>
-        <div class="lab-category">Class 11 • Advanced</div>
-        <h3>Uncertainty & Error Analysis</h3>
-        <p class="lab-description">Master error propagation, measurement uncertainty, and statistical analysis. Perfect for practical exams and experimental design.</p>
-        <ul class="lab-features">
-          <li>Error propagation calculator</li>
-          <li>Monte Carlo simulations</li>
-          <li>Linear regression tools</li>
-          <li>Significant figures challenges</li>
-          <li>19+ interactive sections</li>
-        </ul>
-        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/error_analysis_lab/" class="btn btn-primary" style="width: 100%; text-align: center;">Launch Lab →</a>
-      </div>
-
-      <!-- Lab 1 -->
-      <div class="lab-card">
-        <div class="lab-icon">🎯</div>
-        <div class="lab-category">Class 11 • Fundamentals</div>
-        <h3>Dimensional Analysis</h3>
-        <p class="lab-description">Verify equations, derive formulas, and master dimensional reasoning with real-time verification.</p>
-        <ul class="lab-features">
-          <li>Equation checker</li>
-          <li>Quantity finder (reverse search)</li>
-          <li>Buckingham π theorem</li>
-          <li>Boss Battle challenges</li>
-          <li>Certificate of mastery</li>
-        </ul>
-        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimensional_analysis_lab/" class="btn btn-primary" style="width: 100%; text-align: center;">Launch Lab →</a>
-      </div>
-
-      <!-- Lab 2 -->
-      <div class="lab-card">
-        <div class="lab-icon">⚡</div>
-        <div class="lab-category">Class 12 • Electromagnetism</div>
-        <h3>Magnetic Lorentz Force</h3>
-        <p class="lab-description">Visualize charged particle motion in magnetic fields. Control all parameters in real time.</p>
-        <ul class="lab-features">
-          <li>Real-time particle simulation</li>
-          <li>Adjustable parameters</li>
-          <li>Circular motion visualization</li>
-          <li>CSV data export</li>
-          <li>Teacher worksheets</li>
-        </ul>
-        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Magnetic%20lorentz-force/" class="btn btn-primary" style="width: 100%; text-align: center;">Launch Lab →</a>
-      </div>
-
-      <!-- Lab 3 -->
-      <div class="lab-card">
-        <div class="lab-icon">🧲</div>
-        <div class="lab-category">Class 12 • Magnetism</div>
-        <h3>Parallel Conductors & Ampere's Law</h3>
-        <p class="lab-description">Explore magnetic forces between parallel current-carrying conductors with field visualization.</p>
-        <ul class="lab-features">
-          <li>Magnetic field mapping</li>
-          <li>Ampere's law verification</li>
-          <li>Multiple view modes</li>
-          <li>Force calculations</li>
-          <li>Experimental protocols</li>
-        </ul>
-        <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/" class="btn btn-primary" style="width: 100%; text-align: center;">Launch Lab →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- VIDEOS -->
-<section class="video-section" id="videos">
-  <div class="container">
-    <div class="section-header" style="margin-bottom: 2rem;">
-      <div class="section-label">🎬 Latest Content</div>
-      <h2>Physics Explained Visually</h2>
-    </div>
-
-    <div class="video-grid">
-      <div class="featured-video">
-        <div class="video-thumbnail">
-          <img id="featured-thumbnail" src="https://via.placeholder.com/800x450?text=Loading..." alt="Latest Video">
-        </div>
-        <div>
-          <h3 id="featured-title">Loading latest video...</h3>
-          <a id="featured-link" href="#" target="_blank" class="btn btn-primary">▶ Watch on YouTube</a>
-        </div>
-      </div>
-
-      <div>
-        <h3 style="margin-bottom: 1.5rem; font-size: 1.2rem;">Recent Videos</h3>
-        <div class="recent-videos" id="recent-videos-container">
-          <div class="recent-video-item" style="opacity: 0.5;">Loading videos...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CURRICULUM -->
-<section class="container" id="curriculum">
+<section class="container section-margin" id="featured">
   <div class="section-header">
-    <div class="section-label">📚 Curriculum Structure</div>
-    <h2>Grade-Wise Resources</h2>
+    <div class="section-label">🔥 What's New</div>
+    <h2>Featured Resources</h2>
   </div>
-
-  <div class="curriculum-grid">
-    <a href="class9.html" class="curriculum-card">
-      <h3>Class 9</h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Foundational Concepts</p>
-    </a>
-    <a href="class10.html" class="curriculum-card">
-      <h3>Class 10</h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Board Preparation</p>
-    </a>
-    <a href="class11.html" class="curriculum-card">
-      <h3>Class 11</h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Advanced Topics</p>
-    </a>
-    <a href="class12.html" class="curriculum-card">
-      <h3>Class 12</h3>
-      <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">Exam Ready</p>
-    </a>
+  <div class="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="Class 11">Class 11</button>
+    <button class="filter-btn" data-filter="Class 12">Class 12</button>
+    <button class="filter-btn" data-filter="JEE">JEE</button>
+    <button class="filter-btn" data-filter="NEET">NEET</button>
   </div>
+  <div id="featured-container" class="grid-auto">
+    </div>
 </section>
 
-<!-- CTA -->
-<section class="cta-section">
-  <div class="container">
+<section class="container section-margin" id="labs">
+  <div class="section-header">
+    <div class="section-label">🧪 Interactive Labs</div>
+    <h2>Master Physics Concepts</h2>
+  </div>
+  <div id="labs-container" class="grid-auto">
+    </div>
+</section>
+
+<section class="container section-margin" id="worksheets">
+  <div class="section-header">
+    <div class="section-label">📝 Practice Material</div>
+    <h2>Latest Worksheets</h2>
+  </div>
+  <div id="worksheets-container" class="grid-auto">
+    </div>
+</section>
+
+<section class="container section-margin" id="qbanks">
+  <div class="section-header">
+    <div class="section-label">🎯 Exam Prep</div>
+    <h2>Question Banks</h2>
+  </div>
+  <div id="qbanks-container" class="grid-auto">
+    </div>
+</section>
+
+<section class="container section-margin" id="ai-tutor">
+  <div class="section-header" style="text-align: center;">
+    <div class="section-label">🤖 Artificial Intelligence</div>
+    <h2>Meet Your AI Co-Pilot</h2>
+    <p style="margin: 0 auto;">Smart tools designed to explain, solve, and generate educational content instantly.</p>
+  </div>
+  <div id="ai-container" class="ai-grid">
+    </div>
+</section>
+
+<section class="container section-margin video-section" id="videos">
+  <div class="section-header">
+    <div class="section-label">🎬 YouTube</div>
+    <h2>Latest Video Lessons</h2>
+  </div>
+  <div class="video-grid" id="video-container">
+    </div>
+</section>
+
+<section class="container section-margin">
+  <div class="cta-section">
     <h2>Start Learning Physics Differently</h2>
-    <p>Interactive labs + visual explanations + curated resources. Everything you need to master physics concepts for exams and beyond.</p>
-    <a href="#labs" class="btn btn-primary">Explore All Labs →</a>
+    <p>Interactive labs, visual explanations, and AI resources. Everything you need to master physics.</p>
+    <a href="#labs" class="btn btn-primary">Explore Resources →</a>
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer id="contact">
   <div class="container">
     <h3>Let's Connect</h3>
-    <p style="max-width: 600px; margin: 1rem auto;">Building the future of physics education through interactive simulations and conceptual teaching.</p>
     <div class="contact-links">
       <a href="mailto:singhabhijit327@gmail.com">Email</a>
       <a href="https://github.com/Abhijit-CinePhysics" target="_blank">GitHub</a>
@@ -820,41 +515,255 @@
 </footer>
 
 <script>
-  const API_KEY = 'AIzaSyAB-8ISfjbtQ93cjgSuCg7x8vvmBZT2ekQ';
-  const CHANNEL_ID = 'UC4VJyWWg1sl8vYFqPrVroqg';
-  const API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=4`;
+    /** * MODULE 1: DATA LOADER (Equivalent to data-loader.js)
+     * Simulates fetching data from JSON files or APIs.
+     */
+    const DataLoader = {
+        fetchStats: async () => {
+            return new Promise(resolve => setTimeout(() => {
+                resolve({ labs: 12, worksheets: 186, qBanks: 95, aiQuestions: "500+" });
+            }, 500));
+        },
+        fetchLabs: async () => {
+            return new Promise(resolve => setTimeout(() => {
+                resolve([
+                    { id: 1, title: "Uncertainty & Error Analysis", description: "Master error propagation and statistical analysis.", icon: "📊", category: "Class 11 • Advanced", difficulty: "Hard", url: "#", badge: "Featured", features: ["Error propagation", "Monte Carlo"] },
+                    { id: 2, title: "Dimensional Analysis", description: "Verify equations and master dimensional reasoning.", icon: "🎯", category: "Class 11 • Fundamentals", difficulty: "Medium", url: "#", badge: null, features: ["Equation checker", "Buckingham π"] },
+                    { id: 3, title: "Magnetic Lorentz Force", description: "Visualize charged particle motion in magnetic fields.", icon: "⚡", category: "Class 12 • Electromagnetism", difficulty: "Hard", url: "#", badge: null, features: ["Real-time simulation", "CSV export"] }
+                ]);
+            }, 600));
+        },
+        fetchWorksheets: async () => {
+            return new Promise(resolve => setTimeout(() => {
+                resolve([
+                    { id: 101, title: "Kinematics 1D & 2D", classLevel: "Class 11", chapter: "Motion", difficulty: "JEE Main", board: "CBSE", date: "2026-06-25", url: "#" },
+                    { id: 102, title: "Electrostatics Board Practice", classLevel: "Class 12", chapter: "Electric Charges", difficulty: "Board Level", board: "ISC", date: "2026-06-20", url: "#" },
+                    { id: 103, title: "Optics Ray Diagrams", classLevel: "Class 12", chapter: "Ray Optics", difficulty: "NEET", board: "CBSE", date: "2026-06-15", url: "#" }
+                ]);
+            }, 700));
+        },
+        fetchQuestionBanks: async () => {
+            return new Promise(resolve => setTimeout(() => {
+                resolve([
+                    { id: 201, classLevel: "Class 11", chapter: "Laws of Motion", questions: 150, difficulty: "Advanced", url: "#" },
+                    { id: 202, classLevel: "Class 12", chapter: "Current Electricity", questions: 200, difficulty: "Mains", url: "#" }
+                ]);
+            }, 500));
+        },
+        fetchAIFeatures: async () => {
+            return Promise.resolve([
+                { title: "AI Worksheet Builder", desc: "Generate custom PDFs instantly based on topic and difficulty.", icon: "📄", url: "#" },
+                { title: "AI Physics Tutor", desc: "Chat with a specialized tutor trained on physics concepts.", icon: "🧠", url: "#" },
+                { title: "Formula Explainer", desc: "Paste any complex formula for a step-by-step breakdown.", icon: "∑", url: "#" },
+                { title: "Numerical Solver", desc: "Step-by-step solutions for complex textbook numericals.", icon: "🧮", url: "#" }
+            ]);
+        }
+    };
 
-  async function loadLatestVideos() {
-    try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      if (data.items && data.items.length > 0) {
-        const latest = data.items[0];
-        document.getElementById('featured-title').innerText = latest.snippet.title;
-        document.getElementById('featured-link').href = `https://www.youtube.com/watch?v=${latest.id.videoId}`;
-        document.getElementById('featured-thumbnail').src = latest.snippet.thumbnails.high.url;
-        
-        const recentContainer = document.getElementById('recent-videos-container');
-        recentContainer.innerHTML = '';
-        data.items.slice(1, 4).forEach(video => {
-          const item = document.createElement('a');
-          item.className = 'recent-video-item';
-          item.href = `https://www.youtube.com/watch?v=${video.id.videoId}`;
-          item.target = '_blank';
-          item.innerHTML = `
-            <h4 style="margin-bottom: 0.25rem; font-size: 0.95rem;">${video.snippet.title}</h4>
-            <p>${new Date(video.snippet.publishedAt).toLocaleDateString()}</p>
-          `;
-          recentContainer.appendChild(item);
+    /** * MODULE 2: UI COMPONENTS (Equivalent to ui-components.js)
+     * Pure functions to generate HTML strings or DOM elements.
+     */
+    const UIComponents = {
+        generateCardSkeleton: () => `
+            <div class="card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text" style="width: 40%"></div>
+            </div>
+        `,
+        renderSkeletons: (containerId, count = 3) => {
+            const container = document.getElementById(containerId);
+            if(container) container.innerHTML = Array(count).fill(UIComponents.generateCardSkeleton()).join('');
+        },
+        createLabCard: (lab) => `
+            <div class="card ${lab.badge ? 'featured' : ''}">
+                ${lab.badge ? `<div class="badge">${lab.badge}</div>` : ''}
+                <div class="card-icon">${lab.icon}</div>
+                <div class="card-meta">${lab.category}</div>
+                <h3>${lab.title}</h3>
+                <p class="card-desc">${lab.description}</p>
+                <a href="${lab.url}" class="btn btn-secondary btn-sm" style="margin-top:auto">Launch Lab →</a>
+            </div>
+        `,
+        createWorksheetCard: (ws) => `
+            <div class="card">
+                <div class="card-meta">${ws.classLevel} • ${ws.board}</div>
+                <h3>${ws.title}</h3>
+                <p class="card-desc">Chapter: ${ws.chapter}<br>Difficulty: ${ws.difficulty}</p>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem;">Generated: ${ws.date}</div>
+                <a href="${ws.url}" class="btn btn-primary btn-sm" style="margin-top:auto">View Worksheet</a>
+            </div>
+        `,
+        createQBankCard: (qb) => `
+            <div class="card">
+                <div class="card-meta">${qb.classLevel}</div>
+                <h3>${qb.chapter}</h3>
+                <p class="card-desc">${qb.questions} Questions • ${qb.difficulty}</p>
+                <a href="${qb.url}" class="btn btn-secondary btn-sm" style="margin-top:auto">Start Practicing</a>
+            </div>
+        `,
+        createAICard: (ai) => `
+            <a href="${ai.url}" class="card ai-card" style="text-decoration:none;">
+                <div class="card-icon">${ai.icon}</div>
+                <h3 style="color:var(--text)">${ai.title}</h3>
+                <p class="card-desc">${ai.desc}</p>
+            </a>
+        `,
+        renderVideoSection: (videos, containerId) => {
+            const container = document.getElementById(containerId);
+            if (!videos || videos.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted)">Videos temporarily unavailable. Check back later.</p>`;
+                return;
+            }
+            const featured = videos[0];
+            const recents = videos.slice(1, 4);
+            
+            container.innerHTML = `
+                <div class="featured-video">
+                    <a href="https://youtube.com/watch?v=${featured.id.videoId}" target="_blank" class="video-thumbnail">
+                        <img loading="lazy" src="${featured.snippet.thumbnails.high.url}" alt="${featured.snippet.title}">
+                    </a>
+                    <h3>${featured.snippet.title}</h3>
+                    <a href="https://youtube.com/watch?v=${featured.id.videoId}" target="_blank" class="btn btn-primary btn-sm" style="max-width: 200px">▶ Watch on YouTube</a>
+                </div>
+                <div class="recent-videos">
+                    <h3 style="font-size: 1.2rem; margin-bottom:1rem;">Recent Videos</h3>
+                    ${recents.map(v => `
+                        <a href="https://youtube.com/watch?v=${v.id.videoId}" target="_blank" class="recent-video-item">
+                            <img loading="lazy" src="${v.snippet.thumbnails.default.url}" alt="Thumbnail">
+                            <div>
+                                <h4 style="font-size: 0.9rem; margin-bottom: 0.2rem;">${v.snippet.title}</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted)">${new Date(v.snippet.publishedAt).toLocaleDateString()}</p>
+                            </div>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+        }
+    };
+
+    /** * MODULE 3: MAIN INITIALIZATION (Equivalent to main.js)
+     * App initialization and event listeners.
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+        initNavigation();
+        loadDynamicContent();
+        initYouTubeAPI();
+    });
+
+    // Navigation, Sticky Header & Hamburger Logic
+    function initNavigation() {
+        const header = document.getElementById('main-header');
+        const hamburger = document.querySelector('.hamburger');
+        const drawer = document.getElementById('mobile-nav');
+        const overlay = document.querySelector('.drawer-overlay');
+        const links = document.querySelectorAll('.nav-link, .mobile-link');
+
+        // Sticky Header Scroll Effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+            updateActiveNav();
         });
-      }
-    } catch (error) { 
-      console.error('Error loading videos:', error);
-      document.getElementById('recent-videos-container').innerHTML = '<p style="color: var(--text-muted);">Unable to load videos</p>';
-    }
-  }
 
-  loadLatestVideos();
+        // Mobile Menu Toggle
+        const toggleMenu = () => {
+            const isOpen = drawer.classList.contains('open');
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('open');
+            hamburger.setAttribute('aria-expanded', !isOpen);
+        };
+
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        
+        // Close drawer on link click & Handle Active State
+        links.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if(drawer.classList.contains('open')) toggleMenu();
+                links.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Simple scrollspy for active nav
+        function updateActiveNav() {
+            let current = '';
+            const sections = document.querySelectorAll('section[id]');
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 150) current = section.getAttribute('id');
+            });
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+    }
+
+    // Data Fetching & Rendering Pipeline
+    async function loadDynamicContent() {
+        // 1. Stats
+        const statsData = await DataLoader.fetchStats();
+        document.getElementById('stats-container').innerHTML = `
+            <div class="stat-item"><div class="stat-number">${statsData.labs}</div><div class="stat-label">Interactive Labs</div></div>
+            <div class="stat-item"><div class="stat-number">${statsData.worksheets}</div><div class="stat-label">Worksheets</div></div>
+            <div class="stat-item"><div class="stat-number">${statsData.qBanks}</div><div class="stat-label">Question Banks</div></div>
+            <div class="stat-item"><div class="stat-number">${statsData.aiQuestions}</div><div class="stat-label">AI Gen Questions</div></div>
+        `;
+
+        // 2. Pre-render Skeletons
+        UIComponents.renderSkeletons('labs-container', 3);
+        UIComponents.renderSkeletons('worksheets-container', 3);
+        UIComponents.renderSkeletons('qbanks-container', 2);
+        UIComponents.renderSkeletons('featured-container', 3);
+
+        // 3. Fetch & Populate (Concurrently for speed)
+        Promise.all([
+            DataLoader.fetchLabs(),
+            DataLoader.fetchWorksheets(),
+            DataLoader.fetchQuestionBanks(),
+            DataLoader.fetchAIFeatures()
+        ]).then(([labs, wks, qbs, ais]) => {
+            document.getElementById('labs-container').innerHTML = labs.map(UIComponents.createLabCard).join('');
+            document.getElementById('worksheets-container').innerHTML = wks.map(UIComponents.createWorksheetCard).join('');
+            document.getElementById('qbanks-container').innerHTML = qbs.map(UIComponents.createQBankCard).join('');
+            document.getElementById('ai-container').innerHTML = ais.map(UIComponents.createAICard).join('');
+            
+            // Featured (Mix of latest items)
+            const featuredHTML = [
+                UIComponents.createLabCard(labs[0]), 
+                UIComponents.createWorksheetCard(wks[0]), 
+                UIComponents.createQBankCard(qbs[0])
+            ].join('');
+            document.getElementById('featured-container').innerHTML = featuredHTML;
+        }).catch(err => {
+            console.error("Error loading content:", err);
+            // Implement Graceful fail messages inside containers here if needed
+        });
+    }
+
+    // YouTube Logic (With graceful failure)
+    async function initYouTubeAPI() {
+        const videoContainer = document.getElementById('video-container');
+        videoContainer.innerHTML = UIComponents.generateCardSkeleton() + UIComponents.generateCardSkeleton(); // Loading state
+        
+        try {
+            const API_KEY = 'AIzaSyAB-8ISfjbtQ93cjgSuCg7x8vvmBZT2ekQ';
+            const CHANNEL_ID = 'UC4VJyWWg1sl8vYFqPrVroqg';
+            const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&order=date&part=snippet&type=video&maxResults=4`);
+            if(!res.ok) throw new Error("API failed");
+            
+            const data = await res.json();
+            UIComponents.renderVideoSection(data.items, 'video-container');
+        } catch(err) {
+            console.error("YouTube Fetch failed, falling back to mock UI");
+            UIComponents.renderVideoSection([], 'video-container'); // Triggers fallback UI
+        }
+    }
 </script>
 
 </body>
