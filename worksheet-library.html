@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EdTech Platform | CinePhysicsHQ v5.0</title>
+    
+    <script defer src="https://www.googletagmanager.com/gtag/js?id=G-R41EJ3144X"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-R41EJ3144X');
+    </script>
+    
+    <meta name="description" content="Premium, verified physics worksheets for Class 11 and 12. Featuring student tracking, teacher assignments, and advanced analytics.">
+    <link rel="canonical" id="canonicalUrl" href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/worksheet-library.html">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json" id="seo-schema-container"></script>
+
+    <style>
+        /* --- CORE THEME (Black & Gold Premium) --- */
+        :root {
+            --bg-dark: #050505;
+            --bg-card: rgba(20, 20, 20, 0.65);
+            --bg-elevated: #111111;
+            --gold-accent: #d4af37;
+            --gold-hover: #f3e5ab;
+            --gold-dim: rgba(212, 175, 55, 0.12);
+            --text-main: #f8f8f8;
+            --text-muted: #a0a0a0;
+            --glass-border: rgba(212, 175, 55, 0.22);
+            --glass-blur: blur(16px);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            --diff-basic: #4caf50; --diff-moderate: #ff9800; --diff-advanced: #f44336;
+            --sys-error: #ff5252; --sys-success: #4caf50;
+        }
+
+        /* Accessibility & Perf */
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.03), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(212, 175, 55, 0.03), transparent 25%);
+            background-attachment: fixed; color: var(--text-main); font-family: 'Inter', sans-serif;
+            overflow-x: hidden; min-height: 100vh; -webkit-font-smoothing: antialiased;
+        }
+        button, input, select, a { font-family: inherit; color: inherit; background: none; border: none; text-decoration: none; }
+        button { cursor: pointer; } button:disabled { opacity: 0.4; cursor: not-allowed; }
+        :focus-visible { outline: 2px solid var(--gold-accent); outline-offset: 4px; border-radius: 4px; }
+        
+        .container { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Glassmorphism & UI Components */
+        .glass-card {
+            background: var(--bg-card); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); border-radius: 16px; padding: 24px;
+            transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .glass-card:hover { border-color: var(--gold-accent); box-shadow: 0 12px 40px rgba(212, 175, 55, 0.12); transform: translateY(-4px); }
+        
+        .btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
+        .btn-primary { background: var(--gold-accent); color: #000; }
+        .btn-primary:hover:not(:disabled) { background: var(--gold-hover); transform: translateY(-2px); }
+        .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); }
+        .btn-secondary:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+        
+        /* Top Navigation Tabs */
+        .platform-nav { display: flex; gap: 16px; margin: 24px 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 16px; overflow-x: auto; }
+        .nav-tab { padding: 8px 16px; font-weight: 600; color: var(--text-muted); border-radius: 8px; transition: var(--transition); }
+        .nav-tab.active { background: var(--gold-dim); color: var(--gold-accent); border: 1px solid var(--gold-accent); }
+        .nav-tab:hover:not(.active) { color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+        /* Views */
+        .tab-view { display: none; animation: fadeIn 0.3s ease forwards; }
+        .tab-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; margin-top: 24px; }
+        
+        /* Dashboard Cards */
+        .dash-metric { background: var(--bg-elevated); border: 1px solid var(--glass-border); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .dash-metric .val { font-size: 2rem; font-weight: 700; color: var(--gold-accent); }
+        .dash-metric .label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        /* Worksheet Cards */
+        .ws-thumb { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--glass-border); background: #111; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; background: rgba(255,255,255,0.1); }
+        .badge.advanced { color: var(--diff-advanced); background: rgba(244,67,54,0.15); }
+        
+        /* Dynamic Preview Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; display: none; place-items: center; padding: 20px; }
+        .modal-content { background: var(--bg-dark); border: 1px solid var(--gold-accent); border-radius: 16px; width: 100%; max-width: 1000px; max-height: 90vh; overflow-y: auto; display: grid; grid-template-columns: 1fr 2fr; gap: 24px; padding: 32px; position: relative; }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; color: var(--text-muted); }
+        .modal-close:hover { color: var(--sys-error); }
+        
+        /* Dynamic Toasts */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; }
+        .toast { background: var(--bg-elevated); border-left: 4px solid var(--gold-accent); padding: 16px 24px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: slideIn 0.3s forwards; }
+        @keyframes slideIn { from{ transform: translateX(100%); } to{ transform: translateX(0); } }
+
+        /* Progress Rings */
+        .progress-ring { width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--gold-accent) var(--p), #333 0deg); }
+        .progress-ring::before { content: attr(data-label); width: 50px; height: 50px; background: var(--bg-elevated); border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; }
+
+        @media (max-width: 768px) {
+            .modal-content { grid-template-columns: 1fr; }
+            .header-controls { flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 32px 0 16px; flex-wrap: wrap;">
+            <div>
+                <h1 class="gold-text">CinePhysicsHQ <span style="font-size: 1rem; background: var(--gold-dim); padding: 4px 8px; border-radius: 6px;">v5.0 EduPlatform</span></h1>
+                <p id="userStatusLabel" style="color: var(--text-muted); margin-top: 4px;">Welcome, Authenticating...</p>
+            </div>
+            
+            <div class="header-controls" style="display: flex; gap: 12px; align-items: center;">
+                <a href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/worksheet-builder.html" class="btn btn-primary">
+                    <i class="fas fa-tools"></i> Worksheet Builder
+                </a>
+                <select id="devRoleSwitcher" onchange="CPHQ.Auth.setDevRole(this.value)" class="btn btn-secondary">
+                    <option value="student">View as Student</option>
+                    <option value="teacher">View as Teacher</option>
+                    <option value="admin">View as Admin</option>
+                </select>
+            </div>
+        </header>
+
+        <nav class="platform-nav" role="tablist">
+            <button class="nav-tab active" data-target="libTab" role="tab" onclick="CPHQ.UI.switchTab('libTab')"><i class="fas fa-book-open"></i> Global Library</button>
+            <button class="nav-tab" data-target="dashTab" role="tab" onclick="CPHQ.UI.switchTab('dashTab')"><i class="fas fa-chart-line"></i> My Dashboard</button>
+            <button class="nav-tab" data-target="compareTab" role="tab" onclick="CPHQ.UI.switchTab('compareTab')"><i class="fas fa-balance-scale"></i> Compare</button>
+        </nav>
+
+        <main id="libTab" class="tab-view active">
+            <div class="glass-card" style="padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center;">
+                <i class="fas fa-search" style="color:var(--text-muted); font-size:1.2rem;"></i>
+                <input type="text" id="masterSearch" placeholder='Try "Advanced kinematics MCQs", "CBSE 2026 practice", or dimensional formulas...' style="flex: 1; font-size: 1.1rem; padding: 8px; outline: none;">
+                <button class="btn btn-secondary" title="Voice Search"><i class="fas fa-microphone gold-text"></i></button>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+                <select class="btn btn-secondary"><option>All Classes</option><option>Class 11</option><option>Class 12</option></select>
+                <select class="btn btn-secondary"><option>All Chapters</option><option>Thermodynamics</option><option>Optics</option></select>
+                <select class="btn btn-secondary"><option>Difficulty: All</option><option>Basic</option><option>HOTS</option></select>
+                <select class="btn btn-secondary"><option>Format: All</option><option>MCQ</option><option>Case Study</option><option>Numericals</option></select>
+                <select class="btn btn-secondary"><option>Bloom's Level</option><option>Analyze</option><option>Evaluate</option></select>
+                <select class="btn btn-secondary"><option>Sort By: Trending</option><option>Newest</option><option>Most Downloaded</option></select>
+            </div>
+
+            <div id="worksheetGrid" class="grid-layout">
+                </div>
+        </main>
+
+        <main id="dashTab" class="tab-view">
+            <div id="dashboardInjectionZone"></div>
+        </main>
+
+        <main id="compareTab" class="tab-view">
+            <div class="glass-card" style="text-align: center; padding: 60px 20px;">
+                <i class="fas fa-balance-scale gold-text" style="font-size: 3rem; margin-bottom: 16px;"></i>
+                <h2>Worksheet Comparison Engine</h2>
+                <p style="color: var(--text-muted); margin-top: 8px;">Select up to 3 worksheets from the library to compare competencies, difficulty distributions, and time requirements side-by-side.</p>
+                <button class="btn btn-primary" style="margin-top: 24px;" onclick="CPHQ.UI.switchTab('libTab')">Browse Library</button>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="CPHQ.UI.closeModal()"><i class="fas fa-times"></i></button>
+            <div>
+                <img src="https://via.placeholder.com/400x560/111/d4af37?text=Worksheet+Preview" style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 16px;" alt="Worksheet Cover">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                    <button class="btn btn-secondary" style="width: 100%; justify-content: center;"><i class="fas fa-bookmark"></i> Save</button>
+                </div>
+            </div>
+            <div id="previewMetaZone">
+                </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script>
+        window.CPHQ = (function() {
+            
+            // 1. CONFIG & CACHE
+            const Config = { API_URL: 'https://cinephysics-api.vercel.app/api', CACHE_VERSION: 5 };
+            
+            const Cache = {
+                async get(key) {
+                    try {
+                        const data = localStorage.getItem(`cphq_v5_${key}`);
+                        if(!data) return null;
+                        const parsed = JSON.parse(data);
+                        if(Date.now() - parsed.timestamp > 86400000) return null; // 24h LRU
+                        return parsed.payload;
+                    } catch(e) { return null; }
+                },
+                async set(key, payload) {
+                    localStorage.setItem(`cphq_v5_${key}`, JSON.stringify({ timestamp: Date.now(), payload }));
+                }
+            };
+
+            // 2. SECURITY
+            const Security = {
+                sanitize(str) {
+                    if(!str) return '';
+                    const div = document.createElement('div'); div.textContent = str; return div.innerHTML;
+                }
+            };
+
+            // 3. UI ENGINE
+            const UI = {
+                switchTab(tabId) {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+                    document.querySelector(`[data-target="${tabId}"]`).classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                },
+                
+                toast(msg, icon = 'check-circle') {
+                    const c = document.getElementById('toastContainer');
+                    const t = document.createElement('div');
+                    t.className = 'toast';
+                    t.innerHTML = `<i class="fas fa-${icon} gold-text" style="margin-right:8px;"></i> ${Security.sanitize(msg)}`;
+                    c.appendChild(t);
+                    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 4000);
+                },
+
+                openPreview(id) {
+                    // Simulate fetching deep metadata from Firestore
+                    const metaZone = document.getElementById('previewMetaZone');
+                    
+                    // Note the updated URL format here
+                    metaZone.innerHTML = `
+                        <h2 class="gold-text" style="font-size: 2rem; margin-bottom: 8px;">Electrostatics HOTS & Numericals</h2>
+                        <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;">
+                            <span class="badge">Class 12</span>
+                            <span class="badge">CBSE</span>
+                            <span class="badge advanced">Difficulty: Advanced</span>
+                            <span class="badge">Bloom: Evaluation</span>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-list-ol"></i> Questions</div><div class="val" style="font-size:1.5rem;">25</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-clock"></i> Est. Time</div><div class="val" style="font-size:1.5rem;">60m</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-star"></i> Marks</div><div class="val" style="font-size:1.5rem;">50</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-download"></i> Downloads</div><div class="val" style="font-size:1.5rem;">1.2k</div></div>
+                        </div>
+
+                        <h3 style="margin-bottom: 12px; color: var(--gold-accent); border-bottom: 1px solid #333; padding-bottom: 8px;">NCERT & Competency Mapping</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
+                            <strong>NCERT Chapter:</strong> 1. Electric Charges and Fields (Pages 12-35)<br><br>
+                            <strong>Learning Outcomes:</strong> Predict electrical force in multi-charge systems. Apply Gauss's law to continuous charge distributions.<br><br>
+                            <strong>Required Prerequisites:</strong> Vector addition, Basic integration.
+                        </p>
+                        
+                        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                            <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="window.location.href='worksheets/import.html?id=${id}'">
+                                <i class="fas fa-external-link-alt"></i> Open Worksheet
+                            </button>
+                            <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="CPHQ.UI.shareWorksheet('${id}')">
+                                <i class="fas fa-share-alt"></i> Share Link
+                            </button>
+                        </div>
+                        
+                        ${CPHQ.Auth.role === 'teacher' ? `
+                            <button class="btn btn-secondary" style="width: 100%; justify-content: center; border-color: var(--gold-accent); color: var(--gold-accent);" onclick="CPHQ.UI.toast('Assignment dispatched to Google Classroom!', 'chalkboard-teacher')">
+                                <i class="fas fa-users"></i> Assign to Classroom
+                            </button>
+                        ` : ''}
+                    `;
+                    document.getElementById('previewModal').style.display = 'grid';
+                    CPHQ.Analytics.track('preview_open', { worksheetId: id });
+                },
+
+                shareWorksheet(id) {
+                    // Note the updated URL format here
+                    const url = `${window.location.origin}/worksheets/import.html?id=${id}`;
+                    navigator.clipboard.writeText(url).then(() => {
+                        CPHQ.UI.toast('Worksheet link copied to clipboard!', 'link');
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                },
+
+                closeModal() { document.getElementById('previewModal').style.display = 'none'; },
+
+                buildCard(title, diff, time, id = 'WS-101') {
+                    // Note the updated URL format here
+                    return `
+                        <div class="glass-card">
+                            <img src="https://via.placeholder.com/350x160/111/d4af37?text=Worksheet" class="ws-thumb" alt="Thumb">
+                            <h3 style="margin-bottom: 8px;">${title}</h3>
+                            <div style="display:flex; gap: 8px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-muted);">
+                                <span><i class="fas fa-clock"></i> ${time}m</span> • 
+                                <span class="${diff === 'Advanced' ? 'gold-text' : ''}"><i class="fas fa-layer-group"></i> ${diff}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="CPHQ.UI.openPreview('${id}')">
+                                    <i class="fas fa-expand"></i> Blueprint
+                                </button>
+                                <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="window.location.href='worksheets/import.html?id=${id}'">
+                                    <i class="fas fa-play"></i> Run
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            };
+
+            // 4. ROLE-BASED DASHBOARDS (Teacher / Student)
+            const Dashboards = {
+                renderStudent() {
+                    return `
+                        <h2 style="margin-bottom: 24px;">My Learning Dashboard</h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                            <div class="dash-metric">
+                                <div><div class="label">Study Streak</div><div class="val">12 Days</div></div>
+                                <i class="fas fa-fire gold-text" style="font-size: 2rem;"></i>
+                            </div>
+                            <div class="dash-metric">
+                                <div><div class="label">Worksheets Done</div><div class="val">45</div></div>
+                                <div class="progress-ring" style="--p: 75%;" data-label="75%"></div>
+                            </div>
+                        </div>
+                        <h3 style="margin-bottom: 16px; color: var(--gold-accent);">AI Recommended for You (Weak Areas: Optics)</h3>
+                        <div class="grid-layout" style="margin-top: 0;">
+                            ${UI.buildCard('Ray Optics Practice 1', 'Moderate', 45, 'WS-201')}
+                            ${UI.buildCard('Wave Optics NCERT Examples', 'Advanced', 60, 'WS-202')}
+                        </div>
+                    `;
+                },
+                renderTeacher() {
+                    return `
+                        <h2 style="margin-bottom: 24px;">Teacher Command Center</h2>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                            <div class="dash-metric" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                                <div class="label">Total Downloads</div><div class="val">1,245</div>
+                            </div>
+                            <div class="dash-metric" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                                <div class="label">Active Assignments</div><div class="val">4</div>
+                            </div>
+                            <div class="dash-metric" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                                <div class="label">Avg Class Score</div><div class="val">78%</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 16px; margin-bottom: 32px;">
+                            <button class="btn btn-primary"><i class="fas fa-plus"></i> Create Custom Collection</button>
+                            <button class="btn btn-secondary" onclick="CPHQ.UI.toast('QR Code Generated!')"><i class="fas fa-qrcode"></i> Generate Class QR</button>
+                        </div>
+                        <h3 style="margin-bottom: 16px; color: var(--gold-accent);">Recent Class Analytics</h3>
+                        <div class="glass-card" style="padding: 32px; text-align: center; color: var(--text-muted);">
+                            <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                            <p>[Smart Analytics Charts (Chart.js) injected here for Teacher activity]</p>
+                        </div>
+                    `;
+                }
+            };
+
+            // 5. AUTH & ROLE MANAGEMENT
+            const Auth = {
+                role: 'student', // default
+                setDevRole(newRole) {
+                    this.role = newRole;
+                    document.getElementById('userStatusLabel').innerHTML = `<i class="fas fa-user-circle"></i> Logged in as ${newRole.toUpperCase()}`;
+                    
+                    // Re-render Dashboard based on Role
+                    const zone = document.getElementById('dashboardInjectionZone');
+                    if(newRole === 'student') zone.innerHTML = Dashboards.renderStudent();
+                    else if(newRole === 'teacher' || newRole === 'admin') zone.innerHTML = Dashboards.renderTeacher();
+                    
+                    UI.toast(`Environment switched to ${newRole} mode.`);
+                }
+            };
+
+            // 6. ANALYTICS
+            const Analytics = {
+                track(event, params) { console.log(`[Firebase Analytics] ${event}:`, params); }
+            };
+
+            // INITIALIZE APP
+            return {
+                init() {
+                    // Populate dummy library
+                    const grid = document.getElementById('worksheetGrid');
+                    grid.innerHTML = [
+                        UI.buildCard('Kinematics Mastery Set', 'Moderate', 45, 'WS-301'),
+                        UI.buildCard('Electrostatics HOTS', 'Advanced', 60, 'WS-302'),
+                        UI.buildCard('Thermodynamics Formula Sheet', 'Basic', 20, 'WS-303'),
+                        UI.buildCard('Optics Previous Year Questions', 'Advanced', 90, 'WS-304')
+                    ].join('');
+                    
+                    // Set initial role
+                    Auth.setDevRole('student');
+                },
+                UI, Auth, Analytics
+            };
+
+        })();
+
+        // Bootstrap on Load
+        document.addEventListener('DOMContentLoaded', () => CPHQ.init());
+    </script>
+</body>
+</html>
