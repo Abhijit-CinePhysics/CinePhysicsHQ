@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EdTech Platform | CinePhysicsHQ v5.0</title>
     
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    
     <script defer src="https://www.googletagmanager.com/gtag/js?id=G-R41EJ3144X"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -17,6 +19,10 @@
     <link rel="canonical" id="canonicalUrl" href="https://abhijit-cinephysics.github.io/CinePhysicsHQ/worksheet-library.html">
     
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script type="application/ld+json" id="seo-schema-container"></script>
@@ -121,7 +127,7 @@
         <header style="display: flex; justify-content: space-between; align-items: center; padding: 32px 0 16px; flex-wrap: wrap;">
             <div>
                 <h1 class="gold-text">CinePhysicsHQ <span style="font-size: 1rem; background: var(--gold-dim); padding: 4px 8px; border-radius: 6px;">v5.0 EduPlatform</span></h1>
-                <p id="userStatusLabel" style="color: var(--text-muted); margin-top: 4px;">Welcome, Authenticating...</p>
+                <p id="userStatusLabel" style="color: var(--text-muted); margin-top: 4px;">Welcome, Static Session Active</p>
             </div>
             
             <div class="header-controls" style="display: flex; gap: 12px; align-items: center;">
@@ -180,7 +186,7 @@
         <div class="modal-content">
             <button class="modal-close" onclick="CPHQ.UI.closeModal()"><i class="fas fa-times"></i></button>
             <div>
-                <img src="https://via.placeholder.com/400x560/111/d4af37?text=Worksheet+Preview" style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 16px;" alt="Worksheet Cover">
+                <img id="previewModalImage" src="assets/images/default-worksheet.webp" style="width: 100%; border-radius: 12px; border: 1px solid var(--glass-border); margin-bottom: 16px; background: #111; object-fit: cover; height: 350px;" alt="Worksheet Cover">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <button class="btn btn-primary" style="width: 100%; justify-content: center;"><i class="fas fa-file-pdf"></i> Download PDF</button>
                     <button class="btn btn-secondary" style="width: 100%; justify-content: center;"><i class="fas fa-bookmark"></i> Save</button>
@@ -197,7 +203,11 @@
         window.CPHQ = (function() {
             
             // 1. CONFIG & CACHE
-            const Config = { API_URL: 'https://cinephysics-api.vercel.app/api', CACHE_VERSION: 5 };
+            const Config = { 
+                API_URL: 'https://cinephysics-api.vercel.app/api', 
+                CACHE_VERSION: 5,
+                DEFAULT_THUMB: 'assets/images/default-worksheet.webp' // Fix #3: Local fallback
+            };
             
             const Cache = {
                 async get(key) {
@@ -240,32 +250,43 @@
                     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 4000);
                 },
 
-                openPreview(id) {
-                    // Simulate fetching deep metadata from Firestore
+                openPreview(ws) {
                     const metaZone = document.getElementById('previewMetaZone');
+                    const imgElement = document.getElementById('previewModalImage');
                     
-                    // Note the updated URL format here
+                    // Use worksheet specific data or fallbacks
+                    const id = ws.worksheetId || ws.id || 'Unknown ID';
+                    const title = ws.title || 'Untitled Worksheet';
+                    const diff = ws.difficulty || 'Moderate';
+                    const time = ws.estimatedTime || 45;
+                    const marks = ws.marks || ws.distribution?.totalMarks || 30;
+                    const questions = ws.questionCount || 10;
+                    const chapter = ws.chapter || 'Core Physics Concept';
+                    
+                    // Set image (Fix #3)
+                    imgElement.src = ws.thumbnailURL || Config.DEFAULT_THUMB;
+                    // Fallback if local image fails to load
+                    imgElement.onerror = function() { this.src = 'https://via.placeholder.com/350x160/111/d4af37?text=Worksheet'; };
+
                     metaZone.innerHTML = `
-                        <h2 class="gold-text" style="font-size: 2rem; margin-bottom: 8px;">Electrostatics HOTS & Numericals</h2>
+                        <h2 class="gold-text" style="font-size: 2rem; margin-bottom: 8px;">${Security.sanitize(title)}</h2>
                         <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;">
-                            <span class="badge">Class 12</span>
-                            <span class="badge">CBSE</span>
-                            <span class="badge advanced">Difficulty: Advanced</span>
-                            <span class="badge">Bloom: Evaluation</span>
+                            <span class="badge">Class ${Security.sanitize(ws.className || '11/12')}</span>
+                            <span class="badge">${Security.sanitize(ws.board || 'CBSE')}</span>
+                            <span class="badge ${diff === 'Advanced' ? 'advanced' : ''}">Difficulty: ${Security.sanitize(diff)}</span>
                         </div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-list-ol"></i> Questions</div><div class="val" style="font-size:1.5rem;">25</div></div>
-                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-clock"></i> Est. Time</div><div class="val" style="font-size:1.5rem;">60m</div></div>
-                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-star"></i> Marks</div><div class="val" style="font-size:1.5rem;">50</div></div>
-                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-download"></i> Downloads</div><div class="val" style="font-size:1.5rem;">1.2k</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-list-ol"></i> Questions</div><div class="val" style="font-size:1.5rem;">${questions}</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-clock"></i> Est. Time</div><div class="val" style="font-size:1.5rem;">${time}m</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-star"></i> Marks</div><div class="val" style="font-size:1.5rem;">${marks}</div></div>
+                            <div class="dash-metric" style="padding: 12px;"><div class="label"><i class="fas fa-download"></i> Downloads</div><div class="val" style="font-size:1.5rem;">${ws.downloads || 0}</div></div>
                         </div>
 
-                        <h3 style="margin-bottom: 12px; color: var(--gold-accent); border-bottom: 1px solid #333; padding-bottom: 8px;">NCERT & Competency Mapping</h3>
+                        <h3 style="margin-bottom: 12px; color: var(--gold-accent); border-bottom: 1px solid #333; padding-bottom: 8px;">Chapter Mapping</h3>
                         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;">
-                            <strong>NCERT Chapter:</strong> 1. Electric Charges and Fields (Pages 12-35)<br><br>
-                            <strong>Learning Outcomes:</strong> Predict electrical force in multi-charge systems. Apply Gauss's law to continuous charge distributions.<br><br>
-                            <strong>Required Prerequisites:</strong> Vector addition, Basic integration.
+                            <strong>Concept:</strong> ${Security.sanitize(chapter)}<br><br>
+                            <strong>Topics:</strong> ${(ws.topics || ['General Physics']).join(', ')}<br><br>
                         </p>
                         
                         <div style="display: flex; gap: 12px; margin-bottom: 16px;">
@@ -288,7 +309,6 @@
                 },
 
                 shareWorksheet(id) {
-                    // Note the updated URL format here
                     const url = `${window.location.origin}/worksheets/import.html?id=${id}`;
                     navigator.clipboard.writeText(url).then(() => {
                         CPHQ.UI.toast('Worksheet link copied to clipboard!', 'link');
@@ -299,18 +319,26 @@
 
                 closeModal() { document.getElementById('previewModal').style.display = 'none'; },
 
-                buildCard(title, diff, time, id = 'WS-101') {
-                    // Note the updated URL format here
+                buildCard(ws) {
+                    const title = ws.title || 'Untitled Worksheet';
+                    const diff = ws.difficulty || 'Moderate';
+                    const time = ws.estimatedTime || 45;
+                    const id = ws.worksheetId || ws.id || 'N/A';
+                    const thumb = ws.thumbnailURL || Config.DEFAULT_THUMB;
+
+                    // Serialize the worksheet object to pass to the preview function securely
+                    const wsJSON = encodeURIComponent(JSON.stringify(ws));
+
                     return `
                         <div class="glass-card">
-                            <img src="https://via.placeholder.com/350x160/111/d4af37?text=Worksheet" class="ws-thumb" alt="Thumb">
-                            <h3 style="margin-bottom: 8px;">${title}</h3>
+                            <img src="${thumb}" onerror="this.src='https://via.placeholder.com/350x160/111/d4af37?text=Worksheet'" class="ws-thumb" alt="Thumb">
+                            <h3 style="margin-bottom: 8px;">${Security.sanitize(title)}</h3>
                             <div style="display:flex; gap: 8px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-muted);">
                                 <span><i class="fas fa-clock"></i> ${time}m</span> • 
-                                <span class="${diff === 'Advanced' ? 'gold-text' : ''}"><i class="fas fa-layer-group"></i> ${diff}</span>
+                                <span class="${diff === 'Advanced' ? 'gold-text' : ''}"><i class="fas fa-layer-group"></i> ${Security.sanitize(diff)}</span>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="CPHQ.UI.openPreview('${id}')">
+                                <button class="btn btn-secondary" style="flex: 1; justify-content: center;" onclick="CPHQ.UI.openPreview(JSON.parse(decodeURIComponent('${wsJSON}')))">
                                     <i class="fas fa-expand"></i> Blueprint
                                 </button>
                                 <button class="btn btn-primary" style="flex: 1; justify-content: center;" onclick="window.location.href='worksheets/import.html?id=${id}'">
@@ -337,10 +365,11 @@
                                 <div class="progress-ring" style="--p: 75%;" data-label="75%"></div>
                             </div>
                         </div>
-                        <h3 style="margin-bottom: 16px; color: var(--gold-accent);">AI Recommended for You (Weak Areas: Optics)</h3>
-                        <div class="grid-layout" style="margin-top: 0;">
-                            ${UI.buildCard('Ray Optics Practice 1', 'Moderate', 45, 'WS-201')}
-                            ${UI.buildCard('Wave Optics NCERT Examples', 'Advanced', 60, 'WS-202')}
+                        <h3 style="margin-bottom: 16px; color: var(--gold-accent);">Explore the Library</h3>
+                        <div class="glass-card" style="padding: 32px; text-align: center; color: var(--text-muted);">
+                            <i class="fas fa-compass" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                            <p>Head over to the Global Library tab to find new worksheets to solve!</p>
+                            <button class="btn btn-primary" style="margin-top: 16px;" onclick="CPHQ.UI.switchTab('libTab')">Browse Library</button>
                         </div>
                     `;
                 },
@@ -365,7 +394,7 @@
                         <h3 style="margin-bottom: 16px; color: var(--gold-accent);">Recent Class Analytics</h3>
                         <div class="glass-card" style="padding: 32px; text-align: center; color: var(--text-muted);">
                             <i class="fas fa-chart-bar" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
-                            <p>[Smart Analytics Charts (Chart.js) injected here for Teacher activity]</p>
+                            <p>[Smart Analytics Charts injected here for Teacher activity]</p>
                         </div>
                     `;
                 }
@@ -373,7 +402,7 @@
 
             // 5. AUTH & ROLE MANAGEMENT
             const Auth = {
-                role: 'student', // default
+                role: 'student', // default for static session
                 setDevRole(newRole) {
                     this.role = newRole;
                     document.getElementById('userStatusLabel').innerHTML = `<i class="fas fa-user-circle"></i> Logged in as ${newRole.toUpperCase()}`;
@@ -392,20 +421,43 @@
                 track(event, params) { console.log(`[Firebase Analytics] ${event}:`, params); }
             };
 
-            // INITIALIZE APP
+            // INITIALIZE APP & FETCH DATA (Fix #2)
             return {
-                init() {
-                    // Populate dummy library
-                    const grid = document.getElementById('worksheetGrid');
-                    grid.innerHTML = [
-                        UI.buildCard('Kinematics Mastery Set', 'Moderate', 45, 'WS-301'),
-                        UI.buildCard('Electrostatics HOTS', 'Advanced', 60, 'WS-302'),
-                        UI.buildCard('Thermodynamics Formula Sheet', 'Basic', 20, 'WS-303'),
-                        UI.buildCard('Optics Previous Year Questions', 'Advanced', 90, 'WS-304')
-                    ].join('');
-                    
-                    // Set initial role
+                async init() {
+                    // Set initial role (No Firebase Auth yet, keeping it static for GitHub pages testing)
                     Auth.setDevRole('student');
+                    
+                    const grid = document.getElementById('worksheetGrid');
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px 0;"><i class="fas fa-spinner fa-spin gold-text" style="font-size: 2rem;"></i><p style="margin-top: 16px; color: var(--text-muted);">Loading Digital Library...</p></div>';
+                    
+                    try {
+                        const response = await fetch(`${Config.API_URL}/library`);
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        
+                        const data = await response.json();
+                        const worksheets = Array.isArray(data) ? data : (data.worksheets || data.data || []);
+                        
+                        if (worksheets.length === 0) {
+                            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No worksheets available yet.</div>';
+                            return;
+                        }
+                        
+                        // Render worksheets via API
+                        const frag = document.createDocumentFragment();
+                        worksheets.forEach(ws => {
+                            const cardHTML = UI.buildCard(ws);
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = cardHTML;
+                            frag.appendChild(tempDiv.firstElementChild);
+                        });
+                        
+                        grid.innerHTML = '';
+                        grid.appendChild(frag);
+
+                    } catch (error) {
+                        console.error("Fetch error:", error);
+                        grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--sys-error); padding: 40px 0;"><i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 12px;"></i><br>Failed to load worksheets from server.</div>';
+                    }
                 },
                 UI, Auth, Analytics
             };
