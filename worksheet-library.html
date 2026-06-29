@@ -206,7 +206,7 @@
             const Config = { 
                 API_URL: 'https://cinephysics-api.vercel.app/api', 
                 CACHE_VERSION: 5,
-                DEFAULT_THUMB: 'assets/images/default-worksheet.webp' // Fix #3: Local fallback
+                DEFAULT_THUMB: 'assets/images/default-worksheet.webp' 
             };
             
             const Cache = {
@@ -405,13 +405,24 @@
                 role: 'student', // default for static session
                 setDevRole(newRole) {
                     this.role = newRole;
-                    document.getElementById('userStatusLabel').innerHTML = `<i class="fas fa-user-circle"></i> Logged in as ${newRole.toUpperCase()}`;
-                    
-                    // Re-render Dashboard based on Role
-                    const zone = document.getElementById('dashboardInjectionZone');
-                    if(newRole === 'student') zone.innerHTML = Dashboards.renderStudent();
-                    else if(newRole === 'teacher' || newRole === 'admin') zone.innerHTML = Dashboards.renderTeacher();
-                    
+
+                    document.getElementById("userStatusLabel").innerHTML =
+                        `<i class="fas fa-user-circle"></i> Logged in as ${newRole.toUpperCase()}`;
+
+                    // Redirect to Admin Login
+                    if (newRole === "admin") {
+                        window.location.href = "./admin-login.html";
+                        return;
+                    }
+
+                    const zone = document.getElementById("dashboardInjectionZone");
+
+                    if (newRole === "student") {
+                        zone.innerHTML = Dashboards.renderStudent();
+                    } else {
+                        zone.innerHTML = Dashboards.renderTeacher();
+                    }
+
                     UI.toast(`Environment switched to ${newRole} mode.`);
                 }
             };
