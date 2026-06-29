@@ -7,10 +7,9 @@
     <title>CinePhysicsHQ Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- FIREBASE SCRIPTS FIRST (CRITICAL) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
     <style>
         :root {
@@ -382,11 +381,94 @@
                 align-items: flex-start;
             }
         }
+
+        /* NEW ADDITIONS FOR PREVIEW MODAL AND BUTTONS */
+        .preview-btn, .download-btn {
+            flex: 1;
+            padding: 0.7rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .preview-btn {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .preview-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .download-btn {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--accent-alt);
+            border: 1px solid var(--accent-alt);
+        }
+
+        .download-btn:hover {
+            background: var(--accent-alt);
+            color: var(--bg);
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 26, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white; /* White background for worksheet HTML rendering */
+            color: black;      /* Black text for default worksheet reading */
+            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h1>⚡ CinePhysicsHQ</h1>
@@ -420,7 +502,6 @@
     </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="dashboard">
     <div class="container">
         <div class="header">
@@ -433,7 +514,6 @@
             <button class="logout-btn" id="logoutBtn">Logout</button>
         </div>
 
-        <!-- STATS -->
         <div class="stats">
             <div class="stat-box">
                 <div class="stat-number" id="statPending">0</div>
@@ -449,15 +529,12 @@
             </div>
         </div>
 
-        <!-- LOADING STATE -->
         <div class="loading" id="loadingState" style="display: none;">
             Loading worksheets... ⏳
         </div>
 
-        <!-- WORKSHEETS GRID -->
         <div id="worksheetsContainer" class="worksheets-container"></div>
 
-        <!-- EMPTY STATE -->
         <div class="empty-state" id="emptyState" style="display: none;">
             <div class="empty-state-icon">📭</div>
             <h2>No worksheets yet</h2>
@@ -466,12 +543,18 @@
     </div>
 </div>
 
+<div id="previewModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close-btn" onclick="closePreview()">✕</button>
+        <div id="previewContainer"></div>
+    </div>
+</div>
+
 <script>
-// Firebase Configuration (YOUR config)
+// Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
   authDomain: "cinephysicshq.firebaseapp.com",
-  databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "cinephysicshq",
   storageBucket: "cinephysicshq.firebasestorage.app",
   messagingSenderId: "506903518720",
@@ -479,10 +562,13 @@ const firebaseConfig = {
   measurementId: "G-TC2GZCD8K5"
 };
 
-// Initialize Firebase FIRST
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
-const db = firebase.database();
+const db = firebase.firestore();
+
+// Global store to hold worksheet data for previewing/downloading
+let globalWorksheetsStore = {};
 
 // DOM Elements
 const loginScreen = document.getElementById('loginScreen');
@@ -494,17 +580,17 @@ const adminEmail = document.getElementById('adminEmail');
 const worksheetsContainer = document.getElementById('worksheetsContainer');
 const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
+const previewModal = document.getElementById('previewModal');
+const previewContainer = document.getElementById('previewContainer');
 
 // Check Authentication State
 auth.onAuthStateChanged(user => {
     if (user) {
-        // User is logged in
         loginScreen.style.display = 'none';
         dashboard.classList.add('active');
         adminEmail.textContent = user.email;
         loadWorksheets();
     } else {
-        // User is logged out
         loginScreen.style.display = 'flex';
         dashboard.classList.remove('active');
         worksheetsContainer.innerHTML = '';
@@ -525,7 +611,6 @@ loginForm.addEventListener('submit', async (e) => {
     
     try {
         await auth.signInWithEmailAndPassword(email, password);
-        // Success - onAuthStateChanged will handle UI update
     } catch (error) {
         errorMessage.textContent = '❌ ' + error.message;
         errorMessage.classList.add('show');
@@ -544,17 +629,17 @@ logoutBtn.addEventListener('click', async () => {
     }
 });
 
-// LOAD WORKSHEETS FROM FIREBASE
+// LOAD WORKSHEETS FROM FIRESTORE
 async function loadWorksheets() {
     loadingState.style.display = 'block';
     worksheetsContainer.innerHTML = '';
     emptyState.style.display = 'none';
+    globalWorksheetsStore = {}; // Reset global store
     
     try {
-        const snapshot = await db.ref('worksheets').once('value');
-        const worksheets = snapshot.val();
+        const snapshot = await db.collection("worksheets").get();
         
-        if (!worksheets) {
+        if (snapshot.empty) {
             emptyState.style.display = 'block';
             loadingState.style.display = 'none';
             updateStats(0, 0, 0);
@@ -565,34 +650,32 @@ async function loadWorksheets() {
         let pendingCount = 0;
         let approvedCount = 0;
         
-        // Flatten the nested structure
-        Object.keys(worksheets).forEach(chapter => {
-            Object.keys(worksheets[chapter]).forEach(id => {
-                const ws = worksheets[chapter][id];
-                allWorksheets.push({
-                    id: id,
-                    chapter: chapter,
-                    ...ws
-                });
-                
-                if (ws.status === 'pending') pendingCount++;
-                else if (ws.status === 'approved') approvedCount++;
-            });
+        snapshot.forEach(doc => {
+            const ws = doc.data();
+            
+            // Fix 3: Assign pending if missing
+            if (!ws.status) {
+                ws.status = "pending";
+            }
+            
+            ws.id = doc.id;
+            globalWorksheetsStore[doc.id] = ws;
+            allWorksheets.push(ws);
+            
+            if (ws.status === 'pending') pendingCount++;
+            else if (ws.status === 'approved') approvedCount++;
         });
         
-        // Display pending worksheets first
         const pendingWorksheets = allWorksheets.filter(ws => ws.status === 'pending');
         const approvedWorksheets = allWorksheets.filter(ws => ws.status === 'approved');
         
         if (pendingWorksheets.length === 0 && approvedWorksheets.length === 0) {
             emptyState.style.display = 'block';
         } else {
-            // Display pending first
             pendingWorksheets.forEach(ws => {
                 worksheetsContainer.appendChild(createWorksheetCard(ws));
             });
             
-            // Then approved (lighter opacity)
             approvedWorksheets.forEach(ws => {
                 const card = createWorksheetCard(ws);
                 card.style.opacity = '0.6';
@@ -616,44 +699,77 @@ function createWorksheetCard(worksheet) {
     const card = document.createElement('div');
     card.className = 'worksheet-card';
     
-    const status = worksheet.status || 'pending';
+    const status = worksheet.status;
     const statusText = status === 'pending' ? '⏳ Pending' : '✓ Approved';
     const statusClass = status === 'pending' ? 'status-pending' : 'status-approved';
     
+    // Fix 5: Replace timestamp
+    const dateField = worksheet.createdAt || worksheet.generatedAt;
+    const dateDisplay = dateField ? new Date(dateField).toLocaleDateString() : 'Unknown Date';
+    
+    // Fix 6: Replace userName
+    const generator = worksheet.generator || "CinePhysicsHQ";
+    
+    // Fix 7: Replace question count based on distribution
+    let totalQuestions = 0;
+    if (worksheet.distribution) {
+        totalQuestions += (worksheet.distribution.mcq || 0);
+        totalQuestions += (worksheet.distribution.sa || 0);
+        totalQuestions += (worksheet.distribution.la || 0);
+        totalQuestions += (worksheet.distribution.vsa || 0);
+        totalQuestions += (worksheet.distribution.assertionReason || 0);
+        totalQuestions += (worksheet.distribution.numerical || 0);
+    }
+
+    // Displays (Fixes 8-12)
+    const chapterName = worksheet.chapter || "Untitled Worksheet";
+    const typeName = worksheet.worksheetType || "Worksheet";
+    const boardName = worksheet.board || "N/A";
+    const className = worksheet.className || "N/A";
+    const difficultyLevel = worksheet.difficulty || "N/A";
+    
     card.innerHTML = `
         <div class="worksheet-header">
-            <h3 class="worksheet-title">${worksheet.chapter}</h3>
+            <h3 class="worksheet-title">${chapterName}</h3>
             <div class="worksheet-meta">
                 <span class="status-badge ${statusClass}">${statusText}</span>
-                <span>${worksheet.difficulty || 'N/A'}</span>
+                <span>${difficultyLevel}</span>
             </div>
         </div>
         
         <div class="worksheet-details">
             <div class="detail-row">
                 <span>By:</span>
-                <span>${worksheet.userName || 'Anonymous'}</span>
+                <span>${generator}</span>
             </div>
             <div class="detail-row">
-                <span>Questions:</span>
-                <span>${worksheet.questions?.length || 0}</span>
+                <span>Total Questions:</span>
+                <span>${totalQuestions}</span>
             </div>
             <div class="detail-row">
                 <span>Type:</span>
-                <span>${worksheet.questionType || 'Mixed'}</span>
+                <span>${typeName}</span>
+            </div>
+            <div class="detail-row">
+                <span>Board:</span>
+                <span>${boardName}</span>
+            </div>
+            <div class="detail-row">
+                <span>Class:</span>
+                <span>${className}</span>
             </div>
             <div class="detail-row">
                 <span>Date:</span>
-                <span>${new Date(worksheet.timestamp).toLocaleDateString()}</span>
+                <span>${dateDisplay}</span>
             </div>
         </div>
         
         ${status === 'pending' ? `
             <div class="worksheet-actions">
-                <button class="btn-approve" onclick="approveWorksheet('${worksheet.chapter}', '${worksheet.id}')">
+                <button class="btn-approve" onclick="approveWorksheet('${worksheet.id}')">
                     ✓ Approve
                 </button>
-                <button class="btn-reject" onclick="rejectWorksheet('${worksheet.chapter}', '${worksheet.id}')">
+                <button class="btn-reject" onclick="rejectWorksheet('${worksheet.id}')">
                     ✕ Reject
                 </button>
             </div>
@@ -662,36 +778,84 @@ function createWorksheetCard(worksheet) {
                 ✓ Approved by admin
             </div>
         `}
+
+        ${worksheet.worksheetHTML ? `
+            <div class="worksheet-actions" style="margin-top: 0.5rem;">
+                <button class="preview-btn" onclick="openPreviewModal('${worksheet.id}')">
+                    👁 Preview
+                </button>
+                <button class="download-btn" onclick="downloadHTMLFile('${worksheet.id}')">
+                    ⬇ Download HTML
+                </button>
+            </div>
+        ` : ''}
     `;
     
     return card;
 }
 
 // APPROVE WORKSHEET
-async function approveWorksheet(chapter, id) {
+async function approveWorksheet(id) {
     if (!confirm('Approve this worksheet?')) return;
     
     try {
-        await db.ref(`worksheets/${chapter}/${id}`).update({
-            status: 'approved',
+        await db.collection("worksheets").doc(id).update({
+            status: "approved",
             approvedAt: new Date().toISOString(),
             approvedBy: auth.currentUser.email
         });
         loadWorksheets();
     } catch (error) {
-        alert('Error approving worksheet: ' + error.message);
+        console.error('Approve Error:', error);
+        errorMessage.textContent = '❌ Error approving: ' + error.message;
+        errorMessage.classList.add('show');
+        window.scrollTo(0, 0);
     }
 }
 
 // REJECT WORKSHEET
-async function rejectWorksheet(chapter, id) {
-    if (!confirm('Reject this worksheet? It will be removed.')) return;
+async function rejectWorksheet(id) {
+    if (!confirm('Reject this worksheet? It will be permanently deleted.')) return;
     
     try {
-        await db.ref(`worksheets/${chapter}/${id}`).remove();
+        await db.collection("worksheets").doc(id).delete();
         loadWorksheets();
     } catch (error) {
-        alert('Error rejecting worksheet: ' + error.message);
+        console.error('Reject Error:', error);
+        errorMessage.textContent = '❌ Error rejecting: ' + error.message;
+        errorMessage.classList.add('show');
+        window.scrollTo(0, 0);
+    }
+}
+
+// PREVIEW MODAL LOGIC
+function openPreviewModal(id) {
+    const ws = globalWorksheetsStore[id];
+    if (ws && ws.worksheetHTML) {
+        previewContainer.innerHTML = ws.worksheetHTML;
+        previewModal.classList.add('active');
+    }
+}
+
+function closePreview() {
+    previewModal.classList.remove('active');
+    previewContainer.innerHTML = '';
+}
+
+// DOWNLOAD HTML LOGIC
+function downloadHTMLFile(id) {
+    const ws = globalWorksheetsStore[id];
+    if (ws && ws.worksheetHTML) {
+        const blob = new Blob([ws.worksheetHTML], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeChapter = (ws.chapter || 'Worksheet').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        a.download = `cinephysicshq_${safeChapter}_${id}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
     }
 }
 
