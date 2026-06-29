@@ -634,10 +634,16 @@ async function loadWorksheets() {
     loadingState.style.display = 'block';
     worksheetsContainer.innerHTML = '';
     emptyState.style.display = 'none';
-    globalWorksheetsStore = {}; // Reset global store
+    globalWorksheetsStore = {}; 
     
     try {
         const snapshot = await db.collection("worksheets").get();
+        
+        // Debugging logs to verify your Firestore structure
+        console.log("Docs:", snapshot.size);
+        snapshot.forEach(doc => {
+            console.log(doc.id, doc.data());
+        });
         
         if (snapshot.empty) {
             emptyState.style.display = 'block';
@@ -649,21 +655,30 @@ async function loadWorksheets() {
         let allWorksheets = [];
         let pendingCount = 0;
         let approvedCount = 0;
+        let rejectedCount = 0;
         
         snapshot.forEach(doc => {
-            const ws = doc.data();
-            
-            // Fix 3: Assign pending if missing
-            if (!ws.status) {
-                ws.status = "pending";
-            }
-            
+            let ws = doc.data();
             ws.id = doc.id;
+            
+            // Handle missing fields and normalize case
+            ws.status = (ws.status || "pending").toLowerCase();
+            
             globalWorksheetsStore[doc.id] = ws;
             allWorksheets.push(ws);
             
-            if (ws.status === 'pending') pendingCount++;
-            else if (ws.status === 'approved') approvedCount++;
+            // Switch statement for calculating exact stats
+            switch(ws.status) {
+                case "approved":
+                    approvedCount++;
+                    break;
+                case "rejected":
+                    rejectedCount++;
+                    break;
+                default:
+                    pendingCount++;
+                    break;
+            }
         });
         
         const pendingWorksheets = allWorksheets.filter(ws => ws.status === 'pending');
@@ -703,14 +718,11 @@ function createWorksheetCard(worksheet) {
     const statusText = status === 'pending' ? '⏳ Pending' : '✓ Approved';
     const statusClass = status === 'pending' ? 'status-pending' : 'status-approved';
     
-    // Fix 5: Replace timestamp
     const dateField = worksheet.createdAt || worksheet.generatedAt;
     const dateDisplay = dateField ? new Date(dateField).toLocaleDateString() : 'Unknown Date';
     
-    // Fix 6: Replace userName
     const generator = worksheet.generator || "CinePhysicsHQ";
     
-    // Fix 7: Replace question count based on distribution
     let totalQuestions = 0;
     if (worksheet.distribution) {
         totalQuestions += (worksheet.distribution.mcq || 0);
@@ -721,7 +733,6 @@ function createWorksheetCard(worksheet) {
         totalQuestions += (worksheet.distribution.numerical || 0);
     }
 
-    // Displays (Fixes 8-12)
     const chapterName = worksheet.chapter || "Untitled Worksheet";
     const typeName = worksheet.worksheetType || "Worksheet";
     const boardName = worksheet.board || "N/A";
