@@ -497,30 +497,40 @@
 
     <script>
         /**
+         * CONFIGURATION
+         */
+        const CONFIG = {
+            apiBase: 'https://cinephysics-api.vercel.app/api/admin/admin', 
+            getHeaders: () => ({
+                'Content-Type': 'application/json'
+            })
+        };
+
+        /**
          * SESSION VERIFICATION
          */
         async function verifySession() {
             try {
-                const res = await fetch("https://cinephysics-api.vercel.app/api/admin/session", {
+                const response = await fetch(`${CONFIG.apiBase}?action=session`, {
                     credentials: "include"
                 });
 
-                if (!res.ok) {
-                    window.location.replace("login.html");
+                if (response.status === 401 || !response.ok) {
+                    window.location.replace("admin-login.html");
                     return false;
                 }
 
-                const data = await res.json();
+                const data = await response.json();
 
                 if (!data.authenticated) {
-                    window.location.replace("login.html");
+                    window.location.replace("admin-login.html");
                     return false;
                 }
 
                 return true;
             } catch (error) {
                 console.error("Session verification failed:", error);
-                window.location.replace("login.html");
+                window.location.replace("admin-login.html");
                 return false;
             }
         }
@@ -530,34 +540,16 @@
          */
         async function logout() {
             try {
-                await fetch("https://cinephysics-api.vercel.app/api/admin/logout", {
+                await fetch(`${CONFIG.apiBase}?action=logout`, {
                     method: "POST",
                     credentials: "include"
                 });
-                window.location.replace("login.html");
+                window.location.replace("admin-login.html");
             } catch (error) {
                 console.error("Logout failed:", error);
-                window.location.replace("login.html");
+                window.location.replace("admin-login.html");
             }
         }
-
-        /**
-         * CONFIGURATION
-         */
-        const CONFIG = {
-            apiBase: 'https://cinephysics-api.vercel.app/api', 
-            endpoints: {
-                pending: '/admin/pending',
-                approve: '/admin/approve',
-                reject:  '/admin/reject',
-                delete:  '/admin/delete',
-                worksheet: '/worksheet',
-                stats: '/admin/stats' 
-            },
-            getHeaders: () => ({
-                'Content-Type': 'application/json'
-            })
-        };
 
         /**
          * UTILITIES
@@ -604,10 +596,16 @@
         const AdminAPI = {
             async fetchStats() {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.stats}`, {
+                    const response = await fetch(`${CONFIG.apiBase}?action=stats`, {
                         credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
+                    
+                    if (response.status === 401) {
+                        window.location.replace("admin-login.html");
+                        return { pending: 0, approved: 0, rejected: 0, total: 0 };
+                    }
+                    
                     if (!response.ok) throw new Error('Stats endpoint failed');
                     return await response.json();
                 } catch (error) {
@@ -617,10 +615,16 @@
             },
             async fetchPending() {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.pending}`, {
+                    const response = await fetch(`${CONFIG.apiBase}?action=pending`, {
                         credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
+                    
+                    if (response.status === 401) {
+                        window.location.replace("admin-login.html");
+                        return { success: false, worksheets: [] };
+                    }
+                    
                     if (!response.ok) throw new Error('Failed to fetch worksheets');
                     return await response.json();
                 } catch (error) {
@@ -629,14 +633,20 @@
                     return { success: false, worksheets: [] };
                 }
             },
-            async action(endpoint, worksheetId) {
+            async action(actionType, worksheetId) {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}${endpoint}`, {
+                    const response = await fetch(`${CONFIG.apiBase}?action=${actionType}`, {
                         method: 'POST',
                         credentials: "include",
                         headers: CONFIG.getHeaders(),
                         body: JSON.stringify({ worksheetId })
                     });
+                    
+                    if (response.status === 401) {
+                        window.location.replace("admin-login.html");
+                        return false;
+                    }
+                    
                     if (!response.ok) throw new Error(`API error during action`);
                     return true;
                 } catch (error) {
@@ -647,10 +657,16 @@
             },
             async getWorksheet(worksheetId) {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.worksheet}?id=${worksheetId}`, {
+                    const response = await fetch(`${CONFIG.apiBase}?action=worksheet&id=${worksheetId}`, {
                         credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
+                    
+                    if (response.status === 401) {
+                        window.location.replace("admin-login.html");
+                        return null;
+                    }
+                    
                     if (!response.ok) throw new Error('Failed to load worksheet details');
                     return await response.json();
                 } catch (error) {
@@ -679,7 +695,7 @@
                         const btn = e.target;
                         btn.disabled = true; 
                         
-                        const success = await AdminAPI.action(CONFIG.endpoints.delete, Modal.currentDeleteId);
+                        const success = await AdminAPI.action('delete', Modal.currentDeleteId);
                         
                         btn.disabled = false;
                         Modal.confirm.close();
@@ -903,14 +919,9 @@
             },
 
             async handleAction(actionType, worksheetId) {
-                const endpoints = {
-                    'approve': CONFIG.endpoints.approve,
-                    'reject': CONFIG.endpoints.reject
-                };
-
                 document.querySelectorAll("button").forEach(btn => btn.disabled = true);
 
-                const success = await AdminAPI.action(endpoints[actionType], worksheetId);
+                const success = await AdminAPI.action(actionType, worksheetId);
                 
                 document.querySelectorAll("button").forEach(btn => btn.disabled = false);
 
@@ -922,11 +933,24 @@
         };
 
         /**
+         * INITIALIZE PAGE
+         * Holds all code that should only run after session authentication succeeds
+         */
+        function initializePage() {
+            Dashboard.init();
+        }
+
+        /**
          * INITIALIZATION GUARD
          */
         document.addEventListener("DOMContentLoaded", async () => {
-            const ok = await verifySession();
-            if (ok) Dashboard.init();
+            const authenticated = await verifySession();
+            
+            // Stop execution if not authenticated
+            if (!authenticated) return;
+            
+            // Proceed with loading the page UI and fetching data
+            initializePage();
         });
 
     </script>
