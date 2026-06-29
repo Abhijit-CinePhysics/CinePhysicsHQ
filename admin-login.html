@@ -380,7 +380,6 @@
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h1>⚡ CinePhysicsHQ</h1>
@@ -414,7 +413,6 @@
     </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="dashboard" class="dashboard">
     <div class="container">
         <div class="header">
@@ -427,7 +425,6 @@
             <button class="logout-btn" id="logoutBtn">Logout</button>
         </div>
 
-        <!-- STATS -->
         <div class="stats">
             <div class="stat-box">
                 <div class="stat-number" id="statPending">0</div>
@@ -443,15 +440,12 @@
             </div>
         </div>
 
-        <!-- LOADING STATE -->
         <div class="loading" id="loadingState" style="display: none;">
             Loading worksheets... ⏳
         </div>
 
-        <!-- WORKSHEETS GRID -->
         <div id="worksheetsContainer" class="worksheets-container"></div>
 
-        <!-- EMPTY STATE -->
         <div class="empty-state" id="emptyState" style="display: none;">
             <div class="empty-state-icon">📭</div>
             <h2>No worksheets yet</h2>
@@ -460,10 +454,9 @@
     </div>
 </div>
 
-<!-- Firebase Scripts -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
 // Firebase Configuration (YOUR config)
@@ -494,20 +487,30 @@ const worksheetsContainer = document.getElementById('worksheetsContainer');
 const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
 
-// Check Authentication State
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // User is logged in
-        loginScreen.style.display = 'none';
-        dashboard.classList.add('active');
-        adminEmail.textContent = user.email;
-        loadWorksheets();
-    } else {
+// Check Authentication State with Admin Constraint
+const ADMIN_EMAIL = "singhabhijit327@gmail.com";
+
+auth.onAuthStateChanged(async user => {
+    if (!user) {
         // User is logged out
-        loginScreen.style.display = 'flex';
-        dashboard.classList.remove('active');
+        loginScreen.style.display = "flex";
+        dashboard.classList.remove("active");
         worksheetsContainer.innerHTML = '';
+        return;
     }
+
+    if (user.email !== ADMIN_EMAIL) {
+        // Unauthorized user
+        alert("Access denied. Admin privileges required.");
+        await auth.signOut();
+        return;
+    }
+
+    // Authorized Admin is logged in
+    loginScreen.style.display = "none";
+    dashboard.classList.add("active");
+    adminEmail.textContent = user.email;
+    loadWorksheets();
 });
 
 // LOGIN HANDLER
@@ -528,6 +531,8 @@ loginForm.addEventListener('submit', async (e) => {
     } catch (error) {
         errorMessage.textContent = '❌ ' + error.message;
         errorMessage.classList.add('show');
+    } finally {
+        // Always re-enable button after attempt finishes
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login as Admin';
     }
