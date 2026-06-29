@@ -454,6 +454,7 @@
     </div>
 </div>
 
+<script>
 // ==========================================
 // CONFIGURATION
 // ==========================================
@@ -477,10 +478,16 @@ const loadingState = document.getElementById('loadingState');
 
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-        const res = await fetch(`${API_BASE}?action=session`, { 
+        const response = await fetch(`${API_BASE}?action=session`, { 
             credentials: 'include' 
         });
-        const data = await res.json();
+        
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {
+            // Fails silently, triggers login screen below
+        }
         
         if (data.authenticated === true) {
             showDashboard(data.email);
@@ -504,6 +511,7 @@ function showLoginScreen() {
     loginScreen.style.display = "flex";
     dashboard.classList.remove("active");
     worksheetsContainer.innerHTML = '';
+    adminEmail.textContent = ''; // UI Clear
 }
 
 // ==========================================
@@ -529,12 +537,17 @@ loginForm.addEventListener('submit', async (e) => {
             credentials: 'include'
         });
 
-        const data = await response.json();
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (err) {
+            // Handle cases where response might be plain text/HTML on server error
+        }
 
         if (data.success === true) {
             showDashboard(email);
         } else {
-            errorMessage.textContent = '❌ ' + (data.message || 'Login failed.');
+            errorMessage.textContent = '❌ ' + (data.error || data.message || 'Login failed.');
             errorMessage.classList.add('show');
         }
     } catch (error) {
@@ -572,7 +585,18 @@ async function loadWorksheets() {
         const response = await fetch(`${API_BASE}?action=pending`, { 
             credentials: 'include' 
         });
-        const data = await response.json();
+        
+        // Check for unauthorized access
+        if (response.status === 401) {
+            showLoginScreen();
+            return;
+        }
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {}
+
         const worksheets = data.worksheets || [];
         
         if (worksheets.length === 0) {
@@ -592,11 +616,22 @@ async function loadWorksheets() {
 async function loadStats() {
     try {
         const response = await fetch(`${API_BASE}?action=stats`, { credentials: 'include' });
-        const data = await response.json();
+        
+        // Check for unauthorized access
+        if (response.status === 401) {
+            showLoginScreen();
+            return;
+        }
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {}
+
         if (data.success) {
-            document.getElementById('statPending').textContent = data.pending;
-            document.getElementById('statApproved').textContent = data.approved;
-            document.getElementById('statTotal').textContent = data.total;
+            document.getElementById('statPending').textContent = data.pending || 0;
+            document.getElementById('statApproved').textContent = data.approved || 0;
+            document.getElementById('statTotal').textContent = data.total || 0;
         }
     } catch (error) {
         console.error('Error loading stats:', error);
@@ -624,6 +659,9 @@ function createWorksheetCard(ws) {
             <button class="btn-approve" onclick="handleAction('approve', '${ws.worksheetId}')">✓ Approve</button>
             <button class="btn-reject" onclick="handleAction('reject', '${ws.worksheetId}')">✕ Reject</button>
         </div>
+        <div style="margin-top: 1rem; text-align: center;">
+             <button class="logout-btn" style="width: 100%; border-color: var(--danger); color: var(--danger);" onclick="handleAction('delete', '${ws.worksheetId}')">🗑️ Delete</button>
+        </div>
     `;
     return card;
 }
@@ -644,17 +682,28 @@ async function handleAction(action, worksheetId) {
             credentials: 'include'
         });
         
-        if (response.ok) {
+        // Handle unauthorized request dynamically
+        if (response.status === 401) {
+            showLoginScreen();
+            return;
+        }
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {}
+        
+        if (response.ok && data.success) {
             loadWorksheets();
             loadStats();
         } else {
-            alert('Operation failed.');
+            alert(data.error || data.message || "Operation failed.");
         }
     } catch (error) {
         alert('Error: ' + error.message);
     }
 }
-            
+</script>
 
 </body>
 </html>
