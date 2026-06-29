@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CinePhysicsHQ Admin Panel - Manage and approve student-generated worksheets">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <title>CinePhysicsHQ Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -40,9 +45,29 @@
             padding: 2rem;
         }
 
+        /* LOADING OVERLAY */
+        #initialLoader {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s;
+        }
+        
+        #initialLoader h2 {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
         /* LOGIN SCREEN */
         .login-screen {
-            display: flex;
+            display: none; /* Hidden by default, shown by JS */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -380,6 +405,11 @@
 </head>
 <body>
 
+<div id="initialLoader">
+    <h2>⚡ CinePhysicsHQ</h2>
+    <p style="color: var(--text-muted);">Verifying session...</p>
+</div>
+
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h1>⚡ CinePhysicsHQ</h1>
@@ -458,10 +488,10 @@
 // ==========================================
 // CONFIGURATION
 // ==========================================
-// Updated to the single consolidated endpoint
 const API_BASE = "https://cinephysics-api.vercel.app/api/admin/admin"; 
 
 // DOM Elements
+const initialLoader = document.getElementById('initialLoader');
 const loginScreen = document.getElementById('loginScreen');
 const dashboard = document.getElementById('dashboard');
 const loginForm = document.getElementById('loginForm');
@@ -473,31 +503,56 @@ const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
 
 // ==========================================
+// CUSTOM FETCH WRAPPER (Auto-Logout on 401)
+// ==========================================
+async function apiFetch(url, options = {}) {
+    const response = await fetch(url, {
+        credentials: "include",
+        ...options
+    });
+
+    if (response.status === 401) {
+        showLoginScreen();
+        throw new Error("Unauthorized: Session expired or invalid.");
+    }
+
+    return response;
+}
+
+// ==========================================
 // SESSION MANAGEMENT & UI STATE
 // ==========================================
 
+// Check session on initial load
 window.addEventListener('DOMContentLoaded', async () => {
+    await verifySession();
+    
+    // Hide the initial loader once the first check is done
+    initialLoader.style.display = 'none';
+    
+    // Call verifySession() every 5 minutes (300000 ms)
+    setInterval(verifySession, 5 * 60 * 1000);
+});
+
+// Dedicated session verification function
+async function verifySession() {
     try {
-        const response = await fetch(`${API_BASE}?action=session`, { 
-            credentials: 'include' 
-        });
+        const response = await apiFetch(`${API_BASE}?action=session`);
+        const sessionData = await response.json();
         
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (e) {
-            // Fails silently, triggers login screen below
-        }
-        
-        if (data.authenticated === true) {
-            showDashboard(data.email);
+        if (sessionData.authenticated) {
+            showDashboard(sessionData.email);
+            return true;
         } else {
             showLoginScreen();
+            return false;
         }
     } catch (error) {
+        // apiFetch already triggers showLoginScreen() on 401
         showLoginScreen();
+        return false;
     }
-});
+}
 
 function showDashboard(email) {
     loginScreen.style.display = "none";
@@ -510,8 +565,9 @@ function showDashboard(email) {
 function showLoginScreen() {
     loginScreen.style.display = "flex";
     dashboard.classList.remove("active");
+    loginForm.reset();
     worksheetsContainer.innerHTML = '';
-    adminEmail.textContent = ''; // UI Clear
+    adminEmail.textContent = ''; 
 }
 
 // ==========================================
@@ -530,6 +586,8 @@ loginForm.addEventListener('submit', async (e) => {
     errorMessage.classList.remove('show');
     
     try {
+        // We use standard fetch here because a 401 on login is a standard rejection, 
+        // not an expired session that needs to reset the UI via apiFetch.
         const response = await fetch(`${API_BASE}?action=login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -537,21 +595,20 @@ loginForm.addEventListener('submit', async (e) => {
             credentials: 'include'
         });
 
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (err) {
-            // Handle cases where response might be plain text/HTML on server error
-        }
+        const data = await response.json();
 
         if (data.success === true) {
-            showDashboard(email);
+            // Guarantee the cookie was actually set by checking the session endpoint immediately
+            const isValid = await verifySession();
+            if (!isValid) {
+                throw new Error("Cookie was not set correctly.");
+            }
         } else {
             errorMessage.textContent = '❌ ' + (data.error || data.message || 'Login failed.');
             errorMessage.classList.add('show');
         }
     } catch (error) {
-        errorMessage.textContent = '❌ Network error. Please try again.';
+        errorMessage.textContent = '❌ Network error or invalid session. Please try again.';
         errorMessage.classList.add('show');
     } finally {
         loginBtn.disabled = false;
@@ -561,14 +618,14 @@ loginForm.addEventListener('submit', async (e) => {
 
 logoutBtn.addEventListener('click', async () => {
     try {
-        await fetch(`${API_BASE}?action=logout`, { 
-            method: 'POST', 
-            credentials: 'include' 
+        await apiFetch(`${API_BASE}?action=logout`, { 
+            method: 'POST'
         });
         showLoginScreen();
-        loginForm.reset();
     } catch (error) {
         console.error('Logout error:', error);
+        // Fallback locally just in case
+        showLoginScreen();
     }
 });
 
@@ -582,20 +639,9 @@ async function loadWorksheets() {
     emptyState.style.display = 'none';
     
     try {
-        const response = await fetch(`${API_BASE}?action=pending`, { 
-            credentials: 'include' 
-        });
-        
-        // Check for unauthorized access
-        if (response.status === 401) {
-            showLoginScreen();
-            return;
-        }
-
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (e) {}
+        // Using our new wrapper
+        const response = await apiFetch(`${API_BASE}?action=pending`);
+        const data = await response.json();
 
         const worksheets = data.worksheets || [];
         
@@ -615,18 +661,9 @@ async function loadWorksheets() {
 
 async function loadStats() {
     try {
-        const response = await fetch(`${API_BASE}?action=stats`, { credentials: 'include' });
-        
-        // Check for unauthorized access
-        if (response.status === 401) {
-            showLoginScreen();
-            return;
-        }
-
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (e) {}
+        // Using our new wrapper
+        const response = await apiFetch(`${API_BASE}?action=stats`);
+        const data = await response.json();
 
         if (data.success) {
             document.getElementById('statPending').textContent = data.pending || 0;
@@ -675,23 +712,14 @@ async function handleAction(action, worksheetId) {
     if (!confirmation) return;
 
     try {
-        const response = await fetch(`${API_BASE}?action=${action}`, {
+        // Using our new wrapper
+        const response = await apiFetch(`${API_BASE}?action=${action}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ worksheetId }),
-            credentials: 'include'
+            body: JSON.stringify({ worksheetId })
         });
         
-        // Handle unauthorized request dynamically
-        if (response.status === 401) {
-            showLoginScreen();
-            return;
-        }
-
-        let data = {};
-        try {
-            data = await response.json();
-        } catch (e) {}
+        const data = await response.json();
         
         if (response.ok && data.success) {
             loadWorksheets();
@@ -700,7 +728,10 @@ async function handleAction(action, worksheetId) {
             alert(data.error || data.message || "Operation failed.");
         }
     } catch (error) {
-        alert('Error: ' + error.message);
+        // Suppress alert if it's just the Unauthorized error kicking them out
+        if(error.message !== "Unauthorized: Session expired or invalid.") {
+            alert('Error: ' + error.message);
+        }
     }
 }
 </script>
