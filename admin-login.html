@@ -6,6 +6,12 @@
     <meta name="description" content="CinePhysicsHQ Admin Panel - Manage and approve student-generated worksheets">
     <title>CinePhysicsHQ Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FIREBASE SCRIPTS FIRST (CRITICAL) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+    
     <style>
         :root {
             --bg: #0a0e1a;
@@ -460,11 +466,6 @@
     </div>
 </div>
 
-<!-- Firebase Scripts -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
-
 <script>
 // Firebase Configuration (YOUR config)
 const firebaseConfig = {
@@ -478,7 +479,7 @@ const firebaseConfig = {
   measurementId: "G-TC2GZCD8K5"
 };
 
-// Initialize Firebase
+// Initialize Firebase FIRST
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
