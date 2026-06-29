@@ -37,6 +37,8 @@
             color: var(--text-main);
             min-height: 100vh;
             line-height: 1.6;
+            /* Prevents the dashboard from flashing before authentication is verified */
+            visibility: hidden; 
         }
 
         /* Glassmorphism Utilities */
@@ -74,6 +76,16 @@
             display: flex;
             align-items: center;
             gap: 1rem;
+        }
+        
+        .admin-details {
+            text-align: right;
+            line-height: 1.2;
+        }
+
+        .admin-email {
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
         .container {
@@ -409,7 +421,10 @@
     <nav class="navbar">
         <h1>CinePhysicsHQ Admin</h1>
         <div class="admin-profile">
-            Admin 
+            <div class="admin-details">
+                <div>Admin</div>
+                <div id="admin-email" class="admin-email"></div>
+            </div>
             <button class="btn btn-outline" onclick="logout()" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Logout</button>
         </div>
     </nav>
@@ -497,6 +512,16 @@
 
     <script>
         /**
+         * PREVENT BROWSER CACHING (bfcache)
+         * Forces a reload if the user uses the back button after logging out.
+         */
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+
+        /**
          * CONFIGURATION
          */
         const CONFIG = {
@@ -507,10 +532,29 @@
         };
 
         /**
+         * AUTHENTICATED FETCH WRAPPER
+         * Centralizes the 401 redirect logic for all API calls.
+         */
+        async function apiFetch(url, options = {}) {
+            const response = await fetch(url, {
+                credentials: "include",
+                ...options
+            });
+
+            if (response.status === 401) {
+                window.location.replace("admin-login.html");
+                throw new Error("Unauthorized");
+            }
+
+            return response;
+        }
+
+        /**
          * SESSION VERIFICATION
          */
         async function verifySession() {
             try {
+                // We use standard fetch here to handle the manual redirect for the initial check cleanly
                 const response = await fetch(`${CONFIG.apiBase}?action=session`, {
                     credentials: "include"
                 });
@@ -527,6 +571,11 @@
                     return false;
                 }
 
+                // Display the logged-in user's email
+                if (data.email) {
+                    document.getElementById('admin-email').textContent = data.email;
+                }
+
                 return true;
             } catch (error) {
                 console.error("Session verification failed:", error);
@@ -540,9 +589,8 @@
          */
         async function logout() {
             try {
-                await fetch(`${CONFIG.apiBase}?action=logout`, {
-                    method: "POST",
-                    credentials: "include"
+                await apiFetch(`${CONFIG.apiBase}?action=logout`, {
+                    method: "POST"
                 });
                 window.location.replace("admin-login.html");
             } catch (error) {
@@ -596,82 +644,69 @@
         const AdminAPI = {
             async fetchStats() {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}?action=stats`, {
-                        credentials: "include",
+                    const response = await apiFetch(`${CONFIG.apiBase}?action=stats`, {
                         headers: CONFIG.getHeaders()
                     });
                     
-                    if (response.status === 401) {
-                        window.location.replace("admin-login.html");
-                        return { pending: 0, approved: 0, rejected: 0, total: 0 };
-                    }
-                    
-                    if (!response.ok) throw new Error('Stats endpoint failed');
                     return await response.json();
                 } catch (error) {
-                    console.warn("Stats API error. Defaulting to zeros.", error);
+                    if (error.message !== "Unauthorized") {
+                        console.warn("Stats API error. Defaulting to zeros.", error);
+                    }
                     return { pending: 0, approved: 0, rejected: 0, total: 0 };
                 }
             },
             async fetchPending() {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}?action=pending`, {
-                        credentials: "include",
+                    const response = await apiFetch(`${CONFIG.apiBase}?action=pending`, {
                         headers: CONFIG.getHeaders()
                     });
                     
-                    if (response.status === 401) {
-                        window.location.replace("admin-login.html");
-                        return { success: false, worksheets: [] };
-                    }
-                    
-                    if (!response.ok) throw new Error('Failed to fetch worksheets');
                     return await response.json();
                 } catch (error) {
-                    Toast.error('Network error while fetching data.');
-                    console.error(error);
+                    if (error.message !== "Unauthorized") {
+                        Toast.error('Network error while fetching data.');
+                        console.error(error);
+                    }
                     return { success: false, worksheets: [] };
                 }
             },
             async action(actionType, worksheetId) {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}?action=${actionType}`, {
+                    const response = await apiFetch(`${CONFIG.apiBase}?action=${actionType}`, {
                         method: 'POST',
-                        credentials: "include",
                         headers: CONFIG.getHeaders(),
                         body: JSON.stringify({ worksheetId })
                     });
                     
-                    if (response.status === 401) {
-                        window.location.replace("admin-login.html");
-                        return false;
+                    const data = await response.json();
+                    
+                    // Safely check for success from the parsed JSON payload
+                    if (!data.success) {
+                        throw new Error(data.message || data.error || "Operation failed");
                     }
                     
-                    if (!response.ok) throw new Error(`API error during action`);
                     return true;
                 } catch (error) {
-                    Toast.error(`Action failed: Check if backend route exists.`);
-                    console.error(error);
+                    if (error.message !== "Unauthorized") {
+                        Toast.error(error.message || `Action failed: Check if backend route exists.`);
+                        console.error(error);
+                    }
                     return false;
                 }
             },
             async getWorksheet(worksheetId) {
                 try {
-                    const response = await fetch(`${CONFIG.apiBase}?action=worksheet&id=${worksheetId}`, {
-                        credentials: "include",
+                    const response = await apiFetch(`${CONFIG.apiBase}?action=worksheet&id=${worksheetId}`, {
                         headers: CONFIG.getHeaders()
                     });
                     
-                    if (response.status === 401) {
-                        window.location.replace("admin-login.html");
-                        return null;
-                    }
-                    
-                    if (!response.ok) throw new Error('Failed to load worksheet details');
                     return await response.json();
                 } catch (error) {
-                    Toast.error('API error while fetching worksheet.');
-                    console.error(error);
+                    if (error.message !== "Unauthorized") {
+                        Toast.error('API error while fetching worksheet.');
+                        console.error(error);
+                    }
                     return null;
                 }
             }
@@ -949,8 +984,17 @@
             // Stop execution if not authenticated
             if (!authenticated) return;
             
+            // Unhide the application UI now that auth is confirmed
+            document.body.style.visibility = "visible";
+
             // Proceed with loading the page UI and fetching data
             initializePage();
+
+            // Set up an automatic session verification every 5 minutes (300,000 milliseconds)
+            setInterval(async () => {
+                const ok = await verifySession();
+                if (!ok) return; // User is logged out and automatically redirected
+            }, 300000); 
         });
 
     </script>
