@@ -69,6 +69,12 @@
             font-weight: 600;
             letter-spacing: 1px;
         }
+        
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
 
         .container {
             max-width: 1400px;
@@ -402,7 +408,10 @@
 
     <nav class="navbar">
         <h1>CinePhysicsHQ Admin</h1>
-        <div class="admin-profile">Admin</div>
+        <div class="admin-profile">
+            Admin 
+            <button class="btn btn-outline" onclick="logout()" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Logout</button>
+        </div>
     </nav>
 
     <main class="container">
@@ -488,6 +497,51 @@
 
     <script>
         /**
+         * SESSION VERIFICATION
+         */
+        async function verifySession() {
+            try {
+                const res = await fetch("https://cinephysics-api.vercel.app/api/admin/session", {
+                    credentials: "include"
+                });
+
+                if (!res.ok) {
+                    window.location.replace("login.html");
+                    return false;
+                }
+
+                const data = await res.json();
+
+                if (!data.authenticated) {
+                    window.location.replace("login.html");
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error("Session verification failed:", error);
+                window.location.replace("login.html");
+                return false;
+            }
+        }
+
+        /**
+         * LOGOUT
+         */
+        async function logout() {
+            try {
+                await fetch("https://cinephysics-api.vercel.app/api/admin/logout", {
+                    method: "POST",
+                    credentials: "include"
+                });
+                window.location.replace("login.html");
+            } catch (error) {
+                console.error("Logout failed:", error);
+                window.location.replace("login.html");
+            }
+        }
+
+        /**
          * CONFIGURATION
          */
         const CONFIG = {
@@ -551,6 +605,7 @@
             async fetchStats() {
                 try {
                     const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.stats}`, {
+                        credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
                     if (!response.ok) throw new Error('Stats endpoint failed');
@@ -563,6 +618,7 @@
             async fetchPending() {
                 try {
                     const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.pending}`, {
+                        credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
                     if (!response.ok) throw new Error('Failed to fetch worksheets');
@@ -577,6 +633,7 @@
                 try {
                     const response = await fetch(`${CONFIG.apiBase}${endpoint}`, {
                         method: 'POST',
+                        credentials: "include",
                         headers: CONFIG.getHeaders(),
                         body: JSON.stringify({ worksheetId })
                     });
@@ -591,6 +648,7 @@
             async getWorksheet(worksheetId) {
                 try {
                     const response = await fetch(`${CONFIG.apiBase}${CONFIG.endpoints.worksheet}?id=${worksheetId}`, {
+                        credentials: "include",
                         headers: CONFIG.getHeaders()
                     });
                     if (!response.ok) throw new Error('Failed to load worksheet details');
@@ -616,15 +674,14 @@
                 document.getElementById('close-preview').addEventListener('click', () => Modal.preview.close());
                 document.getElementById('confirm-cancel').addEventListener('click', () => Modal.confirm.close());
                 
-                // FIXED 4: Add loading state to delete button
                 document.getElementById('confirm-delete').addEventListener('click', async (e) => {
                     if (Modal.currentDeleteId) {
                         const btn = e.target;
-                        btn.disabled = true; // Disable button to prevent double-click
+                        btn.disabled = true; 
                         
                         const success = await AdminAPI.action(CONFIG.endpoints.delete, Modal.currentDeleteId);
                         
-                        btn.disabled = false; // Re-enable button
+                        btn.disabled = false;
                         Modal.confirm.close();
                         
                         if (success) {
@@ -679,7 +736,6 @@
                     
                     bodyEl.innerHTML = html;
 
-                    // FIXED 1: Safer MathJax Promise Loading
                     if (window.MathJax?.startup?.promise) {
                         MathJax.startup.promise
                             .then(() => MathJax.typesetPromise([bodyEl]))
@@ -794,7 +850,6 @@
             },
 
             bindEvents() {
-                // FIXED 2: Preserved execution context with an arrow function
                 document.getElementById('btn-refresh').addEventListener('click', () => Dashboard.loadData());
                 
                 const filterChangeHandler = () => Dashboard.applyFilters();
@@ -815,7 +870,6 @@
                     AdminAPI.fetchPending()
                 ]);
 
-                // FIXED 3: Safer API response handling
                 Dashboard.state.allData = Array.isArray(response?.worksheets) ? response.worksheets : [];
                 
                 AdminUI.updateStats(stats);
@@ -854,12 +908,10 @@
                     'reject': CONFIG.endpoints.reject
                 };
 
-                // FIXED 4: Disable all buttons while the request is running
                 document.querySelectorAll("button").forEach(btn => btn.disabled = true);
 
                 const success = await AdminAPI.action(endpoints[actionType], worksheetId);
                 
-                // Re-enable buttons after the request completes
                 document.querySelectorAll("button").forEach(btn => btn.disabled = false);
 
                 if (success) {
@@ -869,7 +921,13 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', Dashboard.init);
+        /**
+         * INITIALIZATION GUARD
+         */
+        document.addEventListener("DOMContentLoaded", async () => {
+            const ok = await verifySession();
+            if (ok) Dashboard.init();
+        });
 
     </script>
 </body>
