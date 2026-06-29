@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CinePhysicsHQ Admin Panel - Manage and approve student-generated worksheets">
-    
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
     <title>CinePhysicsHQ Admin Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -45,29 +40,9 @@
             padding: 2rem;
         }
 
-        /* LOADING OVERLAY */
-        #initialLoader {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--bg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.3s;
-        }
-        
-        #initialLoader h2 {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
-        }
-
         /* LOGIN SCREEN */
         .login-screen {
-            display: none; /* Hidden by default, shown by JS */
+            display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -405,11 +380,7 @@
 </head>
 <body>
 
-<div id="initialLoader">
-    <h2>⚡ CinePhysicsHQ</h2>
-    <p style="color: var(--text-muted);">Verifying session...</p>
-</div>
-
+<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h1>⚡ CinePhysicsHQ</h1>
@@ -443,6 +414,7 @@
     </div>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" class="dashboard">
     <div class="container">
         <div class="header">
@@ -455,6 +427,7 @@
             <button class="logout-btn" id="logoutBtn">Logout</button>
         </div>
 
+        <!-- STATS -->
         <div class="stats">
             <div class="stat-box">
                 <div class="stat-number" id="statPending">0</div>
@@ -470,12 +443,15 @@
             </div>
         </div>
 
+        <!-- LOADING STATE -->
         <div class="loading" id="loadingState" style="display: none;">
             Loading worksheets... ⏳
         </div>
 
+        <!-- WORKSHEETS GRID -->
         <div id="worksheetsContainer" class="worksheets-container"></div>
 
+        <!-- EMPTY STATE -->
         <div class="empty-state" id="emptyState" style="display: none;">
             <div class="empty-state-icon">📭</div>
             <h2>No worksheets yet</h2>
@@ -484,14 +460,30 @@
     </div>
 </div>
 
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+
 <script>
-// ==========================================
-// CONFIGURATION
-// ==========================================
-const API_BASE = "https://cinephysics-api.vercel.app/api/admin/admin"; 
+// Firebase Configuration (YOUR config)
+const firebaseConfig = {
+  apiKey: "AIzaSyAVPytvxafQYkoLhxOr2QcNT-fgwk6Cnmk",
+  authDomain: "cinephysicshq.firebaseapp.com",
+  databaseURL: "https://cinephysicshq-default-rtdb.asia-southeast1.firebasedata.com",
+  projectId: "cinephysicshq",
+  storageBucket: "cinephysicshq.appspot.com",
+  messagingSenderId: "506903518720",
+  appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
+  measurementId: "G-TC2GZCD8K5"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
 // DOM Elements
-const initialLoader = document.getElementById('initialLoader');
 const loginScreen = document.getElementById('loginScreen');
 const dashboard = document.getElementById('dashboard');
 const loginForm = document.getElementById('loginForm');
@@ -502,78 +494,23 @@ const worksheetsContainer = document.getElementById('worksheetsContainer');
 const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
 
-// ==========================================
-// CUSTOM FETCH WRAPPER (Auto-Logout on 401)
-// ==========================================
-async function apiFetch(url, options = {}) {
-    const response = await fetch(url, {
-        credentials: "include",
-        ...options
-    });
-
-    if (response.status === 401) {
-        showLoginScreen();
-        throw new Error("Unauthorized: Session expired or invalid.");
+// Check Authentication State
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // User is logged in
+        loginScreen.style.display = 'none';
+        dashboard.classList.add('active');
+        adminEmail.textContent = user.email;
+        loadWorksheets();
+    } else {
+        // User is logged out
+        loginScreen.style.display = 'flex';
+        dashboard.classList.remove('active');
+        worksheetsContainer.innerHTML = '';
     }
-
-    return response;
-}
-
-// ==========================================
-// SESSION MANAGEMENT & UI STATE
-// ==========================================
-
-// Check session on initial load
-window.addEventListener('DOMContentLoaded', async () => {
-    await verifySession();
-    
-    // Hide the initial loader once the first check is done
-    initialLoader.style.display = 'none';
-    
-    // Call verifySession() every 5 minutes (300000 ms)
-    setInterval(verifySession, 5 * 60 * 1000);
 });
 
-// Dedicated session verification function
-async function verifySession() {
-    try {
-        const response = await apiFetch(`${API_BASE}?action=session`);
-        const sessionData = await response.json();
-        
-        if (sessionData.authenticated) {
-            showDashboard(sessionData.email);
-            return true;
-        } else {
-            showLoginScreen();
-            return false;
-        }
-    } catch (error) {
-        // apiFetch already triggers showLoginScreen() on 401
-        showLoginScreen();
-        return false;
-    }
-}
-
-function showDashboard(email) {
-    loginScreen.style.display = "none";
-    dashboard.classList.add("active");
-    adminEmail.textContent = email;
-    loadWorksheets();
-    loadStats();
-}
-
-function showLoginScreen() {
-    loginScreen.style.display = "flex";
-    dashboard.classList.remove("active");
-    loginForm.reset();
-    worksheetsContainer.innerHTML = '';
-    adminEmail.textContent = ''; 
-}
-
-// ==========================================
-// AUTHENTICATION HANDLERS
-// ==========================================
-
+// LOGIN HANDLER
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -586,153 +523,182 @@ loginForm.addEventListener('submit', async (e) => {
     errorMessage.classList.remove('show');
     
     try {
-        // We use standard fetch here because a 401 on login is a standard rejection, 
-        // not an expired session that needs to reset the UI via apiFetch.
-        const response = await fetch(`${API_BASE}?action=login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-            credentials: 'include'
-        });
-
-        const data = await response.json();
-
-        if (data.success === true) {
-            // Guarantee the cookie was actually set by checking the session endpoint immediately
-            const isValid = await verifySession();
-            if (!isValid) {
-                throw new Error("Cookie was not set correctly.");
-            }
-        } else {
-            errorMessage.textContent = '❌ ' + (data.error || data.message || 'Login failed.');
-            errorMessage.classList.add('show');
-        }
+        await auth.signInWithEmailAndPassword(email, password);
+        // Success - onAuthStateChanged will handle UI update
     } catch (error) {
-        errorMessage.textContent = '❌ Network error or invalid session. Please try again.';
+        errorMessage.textContent = '❌ ' + error.message;
         errorMessage.classList.add('show');
-    } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login as Admin';
     }
 });
 
+// LOGOUT HANDLER
 logoutBtn.addEventListener('click', async () => {
     try {
-        await apiFetch(`${API_BASE}?action=logout`, { 
-            method: 'POST'
-        });
-        showLoginScreen();
+        await auth.signOut();
+        loginForm.reset();
     } catch (error) {
         console.error('Logout error:', error);
-        // Fallback locally just in case
-        showLoginScreen();
     }
 });
 
-// ==========================================
-// DATA FETCHING & RENDERING
-// ==========================================
-
+// LOAD WORKSHEETS FROM FIREBASE
 async function loadWorksheets() {
     loadingState.style.display = 'block';
     worksheetsContainer.innerHTML = '';
     emptyState.style.display = 'none';
     
     try {
-        // Using our new wrapper
-        const response = await apiFetch(`${API_BASE}?action=pending`);
-        const data = await response.json();
-
-        const worksheets = data.worksheets || [];
+        const snapshot = await db.ref('worksheets').once('value');
+        const worksheets = snapshot.val();
         
-        if (worksheets.length === 0) {
+        if (!worksheets) {
+            emptyState.style.display = 'block';
+            loadingState.style.display = 'none';
+            updateStats(0, 0, 0);
+            return;
+        }
+        
+        let allWorksheets = [];
+        let pendingCount = 0;
+        let approvedCount = 0;
+        
+        // Flatten the nested structure
+        Object.keys(worksheets).forEach(chapter => {
+            Object.keys(worksheets[chapter]).forEach(id => {
+                const ws = worksheets[chapter][id];
+                allWorksheets.push({
+                    id: id,
+                    chapter: chapter,
+                    ...ws
+                });
+                
+                if (ws.status === 'pending') pendingCount++;
+                else if (ws.status === 'approved') approvedCount++;
+            });
+        });
+        
+        // Display pending worksheets first
+        const pendingWorksheets = allWorksheets.filter(ws => ws.status === 'pending');
+        const approvedWorksheets = allWorksheets.filter(ws => ws.status === 'approved');
+        
+        if (pendingWorksheets.length === 0 && approvedWorksheets.length === 0) {
             emptyState.style.display = 'block';
         } else {
-            worksheets.forEach(ws => {
+            // Display pending first
+            pendingWorksheets.forEach(ws => {
                 worksheetsContainer.appendChild(createWorksheetCard(ws));
             });
+            
+            // Then approved (lighter opacity)
+            approvedWorksheets.forEach(ws => {
+                const card = createWorksheetCard(ws);
+                card.style.opacity = '0.6';
+                worksheetsContainer.appendChild(card);
+            });
         }
+        
+        updateStats(pendingCount, approvedCount, allWorksheets.length);
+        
     } catch (error) {
         console.error('Error loading worksheets:', error);
-    } finally {
-        loadingState.style.display = 'none';
+        errorMessage.textContent = '❌ Error loading worksheets: ' + error.message;
+        errorMessage.classList.add('show');
     }
+    
+    loadingState.style.display = 'none';
 }
 
-async function loadStats() {
-    try {
-        // Using our new wrapper
-        const response = await apiFetch(`${API_BASE}?action=stats`);
-        const data = await response.json();
-
-        if (data.success) {
-            document.getElementById('statPending').textContent = data.pending || 0;
-            document.getElementById('statApproved').textContent = data.approved || 0;
-            document.getElementById('statTotal').textContent = data.total || 0;
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
-    }
-}
-
-function createWorksheetCard(ws) {
+// CREATE WORKSHEET CARD
+function createWorksheetCard(worksheet) {
     const card = document.createElement('div');
     card.className = 'worksheet-card';
     
+    const status = worksheet.status || 'pending';
+    const statusText = status === 'pending' ? '⏳ Pending' : '✓ Approved';
+    const statusClass = status === 'pending' ? 'status-pending' : 'status-approved';
+    
     card.innerHTML = `
         <div class="worksheet-header">
-            <h3 class="worksheet-title">${ws.title || 'Untitled'}</h3>
+            <h3 class="worksheet-title">${worksheet.chapter}</h3>
             <div class="worksheet-meta">
-                <span class="status-badge status-pending">⏳ ${ws.status}</span>
-                <span>${ws.difficulty || 'N/A'}</span>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+                <span>${worksheet.difficulty || 'N/A'}</span>
             </div>
         </div>
+        
         <div class="worksheet-details">
-            <div class="detail-row"><span>Class:</span><span>${ws.className || 'N/A'}</span></div>
-            <div class="detail-row"><span>Chapter:</span><span>${ws.chapter || 'N/A'}</span></div>
-            <div class="detail-row"><span>Questions:</span><span>${ws.questionCount || 0}</span></div>
+            <div class="detail-row">
+                <span>By:</span>
+                <span>${worksheet.userName || 'Anonymous'}</span>
+            </div>
+            <div class="detail-row">
+                <span>Questions:</span>
+                <span>${worksheet.questions?.length || 0}</span>
+            </div>
+            <div class="detail-row">
+                <span>Type:</span>
+                <span>${worksheet.questionType || 'Mixed'}</span>
+            </div>
+            <div class="detail-row">
+                <span>Date:</span>
+                <span>${new Date(worksheet.timestamp).toLocaleDateString()}</span>
+            </div>
         </div>
-        <div class="worksheet-actions">
-            <button class="btn-approve" onclick="handleAction('approve', '${ws.worksheetId}')">✓ Approve</button>
-            <button class="btn-reject" onclick="handleAction('reject', '${ws.worksheetId}')">✕ Reject</button>
-        </div>
-        <div style="margin-top: 1rem; text-align: center;">
-             <button class="logout-btn" style="width: 100%; border-color: var(--danger); color: var(--danger);" onclick="handleAction('delete', '${ws.worksheetId}')">🗑️ Delete</button>
-        </div>
+        
+        ${status === 'pending' ? `
+            <div class="worksheet-actions">
+                <button class="btn-approve" onclick="approveWorksheet('${worksheet.chapter}', '${worksheet.id}')">
+                    ✓ Approve
+                </button>
+                <button class="btn-reject" onclick="rejectWorksheet('${worksheet.chapter}', '${worksheet.id}')">
+                    ✕ Reject
+                </button>
+            </div>
+        ` : `
+            <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                ✓ Approved by admin
+            </div>
+        `}
     `;
+    
     return card;
 }
 
-// ==========================================
-// ACTIONS
-// ==========================================
-
-async function handleAction(action, worksheetId) {
-    const confirmation = confirm(`Are you sure you want to ${action} this?`);
-    if (!confirmation) return;
-
+// APPROVE WORKSHEET
+async function approveWorksheet(chapter, id) {
+    if (!confirm('Approve this worksheet?')) return;
+    
     try {
-        // Using our new wrapper
-        const response = await apiFetch(`${API_BASE}?action=${action}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ worksheetId })
+        await db.ref(`worksheets/${chapter}/${id}`).update({
+            status: 'approved',
+            approvedAt: new Date().toISOString(),
+            approvedBy: auth.currentUser.email
         });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            loadWorksheets();
-            loadStats();
-        } else {
-            alert(data.error || data.message || "Operation failed.");
-        }
+        loadWorksheets();
     } catch (error) {
-        // Suppress alert if it's just the Unauthorized error kicking them out
-        if(error.message !== "Unauthorized: Session expired or invalid.") {
-            alert('Error: ' + error.message);
-        }
+        alert('Error approving worksheet: ' + error.message);
     }
+}
+
+// REJECT WORKSHEET
+async function rejectWorksheet(chapter, id) {
+    if (!confirm('Reject this worksheet? It will be removed.')) return;
+    
+    try {
+        await db.ref(`worksheets/${chapter}/${id}`).remove();
+        loadWorksheets();
+    } catch (error) {
+        alert('Error rejecting worksheet: ' + error.message);
+    }
+}
+
+// UPDATE STATS
+function updateStats(pending, approved, total) {
+    document.getElementById('statPending').textContent = pending;
+    document.getElementById('statApproved').textContent = approved;
+    document.getElementById('statTotal').textContent = total;
 }
 </script>
 
