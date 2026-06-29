@@ -454,12 +454,11 @@
     </div>
 </div>
 
-<script>
 // ==========================================
 // CONFIGURATION
 // ==========================================
-// Replace this with your actual deployed Vercel domain
-const API_BASE = "https://cinephysics-api.vercel.app/api"; 
+// Updated to the single consolidated endpoint
+const API_BASE = "https://cinephysics-api.vercel.app/api/admin/admin"; 
 
 // DOM Elements
 const loginScreen = document.getElementById('loginScreen');
@@ -476,15 +475,14 @@ const loadingState = document.getElementById('loadingState');
 // SESSION MANAGEMENT & UI STATE
 // ==========================================
 
-// Check Authentication Session on Load
 window.addEventListener('DOMContentLoaded', async () => {
     try {
-        const res = await fetch(`${API_BASE}/admin/session`, { 
+        const res = await fetch(`${API_BASE}?action=session`, { 
             credentials: 'include' 
         });
         const data = await res.json();
         
-        if (data.authenticated) {
+        if (data.authenticated === true) {
             showDashboard(data.email);
         } else {
             showLoginScreen();
@@ -499,6 +497,7 @@ function showDashboard(email) {
     dashboard.classList.add("active");
     adminEmail.textContent = email;
     loadWorksheets();
+    loadStats();
 }
 
 function showLoginScreen() {
@@ -511,7 +510,6 @@ function showLoginScreen() {
 // AUTHENTICATION HANDLERS
 // ==========================================
 
-// LOGIN
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -524,7 +522,7 @@ loginForm.addEventListener('submit', async (e) => {
     errorMessage.classList.remove('show');
     
     try {
-        const response = await fetch(`${API_BASE}/admin/login`, {
+        const response = await fetch(`${API_BASE}?action=login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password }),
@@ -533,7 +531,7 @@ loginForm.addEventListener('submit', async (e) => {
 
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success === true) {
             showDashboard(email);
         } else {
             errorMessage.textContent = '❌ ' + (data.message || 'Login failed.');
@@ -548,10 +546,9 @@ loginForm.addEventListener('submit', async (e) => {
     }
 });
 
-// LOGOUT
 logoutBtn.addEventListener('click', async () => {
     try {
-        await fetch(`${API_BASE}/admin/logout`, { 
+        await fetch(`${API_BASE}?action=logout`, { 
             method: 'POST', 
             credentials: 'include' 
         });
@@ -566,180 +563,98 @@ logoutBtn.addEventListener('click', async () => {
 // DATA FETCHING & RENDERING
 // ==========================================
 
-// LOAD WORKSHEETS
 async function loadWorksheets() {
     loadingState.style.display = 'block';
     worksheetsContainer.innerHTML = '';
     emptyState.style.display = 'none';
     
     try {
-        const response = await fetch(`${API_BASE}/admin/worksheets`, { 
+        const response = await fetch(`${API_BASE}?action=pending`, { 
             credentials: 'include' 
         });
+        const data = await response.json();
+        const worksheets = data.worksheets || [];
         
-        if (!response.ok) throw new Error('Failed to fetch worksheets');
-        
-        const worksheetsData = await response.json();
-        
-        // Ensure data is structured correctly before rendering
-        if (!worksheetsData || Object.keys(worksheetsData).length === 0) {
-            emptyState.style.display = 'block';
-            loadingState.style.display = 'none';
-            updateStats(0, 0, 0);
-            return;
-        }
-        
-        let allWorksheets = [];
-        let pendingCount = 0;
-        let approvedCount = 0;
-        
-        Object.keys(worksheetsData).forEach(chapter => {
-            Object.keys(worksheetsData[chapter]).forEach(id => {
-                const ws = worksheetsData[chapter][id];
-                allWorksheets.push({
-                    id: id,
-                    chapter: chapter,
-                    ...ws
-                });
-                
-                if (ws.status === 'pending') pendingCount++;
-                else if (ws.status === 'approved') approvedCount++;
-            });
-        });
-        
-        const pendingWorksheets = allWorksheets.filter(ws => ws.status === 'pending');
-        const approvedWorksheets = allWorksheets.filter(ws => ws.status === 'approved');
-        
-        if (pendingWorksheets.length === 0 && approvedWorksheets.length === 0) {
+        if (worksheets.length === 0) {
             emptyState.style.display = 'block';
         } else {
-            pendingWorksheets.forEach(ws => {
+            worksheets.forEach(ws => {
                 worksheetsContainer.appendChild(createWorksheetCard(ws));
             });
-            
-            approvedWorksheets.forEach(ws => {
-                const card = createWorksheetCard(ws);
-                card.style.opacity = '0.6';
-                worksheetsContainer.appendChild(card);
-            });
         }
-        
-        updateStats(pendingCount, approvedCount, allWorksheets.length);
-        
     } catch (error) {
         console.error('Error loading worksheets:', error);
-        errorMessage.textContent = '❌ Error loading worksheets: ' + error.message;
-        errorMessage.classList.add('show');
+    } finally {
+        loadingState.style.display = 'none';
     }
-    
-    loadingState.style.display = 'none';
 }
 
-// CREATE WORKSHEET CARD
-function createWorksheetCard(worksheet) {
+async function loadStats() {
+    try {
+        const response = await fetch(`${API_BASE}?action=stats`, { credentials: 'include' });
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('statPending').textContent = data.pending;
+            document.getElementById('statApproved').textContent = data.approved;
+            document.getElementById('statTotal').textContent = data.total;
+        }
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+function createWorksheetCard(ws) {
     const card = document.createElement('div');
     card.className = 'worksheet-card';
     
-    const status = worksheet.status || 'pending';
-    const statusText = status === 'pending' ? '⏳ Pending' : '✓ Approved';
-    const statusClass = status === 'pending' ? 'status-pending' : 'status-approved';
-    
     card.innerHTML = `
         <div class="worksheet-header">
-            <h3 class="worksheet-title">${worksheet.chapter}</h3>
+            <h3 class="worksheet-title">${ws.title || 'Untitled'}</h3>
             <div class="worksheet-meta">
-                <span class="status-badge ${statusClass}">${statusText}</span>
-                <span>${worksheet.difficulty || 'N/A'}</span>
+                <span class="status-badge status-pending">⏳ ${ws.status}</span>
+                <span>${ws.difficulty || 'N/A'}</span>
             </div>
         </div>
-        
         <div class="worksheet-details">
-            <div class="detail-row">
-                <span>By:</span>
-                <span>${worksheet.userName || 'Anonymous'}</span>
-            </div>
-            <div class="detail-row">
-                <span>Questions:</span>
-                <span>${worksheet.questions?.length || 0}</span>
-            </div>
-            <div class="detail-row">
-                <span>Type:</span>
-                <span>${worksheet.questionType || 'Mixed'}</span>
-            </div>
-            <div class="detail-row">
-                <span>Date:</span>
-                <span>${new Date(worksheet.timestamp).toLocaleDateString()}</span>
-            </div>
+            <div class="detail-row"><span>Class:</span><span>${ws.className || 'N/A'}</span></div>
+            <div class="detail-row"><span>Chapter:</span><span>${ws.chapter || 'N/A'}</span></div>
+            <div class="detail-row"><span>Questions:</span><span>${ws.questionCount || 0}</span></div>
         </div>
-        
-        ${status === 'pending' ? `
-            <div class="worksheet-actions">
-                <button class="btn-approve" onclick="approveWorksheet('${worksheet.chapter}', '${worksheet.id}')">
-                    ✓ Approve
-                </button>
-                <button class="btn-reject" onclick="rejectWorksheet('${worksheet.chapter}', '${worksheet.id}')">
-                    ✕ Reject
-                </button>
-            </div>
-        ` : `
-            <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-                ✓ Approved by admin
-            </div>
-        `}
+        <div class="worksheet-actions">
+            <button class="btn-approve" onclick="handleAction('approve', '${ws.worksheetId}')">✓ Approve</button>
+            <button class="btn-reject" onclick="handleAction('reject', '${ws.worksheetId}')">✕ Reject</button>
+        </div>
     `;
-    
     return card;
 }
 
 // ==========================================
-// ACTIONS (APPROVE/REJECT)
+// ACTIONS
 // ==========================================
 
-async function approveWorksheet(chapter, id) {
-    if (!confirm('Approve this worksheet?')) return;
-    
+async function handleAction(action, worksheetId) {
+    const confirmation = confirm(`Are you sure you want to ${action} this?`);
+    if (!confirmation) return;
+
     try {
-        const response = await fetch(`${API_BASE}/admin/approve`, {
+        const response = await fetch(`${API_BASE}?action=${action}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chapter, id }),
+            body: JSON.stringify({ worksheetId }),
             credentials: 'include'
         });
         
-        if (!response.ok) throw new Error('Action failed');
-        loadWorksheets();
+        if (response.ok) {
+            loadWorksheets();
+            loadStats();
+        } else {
+            alert('Operation failed.');
+        }
     } catch (error) {
-        alert('Error approving worksheet: ' + error.message);
+        alert('Error: ' + error.message);
     }
 }
-
-async function rejectWorksheet(chapter, id) {
-    if (!confirm('Reject this worksheet? It will be removed.')) return;
-    
-    try {
-        const response = await fetch(`${API_BASE}/admin/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chapter, id }),
-            credentials: 'include'
-        });
-        
-        if (!response.ok) throw new Error('Action failed');
-        loadWorksheets();
-    } catch (error) {
-        alert('Error rejecting worksheet: ' + error.message);
-    }
-}
-
-// ==========================================
-// UTILITIES
-// ==========================================
-function updateStats(pending, approved, total) {
-    document.getElementById('statPending').textContent = pending;
-    document.getElementById('statApproved').textContent = approved;
-    document.getElementById('statTotal').textContent = total;
-}
-</script>
+            
 
 </body>
 </html>
