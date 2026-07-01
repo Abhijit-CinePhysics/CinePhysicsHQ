@@ -7,6 +7,10 @@
     
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         /* ==========================================================================
            CSS VARIABLES & RESET
@@ -522,80 +526,30 @@
         });
 
         /**
-         * CONFIGURATION
+         * FIREBASE INITIALIZATION
          */
-        const CONFIG = {
-            apiBase: 'https://cinephysics-api.vercel.app/api/admin/admin', 
-            getHeaders: () => ({
-                'Content-Type': 'application/json'
-            })
+        const firebaseConfig = {
+            apiKey: "...", // Remember to put your real API key here
+            authDomain: "cinephysicshq.firebaseapp.com",
+            projectId: "cinephysicshq",
+            storageBucket: "cinephysicshq.firebasestorage.app",
+            messagingSenderId: "506903518720",
+            appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5"
         };
 
-        /**
-         * AUTHENTICATED FETCH WRAPPER
-         * Centralizes the 401 redirect logic for all API calls.
-         */
-        async function apiFetch(url, options = {}) {
-            const response = await fetch(url, {
-                credentials: "include",
-                ...options
-            });
-
-            if (response.status === 401) {
-                window.location.replace("admin-login.html");
-                throw new Error("Unauthorized");
-            }
-
-            return response;
-        }
-
-        /**
-         * SESSION VERIFICATION
-         */
-        async function verifySession() {
-            try {
-                // We use standard fetch here to handle the manual redirect for the initial check cleanly
-                const response = await fetch(`${CONFIG.apiBase}?action=session`, {
-                    credentials: "include"
-                });
-
-                if (response.status === 401 || !response.ok) {
-                    window.location.replace("admin-login.html");
-                    return false;
-                }
-
-                const data = await response.json();
-
-                if (!data.authenticated) {
-                    window.location.replace("admin-login.html");
-                    return false;
-                }
-
-                // Display the logged-in user's email
-                if (data.email) {
-                    document.getElementById('admin-email').textContent = data.email;
-                }
-
-                return true;
-            } catch (error) {
-                console.error("Session verification failed:", error);
-                window.location.replace("admin-login.html");
-                return false;
-            }
-        }
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
         /**
          * LOGOUT
          */
         async function logout() {
             try {
-                await apiFetch(`${CONFIG.apiBase}?action=logout`, {
-                    method: "POST"
-                });
+                await auth.signOut();
                 window.location.replace("admin-login.html");
             } catch (error) {
                 console.error("Logout failed:", error);
-                window.location.replace("admin-login.html");
             }
         }
 
@@ -639,74 +593,82 @@
         };
 
         /**
-         * API SERVICE
+         * FIREBASE DATA SERVICE (Replaces AdminAPI)
          */
         const AdminAPI = {
             async fetchStats() {
                 try {
-                    const response = await apiFetch(`${CONFIG.apiBase}?action=stats`, {
-                        headers: CONFIG.getHeaders()
+                    const snapshot = await db.collection("worksheets").get();
+                    let pending = 0;
+                    let approved = 0;
+                    let rejected = 0;
+                    let total = 0;
+
+                    snapshot.forEach(doc => {
+                        total++;
+                        const status = doc.data().status || 'pending';
+                        if (status === 'pending') pending++;
+                        if (status === 'approved') approved++;
+                        if (status === 'rejected') rejected++;
                     });
                     
-                    return await response.json();
+                    return { pending, approved, rejected, total };
                 } catch (error) {
-                    if (error.message !== "Unauthorized") {
-                        console.warn("Stats API error. Defaulting to zeros.", error);
-                    }
+                    console.error("Stats fetch error:", error);
                     return { pending: 0, approved: 0, rejected: 0, total: 0 };
                 }
             },
             async fetchPending() {
                 try {
-                    const response = await apiFetch(`${CONFIG.apiBase}?action=pending`, {
-                        headers: CONFIG.getHeaders()
+                    const snapshot = await db.collection("worksheets").get();
+                    let worksheets = [];
+                    
+                    snapshot.forEach(doc => {
+                        worksheets.push({
+                            worksheetId: doc.id, // Ensure id maps correctly
+                            ...doc.data()
+                        });
                     });
                     
-                    return await response.json();
+                    return { success: true, worksheets };
                 } catch (error) {
-                    if (error.message !== "Unauthorized") {
-                        Toast.error('Network error while fetching data.');
-                        console.error(error);
-                    }
+                    Toast.error('Error fetching data from Firestore.');
+                    console.error(error);
                     return { success: false, worksheets: [] };
                 }
             },
             async action(actionType, worksheetId) {
                 try {
-                    const response = await apiFetch(`${CONFIG.apiBase}?action=${actionType}`, {
-                        method: 'POST',
-                        headers: CONFIG.getHeaders(),
-                        body: JSON.stringify({ worksheetId })
-                    });
+                    const docRef = db.collection("worksheets").doc(worksheetId);
                     
-                    const data = await response.json();
-                    
-                    // Safely check for success from the parsed JSON payload
-                    if (!data.success) {
-                        throw new Error(data.message || data.error || "Operation failed");
+                    if (actionType === 'delete') {
+                        await docRef.delete();
+                    } else {
+                        // For 'approve' and 'reject'
+                        await docRef.update({
+                            status: actionType,
+                            updatedBy: auth.currentUser.email,
+                            updatedAt: new Date().toISOString()
+                        });
                     }
-                    
                     return true;
                 } catch (error) {
-                    if (error.message !== "Unauthorized") {
-                        Toast.error(error.message || `Action failed: Check if backend route exists.`);
-                        console.error(error);
-                    }
+                    Toast.error(error.message || `Action failed.`);
+                    console.error(error);
                     return false;
                 }
             },
             async getWorksheet(worksheetId) {
                 try {
-                    const response = await apiFetch(`${CONFIG.apiBase}?action=worksheet&id=${worksheetId}`, {
-                        headers: CONFIG.getHeaders()
-                    });
-                    
-                    return await response.json();
-                } catch (error) {
-                    if (error.message !== "Unauthorized") {
-                        Toast.error('API error while fetching worksheet.');
-                        console.error(error);
+                    const doc = await db.collection("worksheets").doc(worksheetId).get();
+                    if (doc.exists) {
+                        return { worksheetId: doc.id, ...doc.data() };
+                    } else {
+                        throw new Error("Document not found");
                     }
+                } catch (error) {
+                    Toast.error('Error fetching worksheet details.');
+                    console.error(error);
                     return null;
                 }
             }
@@ -969,32 +931,35 @@
 
         /**
          * INITIALIZE PAGE
-         * Holds all code that should only run after session authentication succeeds
          */
         function initializePage() {
             Dashboard.init();
         }
 
         /**
-         * INITIALIZATION GUARD
+         * AUTHENTICATION GUARD
+         * Uses Firebase Auth to verify session before showing the UI
          */
-        document.addEventListener("DOMContentLoaded", async () => {
-            const authenticated = await verifySession();
-            
-            // Stop execution if not authenticated
-            if (!authenticated) return;
-            
-            // Unhide the application UI now that auth is confirmed
-            document.body.style.visibility = "visible";
+        document.addEventListener("DOMContentLoaded", () => {
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    location.replace("admin-login.html");
+                    return;
+                }
 
-            // Proceed with loading the page UI and fetching data
-            initializePage();
+                // Verify it's the correct admin email
+                if (user.email !== "singhabhijit327@gmail.com") {
+                    alert("Access denied.");
+                    auth.signOut();
+                    return;
+                }
 
-            // Set up an automatic session verification every 5 minutes (300,000 milliseconds)
-            setInterval(async () => {
-                const ok = await verifySession();
-                if (!ok) return; // User is logged out and automatically redirected
-            }, 300000); 
+                // Unhide body and display admin email
+                document.body.style.visibility = "visible";
+                document.getElementById("admin-email").textContent = user.email;
+
+                initializePage();
+            });
         });
 
     </script>
