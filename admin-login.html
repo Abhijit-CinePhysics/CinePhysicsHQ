@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CinePhysicsHQ Admin Panel - Manage and approve student-generated worksheets">
-    <title>CinePhysicsHQ Admin Panel</title>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>CinePhysicsHQ Admin Panel v3</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
             --bg: #0a0e1a;
@@ -26,478 +33,123 @@
             --danger: #ff4444;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Syne', sans-serif;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
 
         /* LOGIN SCREEN */
-        .login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #0a0e1a 0%, #141d33 100%);
-        }
-
-        .login-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 3rem;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.1);
-        }
-
-        .login-card h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .login-card p {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--text);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.9rem;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 1rem;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.9rem;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%);
-            color: var(--bg);
-            border: none;
-            border-radius: 6px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .error-message {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid var(--danger);
-            color: #ff8888;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
+        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0a0e1a 0%, #141d33 100%); }
+        .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 212, 255, 0.1); }
+        .login-card h1 { font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .login-card p { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
+        .form-group input { width: 100%; padding: 0.9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 1rem; transition: border-color 0.2s; }
+        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1); }
+        .btn { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%); color: var(--bg); border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; margin-top: 1rem; }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3); }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        
         /* DASHBOARD */
-        .dashboard {
-            display: none;
-        }
+        .dashboard { display: none; }
+        .dashboard.active { display: block; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .header h1 { font-size: 2rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-controls { display: flex; gap: 10px; align-items: center; }
+        .header-btn { padding: 0.6rem 1.2rem; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; transition: all 0.2s; }
+        .header-btn:hover { background: rgba(0, 212, 255, 0.1); }
+        .admin-info { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
 
-        .dashboard.active {
-            display: block;
-        }
+        /* DASHBOARD CHARTS & STATS */
+        .dashboard-metrics { display: flex; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        .stats-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
+        .chart-container { width: 300px; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; justify-content: center; align-items: center; }
+        .stat-box { background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; display: flex; flex-direction: column; justify-content: center;}
+        .stat-number { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 3rem;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logout-btn {
-            padding: 0.6rem 1.2rem;
-            background: transparent;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            border-radius: 6px;
-            cursor: pointer;
-            font-family: 'Syne', sans-serif;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .admin-info {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
+        /* TOOLBAR */
+        .toolbar { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; background: var(--surface); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
+        .toolbar-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .search-box input { padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); width: 250px; font-family: 'Syne', sans-serif; }
+        .filter-btn { padding: 0.5rem 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: rgba(0, 212, 255, 0.1); color: var(--accent); border-color: var(--accent); }
+        .action-btn { padding: 0.5rem 1rem; background: rgba(124, 58, 237, 0.1); border: 1px solid var(--accent-alt); color: var(--accent-alt); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.2s; }
+        .action-btn:hover:not(:disabled) { background: var(--accent-alt); color: white; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .batch-btn-approve { border-color: var(--success); color: var(--success); background: rgba(0, 229, 160, 0.1); }
+        .batch-btn-approve:hover:not(:disabled) { background: var(--success); color: var(--bg); }
+        .batch-btn-reject { border-color: var(--danger); color: var(--danger); background: rgba(255, 68, 68, 0.1); }
+        .batch-btn-reject:hover:not(:disabled) { background: var(--danger); color: white; }
 
         /* WORKSHEETS GRID */
-        .worksheets-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
+        .worksheets-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
+        .worksheet-card { position: relative; background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; transition: all 0.3s; }
+        .worksheet-card:hover { border-color: var(--accent); box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1); }
+        .card-checkbox { position: absolute; top: 1.5rem; right: 1.5rem; width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
+        
+        .worksheet-header { margin-bottom: 1.5rem; padding-right: 30px; }
+        .worksheet-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .worksheet-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; }
+        .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .status-pending { background: rgba(255, 157, 0, 0.2); color: var(--accent-warm); border: 1px solid var(--accent-warm); }
+        .status-approved { background: rgba(0, 229, 160, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .worksheet-details { margin: 1.5rem 0; padding: 1rem; background: var(--surface2); border-radius: 6px; font-size: 0.9rem; }
+        .detail-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .detail-row span:first-child { color: var(--text-muted); }
+        
+        .worksheet-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .worksheet-actions button { flex: 1; padding: 0.7rem; border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .btn-approve { background: rgba(0, 229, 160, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .btn-approve:hover:not(:disabled) { background: var(--success); color: var(--bg); }
+        .btn-reject { background: rgba(255, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-reject:hover:not(:disabled) { background: var(--danger); color: white; }
+        .preview-btn { background: rgba(0, 212, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); }
+        .preview-btn:hover { background: var(--accent); color: var(--bg); }
+        .download-btn { background: rgba(124, 58, 237, 0.1); color: var(--accent-alt); border: 1px solid var(--accent-alt); }
+        .download-btn:hover { background: var(--accent-alt); color: var(--bg); }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+        .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
 
-        .worksheet-card {
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            transition: all 0.3s;
-        }
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 14, 26, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 2rem; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 1000px; max-height: 90vh; overflow: hidden; position: relative; }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: var(--danger); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 10; }
 
-        .worksheet-card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1);
-        }
-
-        .worksheet-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .worksheet-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .worksheet-meta {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .status-pending {
-            background: rgba(255, 157, 0, 0.2);
-            color: var(--accent-warm);
-            border: 1px solid var(--accent-warm);
-        }
-
-        .status-approved {
-            background: rgba(0, 229, 160, 0.2);
-            color: var(--success);
-            border: 1px solid var(--success);
-        }
-
-        .worksheet-details {
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: var(--surface2);
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-row span:first-child {
-            color: var(--text-muted);
-        }
-
-        .worksheet-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-approve, .btn-reject {
-            flex: 1;
-            padding: 0.7rem;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .btn-approve {
-            background: rgba(0, 229, 160, 0.2);
-            color: var(--success);
-            border: 1px solid var(--success);
-        }
-
-        .btn-approve:hover {
-            background: var(--success);
-            color: var(--bg);
-        }
-
-        .btn-reject {
-            background: rgba(255, 68, 68, 0.2);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-
-        .btn-reject:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-approve:disabled, .btn-reject:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 3rem;
-        }
-
-        .stat-box {
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-            font-family: 'Space Mono', monospace;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--text-muted);
-        }
+        /* TOAST NOTIFICATIONS */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 1rem 1.5rem; border-radius: 8px; font-family: 'Syne', sans-serif; font-weight: 600; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: translateX(120%); animation: slideIn 0.3s forwards; transition: opacity 0.3s; }
+        .toast-success { background: var(--success); color: var(--bg); }
+        .toast-error { background: var(--danger); }
+        .toast-info { background: var(--accent); color: var(--bg); }
+        @keyframes slideIn { to { transform: translateX(0); } }
 
         @media (max-width: 768px) {
-            .worksheets-container {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-        }
-
-        /* NEW ADDITIONS FOR PREVIEW MODAL AND BUTTONS */
-        .preview-btn, .download-btn {
-            flex: 1;
-            padding: 0.7rem;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Syne', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-        }
-
-        .preview-btn {
-            background: rgba(0, 212, 255, 0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-        }
-
-        .preview-btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-        }
-
-        .download-btn {
-            background: rgba(124, 58, 237, 0.1);
-            color: var(--accent-alt);
-            border: 1px solid var(--accent-alt);
-        }
-
-        .download-btn:hover {
-            background: var(--accent-alt);
-            color: var(--bg);
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 14, 26, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white; /* White background for worksheet HTML rendering */
-            color: black;      /* Black text for default worksheet reading */
-            border-radius: 12px;
-            width: 100%;
-            max-width: 900px;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            .worksheets-container { grid-template-columns: 1fr; }
+            .dashboard-metrics { flex-direction: column; }
+            .chart-container { width: 100%; }
         }
     </style>
 </head>
 <body>
 
+<div id="toastContainer" class="toast-container"></div>
+
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
         <h1>⚡ CinePhysicsHQ</h1>
-        <p>Admin Panel</p>
-        
-        <div class="error-message" id="errorMessage"></div>
-        
+        <p>Admin Panel v3</p>
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    placeholder="your@email.com" 
-                    required
-                >
+                <label for="email">Admin Email</label>
+                <input type="email" id="email" placeholder="admin@cinephysics.com" required>
             </div>
-            
             <div class="form-group">
                 <label for="password">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    placeholder="••••••••" 
-                    required
-                >
+                <input type="password" id="password" placeholder="••••••••" required>
             </div>
-            
-            <button type="submit" class="btn" id="loginBtn">Login as Admin</button>
+            <button type="submit" class="btn" id="loginBtn">Login to Dashboard</button>
         </form>
     </div>
 </div>
@@ -507,48 +159,63 @@
         <div class="header">
             <div>
                 <h1>Admin Dashboard</h1>
-                <div class="admin-info">
-                    Logged in as: <span id="adminEmail"></span>
-                </div>
-                <div style="display:flex; gap:10px; align-items:center;">
-    <button class="logout-btn"
-        onclick="window.open('admin.html','_blank')">
-        Admin Panel
-    </button>
-
-    <button class="logout-btn" id="logoutBtn">
-        Logout
-    </button>
-                </div>
+                <div class="admin-info">Logged in as: <span id="adminEmail"></span></div>
             </div>
-            <button class="logout-btn" id="logoutBtn">Logout</button>
+            <div class="header-controls">
+                <button class="header-btn" onclick="location.href='admin.html'">🏠 Admin Home</button>
+                <button class="header-btn" id="logoutBtn">Logout</button>
+            </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-number" id="statPending">0</div>
-                <div class="stat-label">Pending Review</div>
+        <div class="dashboard-metrics">
+            <div class="chart-container">
+                <canvas id="statsChart"></canvas>
             </div>
-            <div class="stat-box">
-                <div class="stat-number" id="statApproved">0</div>
-                <div class="stat-label">Approved</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="statPending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="statApproved">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="statTotal">0</div>
+                    <div class="stat-label">Total Worksheets</div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-number" id="statTotal">0</div>
-                <div class="stat-label">Total Worksheets</div>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search chapter, board...">
+                </div>
+                <div class="filters" id="filterContainer">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="pending">Pending</button>
+                    <button class="filter-btn" data-filter="approved">Approved</button>
+                </div>
+            </div>
+            
+            <div class="toolbar-group">
+                <span style="font-size: 0.9rem; color: var(--text-muted); margin-right: 0.5rem;">Batch:</span>
+                <button class="action-btn batch-btn-approve" id="batchApproveBtn" onclick="batchApprove()" disabled>☑ Approve</button>
+                <button class="action-btn batch-btn-reject" id="batchRejectBtn" onclick="batchReject()" disabled>☒ Delete</button>
+                
+                <button class="action-btn" style="margin-left: 1rem;" onclick="exportCSV()">⬇ Export CSV</button>
             </div>
         </div>
 
         <div class="loading" id="loadingState" style="display: none;">
-            Loading worksheets... ⏳
+            Listening for live updates... ⏳
         </div>
-
         <div id="worksheetsContainer" class="worksheets-container"></div>
-
         <div class="empty-state" id="emptyState" style="display: none;">
             <div class="empty-state-icon">📭</div>
-            <h2>No worksheets yet</h2>
-            <p>Students will submit their generated worksheets here for your approval.</p>
+            <h2>No worksheets found</h2>
+            <p>Adjust your search or wait for students to submit new work.</p>
         </div>
     </div>
 </div>
@@ -556,12 +223,12 @@
 <div id="previewModal" class="modal-overlay">
     <div class="modal-content">
         <button class="modal-close-btn" onclick="closePreview()">✕</button>
-        <div id="previewContainer"></div>
+        <div id="previewContainer" style="width: 100%; height: 100%;"></div>
     </div>
 </div>
 
 <script>
-// Firebase Configuration
+// --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
   apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
   authDomain: "cinephysicshq.firebaseapp.com",
@@ -572,321 +239,385 @@ const firebaseConfig = {
   measurementId: "G-TC2GZCD8K5"
 };
 
-// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Global store to hold worksheet data for previewing/downloading
-let globalWorksheetsStore = {};
+// --- CONSTANTS & GLOBALS ---
+const ADMIN_EMAIL = "singhabhijit327@gmail.com";
+let allWorksheets = [];
+let currentFilter = 'all';
+let unsubscribe = null;
+let selectedWorksheets = new Set();
+let dashboardChart = null;
 
 // DOM Elements
 const loginScreen = document.getElementById('loginScreen');
 const dashboard = document.getElementById('dashboard');
-const loginForm = document.getElementById('loginForm');
-const logoutBtn = document.getElementById('logoutBtn');
-const errorMessage = document.getElementById('errorMessage');
 const adminEmail = document.getElementById('adminEmail');
 const worksheetsContainer = document.getElementById('worksheetsContainer');
 const emptyState = document.getElementById('emptyState');
 const loadingState = document.getElementById('loadingState');
+const searchInput = document.getElementById('searchInput');
+const filterBtns = document.querySelectorAll('.filter-btn');
 const previewModal = document.getElementById('previewModal');
-const previewContainer = document.getElementById('previewContainer');
+const batchApproveBtn = document.getElementById('batchApproveBtn');
+const batchRejectBtn = document.getElementById('batchRejectBtn');
 
-// Check Authentication State
+// --- UI UTILITIES ---
+function showToast(message, type = "success") {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+// --- SECURE AUTHENTICATION STATE ---
 auth.onAuthStateChanged(user => {
     if (user) {
-        loginScreen.style.display = 'none';
-        dashboard.classList.add('active');
-        adminEmail.textContent = user.email;
-        loadWorksheets();
-    } else {
-        loginScreen.style.display = 'flex';
-        dashboard.classList.remove('active');
-        worksheetsContainer.innerHTML = '';
-    }
-});
-
-// LOGIN HANDLER
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const loginBtn = document.getElementById('loginBtn');
-    
-    loginBtn.disabled = true;
-    loginBtn.textContent = 'Logging in...';
-    errorMessage.classList.remove('show');
-    
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-    } catch (error) {
-        errorMessage.textContent = '❌ ' + error.message;
-        errorMessage.classList.add('show');
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'Login as Admin';
-    }
-});
-
-// LOGOUT HANDLER
-logoutBtn.addEventListener('click', async () => {
-    try {
-        await auth.signOut();
-        loginForm.reset();
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-});
-
-// LOAD WORKSHEETS FROM FIRESTORE
-async function loadWorksheets() {
-    loadingState.style.display = 'block';
-    worksheetsContainer.innerHTML = '';
-    emptyState.style.display = 'none';
-    globalWorksheetsStore = {}; 
-    
-    try {
-        const snapshot = await db.collection("worksheets").get();
-        
-        // Debugging logs to verify your Firestore structure
-        console.log("Docs:", snapshot.size);
-        snapshot.forEach(doc => {
-            console.log(doc.id, doc.data());
-        });
-        
-        if (snapshot.empty) {
-            emptyState.style.display = 'block';
-            loadingState.style.display = 'none';
-            updateStats(0, 0, 0);
+        // IMPROVEMENT 1: Restrict access to admin email
+        if (user.email !== ADMIN_EMAIL) {
+            showToast("Access denied. Unauthorized account.", "error");
+            auth.signOut();
             return;
         }
         
-        let allWorksheets = [];
-        let pendingCount = 0;
-        let approvedCount = 0;
-        let rejectedCount = 0;
+        loginScreen.style.display = 'none';
+        dashboard.classList.add('active');
+        adminEmail.textContent = user.email;
+        
+        window.history.pushState(null, "", window.location.href);
+        window.onpopstate = () => window.history.pushState(null, "", window.location.href);
+        
+        // IMPROVEMENT 2: Prevent duplicate listeners
+        if (unsubscribe) { unsubscribe(); }
+        startLiveListener();
+    } else {
+        loginScreen.style.display = 'flex';
+        dashboard.classList.remove('active');
+        allWorksheets = [];
+        selectedWorksheets.clear();
+        worksheetsContainer.innerHTML = '';
+        adminEmail.textContent = '';
+        if (unsubscribe) unsubscribe(); 
+    }
+});
+
+// --- LOGIN/LOGOUT ---
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('loginBtn');
+    
+    btn.disabled = true;
+    btn.textContent = 'Authenticating...';
+    
+    try {
+        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+        await auth.signInWithEmailAndPassword(email, password);
+        showToast("Welcome back, Admin!", "success");
+    } catch (error) {
+        showToast(error.message, "error");
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login to Dashboard';
+    }
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    worksheetsContainer.innerHTML = '';
+    window.history.replaceState(null, "", window.location.href);
+    await auth.signOut();
+    document.getElementById('loginForm').reset();
+    showToast("Logged out safely.", "info");
+});
+
+// --- LIVE FIRESTORE LISTENER ---
+function startLiveListener() {
+    loadingState.style.display = 'block';
+    emptyState.style.display = 'none';
+    
+    // IMPROVEMENT 4: Use Firestore ordering (Requires index on createdAt if querying specific fields)
+    let query = db.collection("worksheets").orderBy("createdAt", "desc");
+
+    unsubscribe = query.onSnapshot(snapshot => {
+        allWorksheets = [];
+        let pendingCount = 0, approvedCount = 0;
         
         snapshot.forEach(doc => {
             let ws = doc.data();
             ws.id = doc.id;
-            
-            // Handle missing fields and normalize case
             ws.status = (ws.status || "pending").toLowerCase();
-            
-            globalWorksheetsStore[doc.id] = ws;
             allWorksheets.push(ws);
-            
-            // Switch statement for calculating exact stats
-            switch(ws.status) {
-                case "approved":
-                    approvedCount++;
-                    break;
-                case "rejected":
-                    rejectedCount++;
-                    break;
-                default:
-                    pendingCount++;
-                    break;
-            }
+            if (ws.status === 'approved') approvedCount++;
+            else if (ws.status === 'pending') pendingCount++;
+        });
+
+        // IMPROVEMENT 3: JS Sorting fallback (ensures new items are top if orderBy fails due to missing fields)
+        allWorksheets.sort((a, b) => {
+            const da = a.createdAt?.seconds || (new Date(a.generatedAt).getTime()/1000) || 0;
+            const db = b.createdAt?.seconds || (new Date(b.generatedAt).getTime()/1000) || 0;
+            return db - da;
         });
         
-        const pendingWorksheets = allWorksheets.filter(ws => ws.status === 'pending');
-        const approvedWorksheets = allWorksheets.filter(ws => ws.status === 'approved');
+        document.getElementById('statPending').textContent = pendingCount;
+        document.getElementById('statApproved').textContent = approvedCount;
+        document.getElementById('statTotal').textContent = allWorksheets.length;
         
-        if (pendingWorksheets.length === 0 && approvedWorksheets.length === 0) {
-            emptyState.style.display = 'block';
-        } else {
-            pendingWorksheets.forEach(ws => {
-                worksheetsContainer.appendChild(createWorksheetCard(ws));
-            });
-            
-            approvedWorksheets.forEach(ws => {
-                const card = createWorksheetCard(ws);
-                card.style.opacity = '0.6';
-                worksheetsContainer.appendChild(card);
-            });
-        }
+        updateChart(pendingCount, approvedCount);
         
-        updateStats(pendingCount, approvedCount, allWorksheets.length);
+        loadingState.style.display = 'none';
         
-    } catch (error) {
-        console.error('Error loading worksheets:', error);
-        errorMessage.textContent = '❌ Error loading worksheets: ' + error.message;
-        errorMessage.classList.add('show');
-    }
-    
-    loadingState.style.display = 'none';
+        // Clean up deleted items from selection set
+        const currentIds = new Set(allWorksheets.map(ws => ws.id));
+        selectedWorksheets.forEach(id => { if(!currentIds.has(id)) selectedWorksheets.delete(id); });
+        updateBatchButtons();
+        
+        renderWorksheets();
+    }, error => {
+        console.error("Listener error:", error);
+        showToast("Database connection error.", "error");
+    });
 }
 
-// CREATE WORKSHEET CARD
-function createWorksheetCard(worksheet) {
+// --- CHART.JS INTEGRATION (IMPROVEMENT 8) ---
+function updateChart(pending, approved) {
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    if (dashboardChart) {
+        dashboardChart.data.datasets[0].data = [pending, approved];
+        dashboardChart.update();
+    } else {
+        dashboardChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Approved'],
+                datasets: [{
+                    data: [pending, approved],
+                    backgroundColor: ['#ff9d00', '#00e5a0'],
+                    borderColor: '#0f1424',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { color: '#e2eaf5', font: { family: 'Syne' } } } }
+            }
+        });
+    }
+}
+
+// --- RENDER & FILTER ---
+function renderWorksheets() {
+    worksheetsContainer.innerHTML = '';
+    const searchTerm = searchInput.value.toLowerCase();
+    
+    let filtered = allWorksheets;
+    if (currentFilter !== 'all') filtered = allWorksheets.filter(ws => ws.status === currentFilter);
+    if (searchTerm) {
+        filtered = filtered.filter(ws => {
+            const str = `${ws.chapter||''} ${ws.board||''} ${ws.className||''} ${ws.generator||''}`.toLowerCase();
+            return str.includes(searchTerm);
+        });
+    }
+    
+    if (filtered.length === 0) {
+        emptyState.style.display = 'block';
+    } else {
+        emptyState.style.display = 'none';
+        filtered.forEach(ws => worksheetsContainer.appendChild(createWorksheetCard(ws)));
+    }
+}
+
+searchInput.addEventListener('input', renderWorksheets);
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentFilter = e.target.getAttribute('data-filter');
+        renderWorksheets();
+    });
+});
+
+// --- CARD CREATION ---
+function createWorksheetCard(ws) {
     const card = document.createElement('div');
     card.className = 'worksheet-card';
     
-    const status = worksheet.status;
-    const statusText = status === 'pending' ? '⏳ Pending' : '✓ Approved';
-    const statusClass = status === 'pending' ? 'status-pending' : 'status-approved';
+    const isPending = ws.status === 'pending';
+    const statusClass = isPending ? 'status-pending' : 'status-approved';
+    const isChecked = selectedWorksheets.has(ws.id) ? 'checked' : '';
     
-    const dateField = worksheet.createdAt || worksheet.generatedAt;
-    const dateDisplay = dateField ? new Date(dateField).toLocaleDateString() : 'Unknown Date';
+    let dateDisplay = "Unknown Date";
+    if (ws.createdAt) {
+        dateDisplay = (typeof ws.createdAt.toDate === 'function') ? ws.createdAt.toDate().toLocaleDateString() : new Date(ws.createdAt).toLocaleDateString();
+    } else if (ws.generatedAt) {
+        dateDisplay = new Date(ws.generatedAt).toLocaleDateString();
+    }
     
-    const generator = worksheet.generator || "CinePhysicsHQ";
-    
-    let totalQuestions = 0;
-    if (worksheet.distribution) {
-        totalQuestions += (worksheet.distribution.mcq || 0);
-        totalQuestions += (worksheet.distribution.sa || 0);
-        totalQuestions += (worksheet.distribution.la || 0);
-        totalQuestions += (worksheet.distribution.vsa || 0);
-        totalQuestions += (worksheet.distribution.assertionReason || 0);
-        totalQuestions += (worksheet.distribution.numerical || 0);
+    let totalQ = ws.totalQuestions || 0;
+    if (ws.distribution) {
+        totalQ = (ws.distribution.mcq||0) + (ws.distribution.sa||0) + (ws.distribution.la||0) + (ws.distribution.vsa||0) + (ws.distribution.numerical||0) + (ws.distribution.assertionReason||0);
     }
 
-    const chapterName = worksheet.chapter || "Untitled Worksheet";
-    const typeName = worksheet.worksheetType || "Worksheet";
-    const boardName = worksheet.board || "N/A";
-    const className = worksheet.className || "N/A";
-    const difficultyLevel = worksheet.difficulty || "N/A";
-    
     card.innerHTML = `
+        <input type="checkbox" class="card-checkbox" value="${ws.id}" ${isChecked} onchange="toggleSelection(this)">
+        
         <div class="worksheet-header">
-            <h3 class="worksheet-title">${chapterName}</h3>
+            <h3 class="worksheet-title">${ws.chapter || "Untitled"}</h3>
             <div class="worksheet-meta">
-                <span class="status-badge ${statusClass}">${statusText}</span>
-                <span>${difficultyLevel}</span>
+                <span class="status-badge ${statusClass}">${isPending ? '⏳ Pending' : '✓ Approved'}</span>
+                <span>${ws.difficulty || "N/A"}</span>
             </div>
         </div>
-        
         <div class="worksheet-details">
-            <div class="detail-row">
-                <span>By:</span>
-                <span>${generator}</span>
-            </div>
-            <div class="detail-row">
-                <span>Total Questions:</span>
-                <span>${totalQuestions}</span>
-            </div>
-            <div class="detail-row">
-                <span>Type:</span>
-                <span>${typeName}</span>
-            </div>
-            <div class="detail-row">
-                <span>Board:</span>
-                <span>${boardName}</span>
-            </div>
-            <div class="detail-row">
-                <span>Class:</span>
-                <span>${className}</span>
-            </div>
-            <div class="detail-row">
-                <span>Date:</span>
-                <span>${dateDisplay}</span>
-            </div>
+            <div class="detail-row"><span>By:</span><span>${ws.generator || "CinePhysicsHQ"}</span></div>
+            <div class="detail-row"><span>Total Questions:</span><span>${totalQ}</span></div>
+            <div class="detail-row"><span>Board/Class:</span><span>${ws.board||"N/A"} - ${ws.className||"N/A"}</span></div>
+            <div class="detail-row"><span>Date:</span><span>${dateDisplay}</span></div>
         </div>
         
-        ${status === 'pending' ? `
+        ${isPending ? `
             <div class="worksheet-actions">
-                <button class="btn-approve" onclick="approveWorksheet('${worksheet.id}')">
-                    ✓ Approve
-                </button>
-                <button class="btn-reject" onclick="rejectWorksheet('${worksheet.id}')">
-                    ✕ Reject
-                </button>
+                <button class="btn-approve" onclick="approveWorksheet('${ws.id}', this)">✓ Approve</button>
+                <button class="btn-reject" onclick="rejectWorksheet('${ws.id}', this)">✕ Reject</button>
             </div>
-        ` : `
-            <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
-                ✓ Approved by admin
-            </div>
-        `}
-
-        ${worksheet.worksheetHTML ? `
+        ` : `<div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">✓ Approved by admin</div>`}
+        
+        ${ws.worksheetHTML ? `
             <div class="worksheet-actions" style="margin-top: 0.5rem;">
-                <button class="preview-btn" onclick="openPreviewModal('${worksheet.id}')">
-                    👁 Preview
-                </button>
-                <button class="download-btn" onclick="downloadHTMLFile('${worksheet.id}')">
-                    ⬇ Download HTML
-                </button>
+                <button class="preview-btn" onclick="openPreviewModal('${ws.id}')">👁 Preview</button>
+                <button class="download-btn" onclick="downloadHTMLFile('${ws.id}')">⬇ Download</button>
             </div>
         ` : ''}
     `;
-    
+    if (!isPending) card.style.opacity = '0.7';
     return card;
 }
 
-// APPROVE WORKSHEET
-async function approveWorksheet(id) {
+// --- INDIVIDUAL ACTIONS (IMPROVEMENT 5) ---
+async function approveWorksheet(id, btn) {
     if (!confirm('Approve this worksheet?')) return;
-    
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = "Approving...";
     try {
         await db.collection("worksheets").doc(id).update({
-            status: "approved",
-            approvedAt: new Date().toISOString(),
-            approvedBy: auth.currentUser.email
+            status: "approved", approvedAt: new Date().toISOString(), approvedBy: auth.currentUser.email
         });
-        loadWorksheets();
+        showToast("✅ Worksheet Approved", "success");
     } catch (error) {
-        console.error('Approve Error:', error);
-        errorMessage.textContent = '❌ Error approving: ' + error.message;
-        errorMessage.classList.add('show');
-        window.scrollTo(0, 0);
+        showToast('❌ Error: ' + error.message, "error");
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
 
-// REJECT WORKSHEET
-async function rejectWorksheet(id) {
+async function rejectWorksheet(id, btn) {
     if (!confirm('Reject this worksheet? It will be permanently deleted.')) return;
-    
-    try {
-        await db.collection("worksheets").doc(id).delete();
-        loadWorksheets();
-    } catch (error) {
-        console.error('Reject Error:', error);
-        errorMessage.textContent = '❌ Error rejecting: ' + error.message;
-        errorMessage.classList.add('show');
-        window.scrollTo(0, 0);
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.textContent = "Deleting...";
+    try { 
+        await db.collection("worksheets").doc(id).delete(); 
+        showToast("❌ Worksheet Deleted", "info");
+    } catch (error) { 
+        showToast('❌ Error: ' + error.message, "error"); 
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
 }
 
-// PREVIEW MODAL LOGIC
+// --- BATCH ACTIONS (IMPROVEMENT 7) ---
+function toggleSelection(checkbox) {
+    if (checkbox.checked) selectedWorksheets.add(checkbox.value);
+    else selectedWorksheets.delete(checkbox.value);
+    updateBatchButtons();
+}
+
+function updateBatchButtons() {
+    const hasSelection = selectedWorksheets.size > 0;
+    batchApproveBtn.disabled = !hasSelection;
+    batchRejectBtn.disabled = !hasSelection;
+    batchApproveBtn.textContent = hasSelection ? `☑ Approve (${selectedWorksheets.size})` : `☑ Approve`;
+    batchRejectBtn.textContent = hasSelection ? `☒ Delete (${selectedWorksheets.size})` : `☒ Delete`;
+}
+
+async function batchApprove() {
+    if (!confirm(`Approve ${selectedWorksheets.size} selected worksheets?`)) return;
+    batchApproveBtn.disabled = true; batchApproveBtn.textContent = "Processing...";
+    try {
+        const batch = db.batch();
+        selectedWorksheets.forEach(id => {
+            const ref = db.collection("worksheets").doc(id);
+            batch.update(ref, { status: "approved", approvedAt: new Date().toISOString(), approvedBy: auth.currentUser.email });
+        });
+        await batch.commit();
+        showToast(`✅ ${selectedWorksheets.size} Worksheets Approved`, "success");
+        selectedWorksheets.clear();
+        updateBatchButtons();
+    } catch (error) { showToast('❌ Batch Error: ' + error.message, "error"); }
+}
+
+async function batchReject() {
+    if (!confirm(`Permanently delete ${selectedWorksheets.size} selected worksheets?`)) return;
+    batchRejectBtn.disabled = true; batchRejectBtn.textContent = "Processing...";
+    try {
+        const batch = db.batch();
+        selectedWorksheets.forEach(id => {
+            const ref = db.collection("worksheets").doc(id);
+            batch.delete(ref);
+        });
+        await batch.commit();
+        showToast(`❌ ${selectedWorksheets.size} Worksheets Deleted`, "info");
+        selectedWorksheets.clear();
+        updateBatchButtons();
+    } catch (error) { showToast('❌ Batch Error: ' + error.message, "error"); }
+}
+
+// --- PREVIEW MODAL (IMPROVEMENTS 6 & 10) ---
 function openPreviewModal(id) {
-    const ws = globalWorksheetsStore[id];
+    const ws = allWorksheets.find(w => w.id === id);
     if (ws && ws.worksheetHTML) {
-        previewContainer.innerHTML = ws.worksheetHTML;
+        // IMPROVEMENT 6: Render in iframe for perfect CSS isolation
+        const safeHTML = ws.worksheetHTML.replace(/"/g, '&quot;');
+        document.getElementById('previewContainer').innerHTML = `<iframe style="width:100%; height:85vh; border:none; background:white; border-radius: 0 0 12px 12px;" srcdoc="${safeHTML}"></iframe>`;
         previewModal.classList.add('active');
     }
 }
 
 function closePreview() {
     previewModal.classList.remove('active');
-    previewContainer.innerHTML = '';
+    document.getElementById('previewContainer').innerHTML = '';
 }
 
-// DOWNLOAD HTML LOGIC
-function downloadHTMLFile(id) {
-    const ws = globalWorksheetsStore[id];
-    if (ws && ws.worksheetHTML) {
-        const blob = new Blob([ws.worksheetHTML], { type: 'text/html' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const safeChapter = (ws.chapter || 'Worksheet').replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        a.download = `cinephysicshq_${safeChapter}_${id}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    }
-}
+// IMPROVEMENT 10: Auto-close preview on outside click
+previewModal.addEventListener("click", e => {
+    if (e.target === previewModal) closePreview();
+});
 
-// UPDATE STATS
-function updateStats(pending, approved, total) {
-    document.getElementById('statPending').textContent = pending;
-    document.getElementById('statApproved').textContent = approved;
-    document.getElementById('statTotal').textContent = total;
+// --- EXPORT ---
+function exportCSV() {
+    if (allWorksheets.length === 0) return showToast("No data to export!", "error");
+    let csvContent = "data:text/csv;charset=utf-8,ID,Chapter,Board,Class,Difficulty,Status,Generator\n";
+    allWorksheets.forEach(ws => {
+        csvContent += `${ws.id},"${ws.chapter||''}","${ws.board||''}","${ws.className||''}",${ws.difficulty||''},${ws.status||''},"${ws.generator||''}"\n`;
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.href = encodedUri;
+    link.download = "cinephysics_worksheets.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast("📄 CSV Exported Successfully", "info");
 }
 </script>
-
 </body>
 </html>
