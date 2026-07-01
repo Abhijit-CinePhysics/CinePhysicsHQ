@@ -4,19 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CinePhysicsHQ Admin Panel - Manage and approve student-generated worksheets">
-    
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     
-    <title>CinePhysicsHQ Admin Panel v3</title>
+    <title>CinePhysicsHQ Admin Panel v4</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
 
     <style>
         :root {
@@ -35,101 +32,96 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; line-height: 1.6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .container { max-width: 1300px; margin: 0 auto; padding: 2rem; }
 
-        /* LOGIN SCREEN */
-        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0a0e1a 0%, #141d33 100%); }
-        .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0, 212, 255, 0.1); }
-        .login-card h1 { font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .login-card p { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
-        .form-group input { width: 100%; padding: 0.9rem; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 1rem; transition: border-color 0.2s; }
-        .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1); }
-        .btn { width: 100%; padding: 0.9rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%); color: var(--bg); border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; margin-top: 1rem; }
+        /* REUSABLE UI */
+        .btn { padding: 0.9rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-alt) 100%); color: var(--bg); border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; transition: all 0.3s; }
         .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 212, 255, 0.3); }
         .btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: var(--surface2); }
         
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--text-muted); }
+        .form-control { width: 100%; padding: 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Syne', sans-serif; }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+
+        /* LOGIN */
+        .login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #0a0e1a 0%, #141d33 100%); }
+        .login-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 3rem; width: 100%; max-width: 400px; }
+        .login-card h1 { font-size: 2rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
         /* DASHBOARD */
         .dashboard { display: none; }
         .dashboard.active { display: block; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
-        .header h1 { font-size: 2rem; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .header-controls { display: flex; gap: 10px; align-items: center; }
-        .header-btn { padding: 0.6rem 1.2rem; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; transition: all 0.2s; }
-        .header-btn:hover { background: rgba(0, 212, 255, 0.1); }
-        .admin-info { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+        .header h1 { font-size: 2rem; color: var(--accent); }
+        .admin-info { color: var(--text-muted); font-size: 0.9rem; }
+        .header-controls { display: flex; gap: 10px; }
 
-        /* DASHBOARD CHARTS & STATS */
-        .dashboard-metrics { display: flex; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        /* STATS */
+        .dashboard-metrics { display: flex; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .chart-container { width: 300px; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
         .stats-grid { flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; }
-        .chart-container { width: 300px; height: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; justify-content: center; align-items: center; }
-        .stat-box { background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; display: flex; flex-direction: column; justify-content: center;}
-        .stat-number { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
+        .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: var(--accent-warm); }
 
         /* TOOLBAR */
         .toolbar { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; background: var(--surface); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 2rem; }
-        .toolbar-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-        .search-box input { padding: 0.6rem 1rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); width: 250px; font-family: 'Syne', sans-serif; }
-        .filter-btn { padding: 0.5rem 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.2s; }
-        .filter-btn.active, .filter-btn:hover { background: rgba(0, 212, 255, 0.1); color: var(--accent); border-color: var(--accent); }
-        .action-btn { padding: 0.5rem 1rem; background: rgba(124, 58, 237, 0.1); border: 1px solid var(--accent-alt); color: var(--accent-alt); border-radius: 6px; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.2s; }
-        .action-btn:hover:not(:disabled) { background: var(--accent-alt); color: white; }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .batch-btn-approve { border-color: var(--success); color: var(--success); background: rgba(0, 229, 160, 0.1); }
-        .batch-btn-approve:hover:not(:disabled) { background: var(--success); color: var(--bg); }
-        .batch-btn-reject { border-color: var(--danger); color: var(--danger); background: rgba(255, 68, 68, 0.1); }
-        .batch-btn-reject:hover:not(:disabled) { background: var(--danger); color: white; }
+        .search-box input { padding: 0.6rem; border-radius: 6px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); width: 300px; }
+        .action-btn { padding: 0.5rem 1rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .action-btn:hover:not(:disabled) { background: var(--accent); color: var(--bg); }
 
-        /* WORKSHEETS GRID */
-        .worksheets-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 2rem; }
-        .worksheet-card { position: relative; background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; transition: all 0.3s; }
-        .worksheet-card:hover { border-color: var(--accent); box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1); }
-        .card-checkbox { position: absolute; top: 1.5rem; right: 1.5rem; width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
+        /* CARDS */
+        .worksheets-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.5rem; }
+        .worksheet-card { position: relative; background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; transition: 0.3s; }
+        .worksheet-card:hover { border-color: var(--accent); }
+        .card-checkbox { position: absolute; top: 1.5rem; right: 1.5rem; width: 18px; height: 18px; accent-color: var(--accent); }
         
-        .worksheet-header { margin-bottom: 1.5rem; padding-right: 30px; }
-        .worksheet-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem; }
-        .worksheet-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 1rem; flex-wrap: wrap; }
-        .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        .status-pending { background: rgba(255, 157, 0, 0.2); color: var(--accent-warm); border: 1px solid var(--accent-warm); }
-        .status-approved { background: rgba(0, 229, 160, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .worksheet-details { margin: 1.5rem 0; padding: 1rem; background: var(--surface2); border-radius: 6px; font-size: 0.9rem; }
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
-        .detail-row span:first-child { color: var(--text-muted); }
-        
-        .worksheet-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
-        .worksheet-actions button { flex: 1; padding: 0.7rem; border: none; border-radius: 6px; font-family: 'Syne', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
-        .btn-approve { background: rgba(0, 229, 160, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .btn-approve:hover:not(:disabled) { background: var(--success); color: var(--bg); }
-        .btn-reject { background: rgba(255, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-        .btn-reject:hover:not(:disabled) { background: var(--danger); color: white; }
-        .preview-btn { background: rgba(0, 212, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); }
-        .preview-btn:hover { background: var(--accent); color: var(--bg); }
-        .download-btn { background: rgba(124, 58, 237, 0.1); color: var(--accent-alt); border: 1px solid var(--accent-alt); }
-        .download-btn:hover { background: var(--accent-alt); color: var(--bg); }
-        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
-        .loading { text-align: center; padding: 2rem; color: var(--text-muted); }
+        .card-header { margin-bottom: 1rem; padding-right: 2rem; }
+        .card-title { font-size: 1.2rem; font-weight: 700; color: white; }
+        .status-badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; margin-top: 0.5rem;}
+        .status-pending { background: rgba(255, 157, 0, 0.2); color: var(--accent-warm); }
+        .status-approved { background: rgba(0, 229, 160, 0.2); color: var(--success); }
+        .status-rejected { background: rgba(255, 68, 68, 0.2); color: var(--danger); }
 
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 14, 26, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 2rem; }
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem; background: var(--bg); padding: 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        .card-grid span { color: var(--text-muted); }
+        .card-grid strong { color: var(--text); float: right; }
+
+        .card-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .card-btn { padding: 0.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .card-btn:hover { background: var(--surface2); color: var(--accent); }
+        
+        .btn-green { border-color: var(--success); color: var(--success); }
+        .btn-green:hover { background: var(--success); color: var(--bg); }
+        .btn-red { border-color: var(--danger); color: var(--danger); }
+        .btn-red:hover { background: var(--danger); color: white; }
+
+        /* MODALS */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 14, 26, 0.95); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 1000px; max-height: 90vh; overflow: hidden; position: relative; }
-        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: var(--danger); color: white; border: none; border-radius: 50%; width: 35px; height: 35px; font-size: 1.2rem; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 10; }
+        .modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 600px; padding: 2rem; position: relative; max-height: 90vh; overflow-y: auto; }
+        .modal-large { max-width: 1200px; height: 90vh; display: flex; flex-direction: column; padding: 1rem; }
+        
+        /* EDITOR SPLIT SCREEN */
+        .editor-container { display: flex; flex: 1; gap: 1rem; min-height: 0; margin-top: 1rem; }
+        .editor-pane { flex: 1; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+        #monacoContainer { flex: 1; width: 100%; }
+        .preview-iframe { width: 100%; height: 100%; border: none; background: #fff; }
 
-        /* TOAST NOTIFICATIONS */
+        /* HISTORY TIMELINE */
+        .history-list { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+        .history-item { padding: 0.8rem; background: var(--bg); border-radius: 6px; margin-bottom: 0.5rem; font-size: 0.8rem; }
+        .history-item button { float: right; padding: 0.2rem 0.5rem; background: var(--accent); color: var(--bg); border: none; border-radius: 4px; cursor: pointer; }
+
+        /* TOASTS */
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
-        .toast { padding: 1rem 1.5rem; border-radius: 8px; font-family: 'Syne', sans-serif; font-weight: 600; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transform: translateX(120%); animation: slideIn 0.3s forwards; transition: opacity 0.3s; }
+        .toast { padding: 1rem; border-radius: 8px; font-weight: 600; color: white; transform: translateX(120%); animation: slideIn 0.3s forwards; }
         .toast-success { background: var(--success); color: var(--bg); }
         .toast-error { background: var(--danger); }
-        .toast-info { background: var(--accent); color: var(--bg); }
         @keyframes slideIn { to { transform: translateX(0); } }
 
-        @media (max-width: 768px) {
-            .worksheets-container { grid-template-columns: 1fr; }
-            .dashboard-metrics { flex-direction: column; }
-            .chart-container { width: 100%; }
-        }
     </style>
 </head>
 <body>
@@ -138,18 +130,11 @@
 
 <div id="loginScreen" class="login-screen">
     <div class="login-card">
-        <h1>⚡ CinePhysicsHQ</h1>
-        <p>Admin Panel v3</p>
+        <h1>⚡ Admin Auth</h1>
         <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Admin Email</label>
-                <input type="email" id="email" placeholder="admin@cinephysics.com" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="btn" id="loginBtn">Login to Dashboard</button>
+            <div class="form-group"><input class="form-control" type="email" id="email" placeholder="admin@cinephysics.com" required></div>
+            <div class="form-group"><input class="form-control" type="password" id="password" placeholder="••••••••" required></div>
+            <button type="submit" class="btn" id="loginBtn" style="width: 100%;">Login</button>
         </form>
     </div>
 </div>
@@ -158,465 +143,482 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>Admin Dashboard</h1>
-                <div class="admin-info">Logged in as: <span id="adminEmail"></span></div>
+                <h1>CinePhysicsHQ Control</h1>
+                <div class="admin-info">Logged in: <span id="adminEmail"></span></div>
             </div>
             <div class="header-controls">
-                <button class="header-btn" onclick="location.href='admin.html'">🏠 Admin Home</button>
-                <button class="header-btn" id="logoutBtn">Logout</button>
+                <button class="btn btn-outline" id="logoutBtn">Logout</button>
             </div>
         </div>
 
         <div class="dashboard-metrics">
-            <div class="chart-container">
-                <canvas id="statsChart"></canvas>
-            </div>
+            <div class="chart-container"><canvas id="statsChart"></canvas></div>
             <div class="stats-grid">
-                <div class="stat-box">
-                    <div class="stat-number" id="statPending">0</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" id="statApproved">0</div>
-                    <div class="stat-label">Approved</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" id="statTotal">0</div>
-                    <div class="stat-label">Total Worksheets</div>
-                </div>
+                <div class="stat-box"><div class="stat-number" id="statPending">0</div><div>Pending</div></div>
+                <div class="stat-box"><div class="stat-number" id="statApproved">0</div><div>Approved</div></div>
+                <div class="stat-box"><div class="stat-number" id="statRejected">0</div><div>Rejected</div></div>
             </div>
         </div>
 
         <div class="toolbar">
-            <div class="toolbar-group">
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Search chapter, board...">
-                </div>
-                <div class="filters" id="filterContainer">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="pending">Pending</button>
-                    <button class="filter-btn" data-filter="approved">Approved</button>
-                </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search IDs, Topics, Teachers...">
             </div>
-            
-            <div class="toolbar-group">
-                <span style="font-size: 0.9rem; color: var(--text-muted); margin-right: 0.5rem;">Batch:</span>
-                <button class="action-btn batch-btn-approve" id="batchApproveBtn" onclick="batchApprove()" disabled>☑ Approve</button>
-                <button class="action-btn batch-btn-reject" id="batchRejectBtn" onclick="batchReject()" disabled>☒ Delete</button>
-                
-                <button class="action-btn" style="margin-left: 1rem;" onclick="exportCSV()">⬇ Export CSV</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="action-btn" onclick="openBatchModal()" id="batchBtn" disabled>⚙️ Batch Actions</button>
+                <button class="action-btn" onclick="exportCSV()">⬇ Export CSV</button>
             </div>
         </div>
 
-        <div class="loading" id="loadingState" style="display: none;">
-            Listening for live updates... ⏳
-        </div>
         <div id="worksheetsContainer" class="worksheets-container"></div>
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <div class="empty-state-icon">📭</div>
-            <h2>No worksheets found</h2>
-            <p>Adjust your search or wait for students to submit new work.</p>
+    </div>
+</div>
+
+<div id="metaModal" class="modal-overlay">
+    <div class="modal-content">
+        <h2>✏️ Edit Metadata</h2>
+        <form id="metaForm" style="margin-top: 1rem;">
+            <input type="hidden" id="editId">
+            <div class="form-group"><label>Title/Topic</label><input type="text" id="editTitle" class="form-control"></div>
+            <div class="form-group"><label>Chapter</label><input type="text" id="editChapter" class="form-control"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group"><label>Board</label><select id="editBoard" class="form-control"><option>CBSE</option><option>ICSE</option><option>State</option></select></div>
+                <div class="form-group"><label>Class</label><select id="editClass" class="form-control"><option>11</option><option>12</option><option>10</option></select></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group"><label>Difficulty</label><select id="editDiff" class="form-control"><option>Easy</option><option>Medium</option><option>Hard</option></select></div>
+                <div class="form-group"><label>Total Questions</label><input type="number" id="editTotalQ" class="form-control"></div>
+            </div>
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <button type="submit" class="btn" style="flex: 1;">Save Changes</button>
+                <button type="button" class="btn btn-outline" onclick="closeModal('metaModal')" style="flex: 1;">Cancel</button>
+            </div>
+        </form>
+        
+        <div class="history-list">
+            <h3>📜 Version History</h3>
+            <div id="historyContainer">No history available.</div>
         </div>
     </div>
 </div>
 
-<div id="previewModal" class="modal-overlay">
-    <div class="modal-content">
-        <button class="modal-close-btn" onclick="closePreview()">✕</button>
-        <div id="previewContainer" style="width: 100%; height: 100%;"></div>
+<div id="htmlModal" class="modal-overlay">
+    <div class="modal-content modal-large">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>📝 Code Editor & Live Preview</h2>
+            <div>
+                <button class="btn" onclick="saveHTML()">Save & Auto-Count</button>
+                <button class="btn btn-outline" onclick="closeModal('htmlModal')">Close</button>
+            </div>
+        </div>
+        <div class="editor-container">
+            <div class="editor-pane" id="monacoContainer"></div>
+            <div class="editor-pane"><iframe id="previewIframe" class="preview-iframe"></iframe></div>
+        </div>
     </div>
 </div>
+
+<div id="approveModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2>Approve Worksheet?</h2>
+        <p style="color: var(--text-muted); margin: 1rem 0;">Publishing makes it visible to students immediately.</p>
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <button class="btn btn-green" onclick="submitApprove(true)">Approve & Publish</button>
+            <button class="btn" onclick="submitApprove(false)">Approve Only</button>
+            <button class="btn btn-outline" onclick="closeModal('approveModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="rejectModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 400px;">
+        <h2>Reject Worksheet</h2>
+        <div class="form-group" style="margin-top: 1rem;">
+            <label>Rejection Reason</label>
+            <select id="rejectReason" class="form-control">
+                <option>Formatting Issue</option><option>Duplicate</option>
+                <option>Wrong Answer</option><option>Low Quality</option>
+                <option>Incomplete</option><option>Other</option>
+            </select>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn btn-red" style="flex:1;" onclick="submitReject()">Reject</button>
+            <button class="btn btn-outline" style="flex:1;" onclick="closeModal('rejectModal')">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="batchModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <h2>⚙️ Batch Actions (<span id="batchCount">0</span> selected)</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+            <button class="btn btn-green" onclick="executeBatch('approve')">Approve All</button>
+            <button class="btn btn-red" onclick="executeBatch('reject')">Reject All</button>
+            <button class="btn btn-outline" onclick="executeBatch('delete')">Permanent Delete</button>
+        </div>
+        <hr style="border-color: var(--border); margin: 1.5rem 0;">
+        <div style="display: flex; gap: 0.5rem;">
+            <select id="batchBoard" class="form-control"><option value="">Change Board...</option><option>CBSE</option><option>ICSE</option></select>
+            <button class="btn" onclick="executeBatch('board')">Apply</button>
+        </div>
+        <button class="btn btn-outline" style="width:100%; margin-top: 1rem;" onclick="closeModal('batchModal')">Cancel</button>
+    </div>
+</div>
+
 
 <script>
-// --- FIREBASE CONFIGURATION ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyAVPytvxafQYKoLhxOr2QcNT-fgwk6Cnmk",
   authDomain: "cinephysicshq.firebaseapp.com",
   projectId: "cinephysicshq",
   storageBucket: "cinephysicshq.firebasestorage.app",
   messagingSenderId: "506903518720",
-  appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5",
-  measurementId: "G-TC2GZCD8K5"
+  appId: "1:506903518720:web:734e3e53e5fbbbc3abc2e5"
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- CONSTANTS & GLOBALS ---
 const ADMIN_EMAIL = "singhabhijit327@gmail.com";
 let allWorksheets = [];
-let currentFilter = 'all';
-let unsubscribe = null;
-let selectedWorksheets = new Set();
+let selectedItems = new Set();
 let dashboardChart = null;
+let currentActionId = null; 
+let monacoEditorInstance = null;
 
-// DOM Elements
-const loginScreen = document.getElementById('loginScreen');
-const dashboard = document.getElementById('dashboard');
-const adminEmail = document.getElementById('adminEmail');
-const worksheetsContainer = document.getElementById('worksheetsContainer');
-const emptyState = document.getElementById('emptyState');
-const loadingState = document.getElementById('loadingState');
-const searchInput = document.getElementById('searchInput');
-const filterBtns = document.querySelectorAll('.filter-btn');
-const previewModal = document.getElementById('previewModal');
-const batchApproveBtn = document.getElementById('batchApproveBtn');
-const batchRejectBtn = document.getElementById('batchRejectBtn');
-
-// --- UI UTILITIES ---
-function showToast(message, type = "success") {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    container.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+// --- TOAST NOTIFICATIONS ---
+function showToast(msg, type="success") {
+    const box = document.createElement('div');
+    box.className = `toast toast-${type}`;
+    box.textContent = msg;
+    document.getElementById('toastContainer').appendChild(box);
+    setTimeout(() => { box.style.opacity='0'; setTimeout(()=>box.remove(), 300); }, 3000);
 }
 
-// --- SECURE AUTHENTICATION STATE ---
+// --- AUTHENTICATION ---
 auth.onAuthStateChanged(user => {
-    if (user) {
-        // IMPROVEMENT 1: Restrict access to admin email
-        if (user.email !== ADMIN_EMAIL) {
-            showToast("Access denied. Unauthorized account.", "error");
-            auth.signOut();
-            return;
-        }
-        
-        loginScreen.style.display = 'none';
-        dashboard.classList.add('active');
-        adminEmail.textContent = user.email;
-        
-        window.history.pushState(null, "", window.location.href);
-        window.onpopstate = () => window.history.pushState(null, "", window.location.href);
-        
-        // IMPROVEMENT 2: Prevent duplicate listeners
-        if (unsubscribe) { unsubscribe(); }
+    if (user && user.email === ADMIN_EMAIL) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        document.getElementById('adminEmail').textContent = user.email;
         startLiveListener();
     } else {
-        loginScreen.style.display = 'flex';
-        dashboard.classList.remove('active');
-        allWorksheets = [];
-        selectedWorksheets.clear();
-        worksheetsContainer.innerHTML = '';
-        adminEmail.textContent = '';
-        if (unsubscribe) unsubscribe(); 
+        if(user) { showToast("Unauthorized access denied.", "error"); auth.signOut(); }
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboard').classList.remove('active');
     }
 });
 
-// --- LOGIN/LOGOUT ---
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const btn = document.getElementById('loginBtn');
-    
-    btn.disabled = true;
-    btn.textContent = 'Authenticating...';
-    
     try {
-        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-        await auth.signInWithEmailAndPassword(email, password);
-        showToast("Welcome back, Admin!", "success");
-    } catch (error) {
-        showToast(error.message, "error");
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Login to Dashboard';
-    }
+        await auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value);
+    } catch (err) { showToast(err.message, "error"); }
 });
+document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
-document.getElementById('logoutBtn').addEventListener('click', async () => {
-    worksheetsContainer.innerHTML = '';
-    window.history.replaceState(null, "", window.location.href);
-    await auth.signOut();
-    document.getElementById('loginForm').reset();
-    showToast("Logged out safely.", "info");
-});
-
-// --- LIVE FIRESTORE LISTENER ---
+// --- DATA LISTENER ---
 function startLiveListener() {
-    loadingState.style.display = 'block';
-    emptyState.style.display = 'none';
-    
-    // IMPROVEMENT 4: Use Firestore ordering (Requires index on createdAt if querying specific fields)
-    let query = db.collection("worksheets").orderBy("createdAt", "desc");
-
-    unsubscribe = query.onSnapshot(snapshot => {
+    db.collection("worksheets").onSnapshot(snap => {
         allWorksheets = [];
-        let pendingCount = 0, approvedCount = 0;
+        let p=0, a=0, r=0;
+        snap.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            allWorksheets.push(data);
+            if(data.status==='pending') p++; else if(data.status==='approved') a++; else if(data.status==='rejected') r++;
+        });
         
-        snapshot.forEach(doc => {
-            let ws = doc.data();
-            ws.id = doc.id;
-            ws.status = (ws.status || "pending").toLowerCase();
-            allWorksheets.push(ws);
-            if (ws.status === 'approved') approvedCount++;
-            else if (ws.status === 'pending') pendingCount++;
+        // Sort by newest first
+        allWorksheets.sort((x, y) => {
+            let t1 = x.createdAt ? new Date(x.createdAt).getTime() : 0;
+            let t2 = y.createdAt ? new Date(y.createdAt).getTime() : 0;
+            return t2 - t1;
         });
 
-        // IMPROVEMENT 3: JS Sorting fallback (ensures new items are top if orderBy fails due to missing fields)
-        allWorksheets.sort((a, b) => {
-            const da = a.createdAt?.seconds || (new Date(a.generatedAt).getTime()/1000) || 0;
-            const db = b.createdAt?.seconds || (new Date(b.generatedAt).getTime()/1000) || 0;
-            return db - da;
-        });
-        
-        document.getElementById('statPending').textContent = pendingCount;
-        document.getElementById('statApproved').textContent = approvedCount;
-        document.getElementById('statTotal').textContent = allWorksheets.length;
-        
-        updateChart(pendingCount, approvedCount);
-        
-        loadingState.style.display = 'none';
-        
-        // Clean up deleted items from selection set
-        const currentIds = new Set(allWorksheets.map(ws => ws.id));
-        selectedWorksheets.forEach(id => { if(!currentIds.has(id)) selectedWorksheets.delete(id); });
-        updateBatchButtons();
-        
-        renderWorksheets();
-    }, error => {
-        console.error("Listener error:", error);
-        showToast("Database connection error.", "error");
+        document.getElementById('statPending').textContent = p;
+        document.getElementById('statApproved').textContent = a;
+        document.getElementById('statRejected').textContent = r;
+        updateChart(p, a, r);
+        renderCards();
     });
 }
 
-// --- CHART.JS INTEGRATION (IMPROVEMENT 8) ---
-function updateChart(pending, approved) {
+function updateChart(p, a, r) {
     const ctx = document.getElementById('statsChart').getContext('2d');
-    if (dashboardChart) {
-        dashboardChart.data.datasets[0].data = [pending, approved];
-        dashboardChart.update();
-    } else {
+    if (dashboardChart) { dashboardChart.data.datasets[0].data = [p, a, r]; dashboardChart.update(); }
+    else {
         dashboardChart = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: ['Pending', 'Approved'],
-                datasets: [{
-                    data: [pending, approved],
-                    backgroundColor: ['#ff9d00', '#00e5a0'],
-                    borderColor: '#0f1424',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'right', labels: { color: '#e2eaf5', font: { family: 'Syne' } } } }
-            }
+            data: { labels: ['Pending', 'Approved', 'Rejected'], datasets: [{ data: [p, a, r], backgroundColor: ['#ff9d00', '#00e5a0', '#ff4444'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: {color: '#fff'} } } }
         });
     }
 }
 
-// --- RENDER & FILTER ---
-function renderWorksheets() {
-    worksheetsContainer.innerHTML = '';
-    const searchTerm = searchInput.value.toLowerCase();
-    
-    let filtered = allWorksheets;
-    if (currentFilter !== 'all') filtered = allWorksheets.filter(ws => ws.status === currentFilter);
-    if (searchTerm) {
-        filtered = filtered.filter(ws => {
-            const str = `${ws.chapter||''} ${ws.board||''} ${ws.className||''} ${ws.generator||''}`.toLowerCase();
-            return str.includes(searchTerm);
-        });
-    }
-    
-    if (filtered.length === 0) {
-        emptyState.style.display = 'block';
-    } else {
-        emptyState.style.display = 'none';
-        filtered.forEach(ws => worksheetsContainer.appendChild(createWorksheetCard(ws)));
-    }
-}
+// --- RENDER CARDS ---
+document.getElementById('searchInput').addEventListener('input', renderCards);
 
-searchInput.addEventListener('input', renderWorksheets);
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        currentFilter = e.target.getAttribute('data-filter');
-        renderWorksheets();
+function renderCards() {
+    const container = document.getElementById('worksheetsContainer');
+    container.innerHTML = '';
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = allWorksheets.filter(w => {
+        const str = `${w.id} ${w.title} ${w.chapter} ${w.topics} ${w.generator} ${w.teacherName} ${w.board} ${w.className}`.toLowerCase();
+        return str.includes(term);
     });
-});
 
-// --- CARD CREATION ---
-function createWorksheetCard(ws) {
-    const card = document.createElement('div');
-    card.className = 'worksheet-card';
-    
-    const isPending = ws.status === 'pending';
-    const statusClass = isPending ? 'status-pending' : 'status-approved';
-    const isChecked = selectedWorksheets.has(ws.id) ? 'checked' : '';
-    
-    let dateDisplay = "Unknown Date";
-    if (ws.createdAt) {
-        dateDisplay = (typeof ws.createdAt.toDate === 'function') ? ws.createdAt.toDate().toLocaleDateString() : new Date(ws.createdAt).toLocaleDateString();
-    } else if (ws.generatedAt) {
-        dateDisplay = new Date(ws.generatedAt).toLocaleDateString();
-    }
-    
-    let totalQ = ws.totalQuestions || 0;
-    if (ws.distribution) {
-        totalQ = (ws.distribution.mcq||0) + (ws.distribution.sa||0) + (ws.distribution.la||0) + (ws.distribution.vsa||0) + (ws.distribution.numerical||0) + (ws.distribution.assertionReason||0);
-    }
-
-    card.innerHTML = `
-        <input type="checkbox" class="card-checkbox" value="${ws.id}" ${isChecked} onchange="toggleSelection(this)">
+    filtered.forEach(ws => {
+        const card = document.createElement('div');
+        card.className = 'worksheet-card';
+        const isChecked = selectedItems.has(ws.id) ? 'checked' : '';
+        const d = ws.createdAt ? new Date(ws.createdAt).toLocaleDateString() : 'N/A';
+        const ed = ws.updatedAt ? new Date(ws.updatedAt).toLocaleDateString() : 'N/A';
         
-        <div class="worksheet-header">
-            <h3 class="worksheet-title">${ws.chapter || "Untitled"}</h3>
-            <div class="worksheet-meta">
-                <span class="status-badge ${statusClass}">${isPending ? '⏳ Pending' : '✓ Approved'}</span>
-                <span>${ws.difficulty || "N/A"}</span>
+        card.innerHTML = `
+            <input type="checkbox" class="card-checkbox" value="${ws.id}" ${isChecked} onchange="toggleSelect(this)">
+            <div class="card-header">
+                <div class="card-title">${ws.title || ws.chapter || 'Untitled'}</div>
+                <span class="status-badge status-${ws.status||'pending'}">${ws.status||'Pending'}</span>
             </div>
-        </div>
-        <div class="worksheet-details">
-            <div class="detail-row"><span>By:</span><span>${ws.generator || "CinePhysicsHQ"}</span></div>
-            <div class="detail-row"><span>Total Questions:</span><span>${totalQ}</span></div>
-            <div class="detail-row"><span>Board/Class:</span><span>${ws.board||"N/A"} - ${ws.className||"N/A"}</span></div>
-            <div class="detail-row"><span>Date:</span><span>${dateDisplay}</span></div>
-        </div>
-        
-        ${isPending ? `
-            <div class="worksheet-actions">
-                <button class="btn-approve" onclick="approveWorksheet('${ws.id}', this)">✓ Approve</button>
-                <button class="btn-reject" onclick="rejectWorksheet('${ws.id}', this)">✕ Reject</button>
+            <div class="card-grid">
+                <span>🆔 ID:</span> <strong>${ws.id.substring(0,6)}...</strong>
+                <span>🏫 Board:</span> <strong>${ws.board||'N/A'}</strong>
+                <span>📚 Class:</span> <strong>${ws.className||'N/A'}</strong>
+                <span>📊 Diff:</span> <strong>${ws.difficulty||'N/A'}</strong>
+                <span>❓ Qty:</span> <strong>${ws.totalQuestions||0}</strong>
+                <span>👤 Gen:</span> <strong>${ws.generator||'N/A'}</strong>
+                <span>📅 Created:</span> <strong>${d}</strong>
+                <span>✏️ Edited:</span> <strong>${ed}</strong>
             </div>
-        ` : `<div style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">✓ Approved by admin</div>`}
-        
-        ${ws.worksheetHTML ? `
-            <div class="worksheet-actions" style="margin-top: 0.5rem;">
-                <button class="preview-btn" onclick="openPreviewModal('${ws.id}')">👁 Preview</button>
-                <button class="download-btn" onclick="downloadHTMLFile('${ws.id}')">⬇ Download</button>
+            <div class="card-actions">
+                <button class="card-btn btn-green" onclick="openApprove('${ws.id}')">✓ Approve</button>
+                <button class="card-btn btn-red" onclick="openReject('${ws.id}')">✕ Reject</button>
+                <button class="card-btn" onclick="openMetaEditor('${ws.id}')">✏️ Edit Meta</button>
+                <button class="card-btn" onclick="openHTMLEditor('${ws.id}')">📝 Edit HTML</button>
             </div>
-        ` : ''}
-    `;
-    if (!isPending) card.style.opacity = '0.7';
-    return card;
+        `;
+        container.appendChild(card);
+    });
 }
 
-// --- INDIVIDUAL ACTIONS (IMPROVEMENT 5) ---
-async function approveWorksheet(id, btn) {
-    if (!confirm('Approve this worksheet?')) return;
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.textContent = "Approving...";
+// --- SELECTION & BATCH ---
+function toggleSelect(cb) {
+    if(cb.checked) selectedItems.add(cb.value); else selectedItems.delete(cb.value);
+    document.getElementById('batchBtn').disabled = selectedItems.size === 0;
+    document.getElementById('batchCount').textContent = selectedItems.size;
+}
+
+function openBatchModal() { document.getElementById('batchModal').classList.add('active'); }
+
+async function executeBatch(action) {
+    const batch = db.batch();
+    const ts = new Date().toISOString();
+    let updates = {};
+    
+    if(action === 'approve') updates = { status: 'approved', published: true, publishedAt: ts, publishedBy: auth.currentUser.email };
+    else if(action === 'reject') updates = { status: 'rejected', rejectedAt: ts, rejectedBy: auth.currentUser.email };
+    else if(action === 'board') {
+        const b = document.getElementById('batchBoard').value;
+        if(!b) return;
+        updates = { board: b, updatedAt: ts, updatedBy: auth.currentUser.email };
+    }
+    
     try {
-        await db.collection("worksheets").doc(id).update({
-            status: "approved", approvedAt: new Date().toISOString(), approvedBy: auth.currentUser.email
-        });
-        showToast("✅ Worksheet Approved", "success");
-    } catch (error) {
-        showToast('❌ Error: ' + error.message, "error");
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
-}
-
-async function rejectWorksheet(id, btn) {
-    if (!confirm('Reject this worksheet? It will be permanently deleted.')) return;
-    const originalText = btn.innerHTML;
-    btn.disabled = true;
-    btn.textContent = "Deleting...";
-    try { 
-        await db.collection("worksheets").doc(id).delete(); 
-        showToast("❌ Worksheet Deleted", "info");
-    } catch (error) { 
-        showToast('❌ Error: ' + error.message, "error"); 
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
-}
-
-// --- BATCH ACTIONS (IMPROVEMENT 7) ---
-function toggleSelection(checkbox) {
-    if (checkbox.checked) selectedWorksheets.add(checkbox.value);
-    else selectedWorksheets.delete(checkbox.value);
-    updateBatchButtons();
-}
-
-function updateBatchButtons() {
-    const hasSelection = selectedWorksheets.size > 0;
-    batchApproveBtn.disabled = !hasSelection;
-    batchRejectBtn.disabled = !hasSelection;
-    batchApproveBtn.textContent = hasSelection ? `☑ Approve (${selectedWorksheets.size})` : `☑ Approve`;
-    batchRejectBtn.textContent = hasSelection ? `☒ Delete (${selectedWorksheets.size})` : `☒ Delete`;
-}
-
-async function batchApprove() {
-    if (!confirm(`Approve ${selectedWorksheets.size} selected worksheets?`)) return;
-    batchApproveBtn.disabled = true; batchApproveBtn.textContent = "Processing...";
-    try {
-        const batch = db.batch();
-        selectedWorksheets.forEach(id => {
-            const ref = db.collection("worksheets").doc(id);
-            batch.update(ref, { status: "approved", approvedAt: new Date().toISOString(), approvedBy: auth.currentUser.email });
+        selectedItems.forEach(id => {
+            const ref = db.collection('worksheets').doc(id);
+            if(action === 'delete') batch.delete(ref); else batch.update(ref, updates);
         });
         await batch.commit();
-        showToast(`✅ ${selectedWorksheets.size} Worksheets Approved`, "success");
-        selectedWorksheets.clear();
-        updateBatchButtons();
-    } catch (error) { showToast('❌ Batch Error: ' + error.message, "error"); }
+        showToast(`Batch ${action} completed successfully.`);
+        closeModal('batchModal');
+        selectedItems.clear();
+        document.getElementById('batchBtn').disabled = true;
+    } catch(e) { showToast(e.message, 'error'); }
 }
 
-async function batchReject() {
-    if (!confirm(`Permanently delete ${selectedWorksheets.size} selected worksheets?`)) return;
-    batchRejectBtn.disabled = true; batchRejectBtn.textContent = "Processing...";
+// --- MODAL UTILS ---
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+// --- APPROVE & REJECT WORKFLOWS ---
+function openApprove(id) { currentActionId = id; document.getElementById('approveModal').classList.add('active'); }
+function openReject(id) { currentActionId = id; document.getElementById('rejectModal').classList.add('active'); }
+
+async function submitApprove(publish) {
     try {
-        const batch = db.batch();
-        selectedWorksheets.forEach(id => {
-            const ref = db.collection("worksheets").doc(id);
-            batch.delete(ref);
-        });
-        await batch.commit();
-        showToast(`❌ ${selectedWorksheets.size} Worksheets Deleted`, "info");
-        selectedWorksheets.clear();
-        updateBatchButtons();
-    } catch (error) { showToast('❌ Batch Error: ' + error.message, "error"); }
+        const payload = { status: 'approved', publishedAt: new Date().toISOString(), publishedBy: auth.currentUser.email };
+        if(publish) payload.published = true;
+        await db.collection('worksheets').doc(currentActionId).update(payload);
+        showToast("Worksheet Approved!");
+        closeModal('approveModal');
+    } catch(e) { showToast(e.message, 'error'); }
 }
 
-// --- PREVIEW MODAL (IMPROVEMENTS 6 & 10) ---
-function openPreviewModal(id) {
+async function submitReject() {
+    try {
+        const reason = document.getElementById('rejectReason').value;
+        await db.collection('worksheets').doc(currentActionId).update({
+            status: 'rejected', rejectReason: reason, rejectedAt: new Date().toISOString(), rejectedBy: auth.currentUser.email
+        });
+        showToast("Worksheet Rejected.");
+        closeModal('rejectModal');
+    } catch(e) { showToast(e.message, 'error'); }
+}
+
+// --- HISTORY LOGIC ---
+async function saveHistory(id, oldData, newData) {
+    const changes = {}, oldV = {};
+    for(let key in newData) {
+        if(oldData[key] !== newData[key]) { changes[key] = newData[key]; oldV[key] = oldData[key]; }
+    }
+    if(Object.keys(changes).length > 0) {
+        await db.collection('worksheets').doc(id).collection('history').add({
+            editorEmail: auth.currentUser.email,
+            editedAt: new Date().toISOString(),
+            changedFields: Object.keys(changes),
+            oldValues: oldV,
+            newValues: changes
+        });
+    }
+}
+
+// --- METADATA EDITOR ---
+async function openMetaEditor(id) {
+    currentActionId = id;
     const ws = allWorksheets.find(w => w.id === id);
-    if (ws && ws.worksheetHTML) {
-        // IMPROVEMENT 6: Render in iframe for perfect CSS isolation
-        const safeHTML = ws.worksheetHTML.replace(/"/g, '&quot;');
-        document.getElementById('previewContainer').innerHTML = `<iframe style="width:100%; height:85vh; border:none; background:white; border-radius: 0 0 12px 12px;" srcdoc="${safeHTML}"></iframe>`;
-        previewModal.classList.add('active');
+    document.getElementById('editId').value = id;
+    document.getElementById('editTitle').value = ws.title || ws.chapter || '';
+    document.getElementById('editChapter').value = ws.chapter || '';
+    document.getElementById('editBoard').value = ws.board || 'CBSE';
+    document.getElementById('editClass').value = ws.className || '12';
+    document.getElementById('editDiff').value = ws.difficulty || 'Medium';
+    document.getElementById('editTotalQ').value = ws.totalQuestions || 0;
+    
+    // Fetch History
+    const hContainer = document.getElementById('historyContainer');
+    hContainer.innerHTML = 'Loading...';
+    const snap = await db.collection('worksheets').doc(id).collection('history').orderBy('editedAt', 'desc').get();
+    if(snap.empty) { hContainer.innerHTML = 'No history available.'; }
+    else {
+        hContainer.innerHTML = '';
+        snap.forEach(doc => {
+            const h = doc.data();
+            const d = new Date(h.editedAt).toLocaleString();
+            hContainer.innerHTML += `<div class="history-item"><strong>${d}</strong> by ${h.editorEmail}<br>Fields: ${h.changedFields.join(', ')}</div>`;
+        });
+    }
+    
+    document.getElementById('metaModal').classList.add('active');
+}
+
+document.getElementById('metaForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editId').value;
+    const oldData = allWorksheets.find(w => w.id === id);
+    
+    const newData = {
+        title: document.getElementById('editTitle').value,
+        chapter: document.getElementById('editChapter').value,
+        board: document.getElementById('editBoard').value,
+        className: document.getElementById('editClass').value,
+        difficulty: document.getElementById('editDiff').value,
+        totalQuestions: parseInt(document.getElementById('editTotalQ').value),
+        updatedAt: new Date().toISOString(),
+        updatedBy: auth.currentUser.email
+    };
+
+    try {
+        await saveHistory(id, oldData, newData);
+        await db.collection('worksheets').doc(id).update(newData);
+        showToast("Metadata Saved!");
+        closeModal('metaModal');
+    } catch(err) { showToast(err.message, 'error'); }
+});
+
+// --- HTML EDITOR & PREVIEW (Monaco Setup) ---
+function initMonaco() {
+    if(monacoEditorInstance) return;
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' }});
+    require(['vs/editor/editor.main'], function() {
+        monacoEditorInstance = monaco.editor.create(document.getElementById('monacoContainer'), {
+            value: '', language: 'html', theme: 'vs-dark', wordWrap: 'on', automaticLayout: true
+        });
+        
+        monacoEditorInstance.onDidChangeModelContent(() => {
+            const html = monacoEditorInstance.getValue();
+            // Inject MathJax for preview rendering
+            const previewHTML = `
+                <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"><\/script>
+                <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
+                <style>body{font-family: Arial, sans-serif; padding: 1rem;}</style>
+                ${html}
+            `;
+            document.getElementById('previewIframe').srcdoc = previewHTML;
+        });
+    });
+}
+
+function openHTMLEditor(id) {
+    currentActionId = id;
+    const ws = allWorksheets.find(w => w.id === id);
+    document.getElementById('htmlModal').classList.add('active');
+    
+    if(!monacoEditorInstance) {
+        initMonaco();
+        setTimeout(() => { monacoEditorInstance.setValue(ws.worksheetHTML || ''); }, 1000);
+    } else {
+        monacoEditorInstance.setValue(ws.worksheetHTML || '');
     }
 }
 
-function closePreview() {
-    previewModal.classList.remove('active');
-    document.getElementById('previewContainer').innerHTML = '';
+// Auto Question Count Logic
+function autoCountQuestions(htmlStr) {
+    // Basic DOM parsing rule based on common structural tags or text
+    let count = 0;
+    // Count common list item prefixes or bold question tags (e.g. "Q1.", "1.", "Question 1")
+    const matches = htmlStr.match(/>(\s*Q\d+|\s*\d+\.)/gi);
+    if(matches) count = matches.length;
+    
+    // Fallback: count list elements if unordered/ordered lists are used for questions
+    if(count === 0) {
+        const liMatches = htmlStr.match(/<li[^>]*>/gi);
+        if(liMatches) count = liMatches.length;
+    }
+    return count;
 }
 
-// IMPROVEMENT 10: Auto-close preview on outside click
-previewModal.addEventListener("click", e => {
-    if (e.target === previewModal) closePreview();
-});
+async function saveHTML() {
+    const newHTML = monacoEditorInstance.getValue();
+    const calcTotal = autoCountQuestions(newHTML);
+    const oldData = allWorksheets.find(w => w.id === currentActionId);
+    
+    const newData = {
+        worksheetHTML: newHTML,
+        totalQuestions: calcTotal,
+        updatedAt: new Date().toISOString(),
+        updatedBy: auth.currentUser.email
+    };
 
-// --- EXPORT ---
+    try {
+        await saveHistory(currentActionId, oldData, newData);
+        await db.collection('worksheets').doc(currentActionId).update(newData);
+        showToast(`HTML Saved! Auto-counted ${calcTotal} questions.`);
+        closeModal('htmlModal');
+    } catch(err) { showToast(err.message, 'error'); }
+}
+
+// --- CSV EXPORT ---
 function exportCSV() {
-    if (allWorksheets.length === 0) return showToast("No data to export!", "error");
-    let csvContent = "data:text/csv;charset=utf-8,ID,Chapter,Board,Class,Difficulty,Status,Generator\n";
-    allWorksheets.forEach(ws => {
-        csvContent += `${ws.id},"${ws.chapter||''}","${ws.board||''}","${ws.className||''}",${ws.difficulty||''},${ws.status||''},"${ws.generator||''}"\n`;
+    let csv = "ID,Title,Chapter,Board,Class,Difficulty,Total_Q,Status,Generator\n";
+    allWorksheets.forEach(w => {
+        csv += `${w.id},"${w.title||''}","${w.chapter||''}","${w.board||''}","${w.className||''}",${w.difficulty||''},${w.totalQuestions||0},${w.status||''},"${w.generator||''}"\n`;
     });
-    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.href = encodedUri;
-    link.download = "cinephysics_worksheets.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    showToast("📄 CSV Exported Successfully", "info");
+    link.href = encodeURI("data:text/csv;charset=utf-8," + csv);
+    link.download = "worksheets_export.csv";
+    document.body.appendChild(link); link.click(); document.body.removeChild(link);
 }
 </script>
 </body>
