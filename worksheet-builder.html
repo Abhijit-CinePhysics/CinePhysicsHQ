@@ -10,7 +10,7 @@
     </script>   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CinePhysicsHQ AI Teacher Dashboard</title>
+    <title>CinePhysicsHQ AI Teacher Dashboard v2.0</title>
 
     <style>
         :root {
@@ -23,11 +23,13 @@
             --glass-bg: rgba(17, 17, 17, 0.6);
             --glass-border: rgba(212, 160, 23, 0.15);
             --glass-blur: blur(12px);
+            --error-color: #ff4c4c;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background-color: var(--bg-base); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
 
+        /* Navigation & Header */
         nav {
             display: flex; justify-content: center; gap: 2rem; padding: 1.5rem;
             background: rgba(11, 11, 11, 0.9); backdrop-filter: var(--glass-blur);
@@ -37,31 +39,62 @@
         nav a.active { color: var(--gold-bright); }
 
         .hero {
-            min-height: 30vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem;
+            min-height: 25vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 2rem;
             background: linear-gradient(to bottom, rgba(11, 11, 11, 0.7), rgba(11, 11, 11, 1)), url('banner.jpg') center/cover;
             border-bottom: 1px solid var(--glass-border);
         }
 
-        .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
-        .chapter-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; backdrop-filter: var(--glass-blur); }
+        /* Layout & Cards */
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem; }
+        .chapter-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; backdrop-filter: var(--glass-blur); transition: all 0.3s ease; }
         .chapter-card h3 { color: var(--gold-bright); margin-bottom: 1.2rem; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; font-size: 1rem; }
 
-        label { color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; display: block; margin-top: 10px; }
-        input, select, textarea {
-            width: 100%; padding: 0.75rem; margin-top: 5px; background: rgba(0, 0, 0, 0.4);
+        /* Form Elements */
+        label { color: var(--text-secondary); font-size: 0.85rem; font-weight: 600; display: block; margin-top: 10px; margin-bottom: 4px; }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea {
+            width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary); border-radius: 4px;
         }
+        input:focus, select:focus { outline: none; border-color: var(--gold-accent); }
+        
+        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; margin-top: 5px; }
+        .checkbox-label input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; accent-color: var(--gold-accent); }
 
+        /* Grids */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+        
+        /* Scrollable Lists for Multi-Select */
+        .scroll-list { max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px; }
 
+        /* Mode Switcher */
+        .mode-switcher { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
+        .mode-btn { padding: 0.8rem 2rem; border: 1px solid var(--gold-accent); background: transparent; color: var(--text-primary); font-weight: bold; cursor: pointer; border-radius: 30px; transition: 0.3s; }
+        .mode-btn.active { background: var(--gold-accent); color: #000; box-shadow: 0 0 15px rgba(212, 160, 23, 0.4); }
+
+        /* Buttons & Overlays */
         .btn { padding: 0.8rem 1.5rem; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; border: none; width: 100%; }
-        .btn-primary { background: var(--gold-accent); color: #000; font-size: 1rem; margin-top: 20px; box-shadow: 0 0 20px rgba(212, 160, 23, 0.2); }
+        .btn-primary { background: var(--gold-accent); color: #000; font-size: 1rem; margin-top: 10px; margin-bottom: 40px; box-shadow: 0 0 20px rgba(212, 160, 23, 0.2); }
         .btn-primary:hover { background: var(--gold-bright); transform: translateY(-2px); }
 
+        .hidden { display: none !important; }
+        
         .loading-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 1000; flex-direction: column; align-items: center; justify-content: center;
+        }
+
+        /* Validation UI */
+        .validation-msg { color: var(--error-color); font-size: 0.85rem; margin-top: 5px; display: none; }
+        .input-error { border-color: var(--error-color) !important; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .mode-switcher { flex-direction: column; padding: 0 1rem; }
+            .mode-btn { width: 100%; }
         }
     </style>
 </head>
@@ -69,7 +102,7 @@
 
     <div id="loadingOverlay" class="loading-overlay">
         <h2 style="color: var(--gold-bright); margin-bottom: 10px;">CinePhysics AI is generating...</h2>
-        <p style="color: white;">Crafting high-quality physics questions.</p>
+        <p style="color: white;" id="loadingText">Crafting high-quality physics questions.</p>
     </div>
 
     <nav>
@@ -80,294 +113,246 @@
 
     <header class="hero">
         <div class="hero-content">
-            <h1 style="font-size: 2.5rem;">AI Worksheet Builder</h1>
-            <p style="color: var(--gold-accent); letter-spacing: 2px;">PREMIUM TEACHER TOOLS</p>
+            <h1 style="font-size: 2.5rem;">AI Teacher Dashboard</h1>
+            <p style="color: var(--gold-accent); letter-spacing: 2px;">WORKSHEETS & EXAM PAPERS</p>
         </div>
     </header>
 
     <div class="container">
-        <div class="chapter-card">
-            <h3>1. Curriculum</h3>
-            <div class="grid-2">
+        
+        <div class="mode-switcher">
+            <button class="mode-btn active" data-mode="worksheet" onclick="App.UI.setMode('worksheet')">Worksheet Generator</button>
+            <button class="mode-btn" data-mode="exam" onclick="App.UI.setMode('exam')">Exam Paper Generator</button>
+        </div>
+
+        <div id="worksheetView">
+            <div class="chapter-card">
+                <h3>1. Worksheet Curriculum</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>Class</label>
+                        <select id="wsClass" onchange="App.Curriculum.loadWorksheetChapters()">
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Single Chapter</label>
+                        <input list="wsChapterList" id="wsChapter" placeholder="Select Chapter..." onchange="App.Curriculum.loadWorksheetTopics()">
+                        <datalist id="wsChapterList"></datalist>
+                    </div>
+                </div>
+                <label style="margin-top: 15px;">Topics</label>
+                <div class="checkbox-label" style="margin-bottom: 10px;">
+                    <input type="checkbox" id="wsSelectAllTopics" onchange="App.UI.toggleAllCheckboxes('wsTopicsContainer', this.checked)"> 
+                    <span style="color:var(--gold-bright)">Select Entire Chapter</span>
+                </div>
+                <div id="wsTopicsContainer" class="scroll-list">Select a chapter first.</div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>2. Worksheet Generator Settings</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>Worksheet Title</label>
+                        <input type="text" id="wsTitle" placeholder="e.g. Kinematics Practice">
+                    </div>
+                    <div>
+                        <label>Output Mode</label>
+                        <select id="wsOutputMode">
+                            <option value="Student Copy">Student Copy (Questions Only)</option>
+                            <option value="Teacher Copy">Teacher Copy (With Answers)</option>
+                            <option value="Worksheet">Printable Worksheet</option>
+                            <option value="Practice Set">Practice Set (Randomized)</option>
+                            <option value="Question Bank">Continuous Question Bank</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="examView" class="hidden">
+            <div class="chapter-card">
+                <h3>1. School Information</h3>
+                <div class="grid-2">
+                    <div><label>School Name *</label><input type="text" id="exSchoolName" placeholder="e.g. ABC Public School"></div>
+                    <div><label>Academic Session</label><input type="text" id="exSession" placeholder="e.g. 2026-27" value="2026-27"></div>
+                    <div><label>Examination Name *</label><input type="text" id="exExamName" placeholder="e.g. Periodic Test-I"></div>
+                    <div><label>Subject</label><input type="text" id="exSubject" value="Physics"></div>
+                    <div><label>Class (Auto-filled via Curriculum)</label><input type="text" id="exClassDisp" disabled></div>
+                    <div><label>Section (Optional)</label><input type="text" id="exSection" placeholder="e.g. A"></div>
+                    <div><label>Date</label><input type="date" id="exDate"></div>
+                    <div><label>School Motto (Optional)</label><input type="text" id="exMotto" placeholder="e.g. Knowledge is Power"></div>
+                </div>
+                <label style="margin-top: 15px;">Header Elements to Include:</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-label"><input type="checkbox" id="exStudentName" checked> Student Name Blank</label>
+                    <label class="checkbox-label"><input type="checkbox" id="exRollNo" checked> Roll Number Blank</label>
+                    <label class="checkbox-label"><input type="checkbox" id="exInvigilator"> Invigilator Signature</label>
+                    <label class="checkbox-label"><input type="checkbox" id="exPrincipal"> Principal Signature</label>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>2. Exam Curriculum (Multi-Select)</h3>
                 <div>
                     <label>Class</label>
-                    <select id="classSelect" onchange="loadChapters()">
+                    <select id="exClass" onchange="App.Curriculum.loadExamChapters()">
                         <option value="Class 11">Class 11</option>
                         <option value="Class 12">Class 12</option>
                     </select>
                 </div>
-                <div>
-                    <label>Chapter</label>
-                    <input list="chapterList" id="chapterSearch" placeholder="Select Chapter..." onchange="loadTopics()">
-                    <datalist id="chapterList"></datalist>
+                <div class="grid-2" style="margin-top: 15px;">
+                    <div>
+                        <label>Select Chapters</label>
+                        <div id="exChaptersContainer" class="scroll-list"></div>
+                    </div>
+                    <div>
+                        <label>Select Topics</label>
+                        <div class="checkbox-label" style="margin-bottom: 5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                            <input type="checkbox" id="exSelectAllTopics" onchange="App.UI.toggleAllCheckboxes('exTopicsContainer', this.checked)"> 
+                            <span style="color:var(--gold-bright)">Select All Loaded Topics</span>
+                        </div>
+                        <div id="exTopicsContainer" class="scroll-list">Select chapters first.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>3. Paper Details</h3>
+                <div class="grid-2">
+                    <div><label>Paper Title</label><input type="text" id="exPaperTitle" placeholder="e.g. Mid-Term Examination"></div>
+                    <div>
+                        <label>Paper Type</label>
+                        <select id="exPaperType">
+                            <option value="Unit Test">Unit Test</option>
+                            <option value="Periodic Test">Periodic Test</option>
+                            <option value="Half Yearly">Half Yearly</option>
+                            <option value="Annual">Annual</option>
+                            <option value="Pre Board">Pre Board</option>
+                            <option value="Mock Test">Mock Test</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Maximum Marks</label>
+                        <select id="exMaxMarks" onchange="App.UI.handleCustomInput(this, 'exCustomMarks')">
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="70">70</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                        <input type="number" id="exCustomMarks" class="hidden" placeholder="Enter Marks" min="1">
+                    </div>
+                    <div>
+                        <label>Board Standard</label>
+                        <select id="exBoardStandard">
+                            <option value="CBSE">CBSE</option>
+                            <option value="JEE Foundation">JEE Foundation</option>
+                            <option value="State Board">State Board</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Output Mode</label>
+                        <select id="exOutputMode">
+                            <option value="Student Copy">Student Copy</option>
+                            <option value="Teacher Copy">Teacher Copy (With Key)</option>
+                            <option value="Sample Paper">Sample Paper</option>
+                            <option value="Board Pattern Paper">Board Pattern Paper</option>
+                            <option value="Mock Test">Mock Test</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>4. Paper Set Generation & CBSE Design</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>Paper Set</label>
+                        <select id="exPaperSet">
+                            <option value="Single Paper">Single Paper</option>
+                            <option value="Set A Only">Set A Only</option>
+                            <option value="Set A & Set B">Set A & Set B</option>
+                        </select>
+                        <small style="color:var(--text-secondary)">Set A & B creates two distinct but perfectly balanced papers.</small>
+                    </div>
+                    <div>
+                        <label>CBSE Question Design</label>
+                        <div class="checkbox-grid" style="grid-template-columns: 1fr;">
+                            <label class="checkbox-label"><input type="checkbox" id="cbseBlueprint" checked> Latest CBSE Blueprint</label>
+                            <label class="checkbox-label"><input type="checkbox" id="cbseCompetency" checked> Competency Based</label>
+                            <label class="checkbox-label"><input type="checkbox" id="cbseCaseStudy"> Case Study Questions</label>
+                            <label class="checkbox-label"><input type="checkbox" id="cbseInternalChoice"> Internal Choices</label>
+                            <label class="checkbox-label"><input type="checkbox" id="cbseInstructions" checked> Section Wise Instructions</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="chapter-card">
-            <h3>2. Selected Topics</h3>
-            <div id="topicsContainer" style="font-size: 0.85rem; color: var(--text-secondary);">Select a chapter first.</div>
-        </div>
-
-        <div class="chapter-card">
-            <h3>3. Question Distribution</h3>
-            <div class="grid-3">
-                <div><label>MCQ</label><input type="number" id="mcqCount" value="5" min="0"></div>
-                <div><label>A-Reason</label><input type="number" id="arCount" value="2" min="0"></div>
-                <div><label>VSA (2M)</label><input type="number" id="vsaCount" value="0" min="0"></div>
-                <div><label>SA (3M)</label><input type="number" id="saCount" value="3" min="0"></div>
-                <div><label>LA (5M)</label><input type="number" id="laCount" value="1" min="0"></div>
-                <div><label>Numerical</label><input type="number" id="numCount" value="2" min="0"></div>
+            <h3 id="qdTitle">Question Distribution</h3>
+            <div class="grid-4" style="margin-bottom: 15px;">
+                <div><label>MCQ</label><input type="number" id="distMcq" value="5" min="0"></div>
+                <div><label>Assertion-Reason</label><input type="number" id="distAr" value="2" min="0"></div>
+                <div><label>VSA</label><input type="number" id="distVsa" value="0" min="0"></div>
+                <div><label>SA</label><input type="number" id="distSa" value="3" min="0"></div>
+                <div><label>LA</label><input type="number" id="distLa" value="1" min="0"></div>
             </div>
-            <label>Difficulty</label>
-            <select id="difficulty">
-                <option>Basic</option>
-                <option value="Moderate" selected>Moderate</option>
-                <option>Advanced</option>
-                <option>Mixed (Board Level)</option>
-            </select>
-        </div>
-
-        <div class="chapter-card">
-            <h3>4. Exam Paper Generator</h3>
-            <label>Paper Title / Header</label>
-            <input type="text" id="examTitle" placeholder="e.g. Unit Test: Kinematics">
-            <div class="grid-2">
+            
+            <div class="grid-3">
+                <div>
+                    <label>Numerical Weightage</label>
+                    <select id="distNumWeight" onchange="App.UI.handleCustomInput(this, 'distCustomNum')">
+                        <option value="0">0%</option>
+                        <option value="10">10%</option>
+                        <option value="20" selected>20%</option>
+                        <option value="30">30%</option>
+                        <option value="40">40%</option>
+                        <option value="50">50%</option>
+                        <option value="Custom">Custom %</option>
+                    </select>
+                    <input type="number" id="distCustomNum" class="hidden" placeholder="0-100" min="0" max="100">
+                </div>
+                <div>
+                    <label>Difficulty</label>
+                    <select id="distDifficulty">
+                        <option value="Easy">Easy</option>
+                        <option value="Moderate" selected>Moderate</option>
+                        <option value="Difficult">Difficult</option>
+                        <option value="Mixed">Mixed</option>
+                    </select>
+                </div>
                 <div>
                     <label>Time Allowed</label>
-                    <select id="examTime">
-                        <option>45 Mins</option>
-                        <option selected>1 Hour</option>
-                        <option>2 Hours</option>
-                        <option>3 Hours</option>
-                    </select>
-                </div>
-                <div>
-                    <label>Output Mode</label>
-                    <select id="outputMode">
-                        <option value="student">Student Worksheet</option>
-                        <option value="teacher">With Answer Key</option>
+                    <select id="distTime">
+                        <option value="45 Mins">45 Mins</option>
+                        <option value="1 Hour" selected>1 Hour</option>
+                        <option value="2 Hours">2 Hours</option>
+                        <option value="3 Hours">3 Hours</option>
                     </select>
                 </div>
             </div>
         </div>
 
         <div class="chapter-card">
-            <h3>5. Optional Enhancements</h3>
-            <div style="font-size: 0.85rem; color: var(--text-secondary); display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-                <label><input type="checkbox" id="enhNCERT" checked> NCERT Alignment</label>
-                <label><input type="checkbox" id="enhCBSE" checked> CBSE Competency</label>
-                <label><input type="checkbox" id="enhRealLife"> Real-life Apps</label>
-                <label><input type="checkbox" id="enhHOTS"> HOTS Questions</label>
-            </div>
+            <h3>Optional Enhancements</h3>
+            <div class="checkbox-grid" id="enhancementsGrid">
+                </div>
         </div>
 
-        <button class="btn btn-primary" id="btnAISync">✨ Generate AI Worksheet & Export</button>
+        <div id="globalError" class="validation-msg" style="margin-bottom: 15px; font-size: 1rem; text-align: center;"></div>
+        <button class="btn btn-primary" id="btnGenerate" onclick="App.Core.startGeneration()">✨ Generate AI Document & Export</button>
 
     </div>
 
     <script src="chapterData11.js"></script>
     <script src="chapterData12.js"></script>
+    
+    <script src="dashboard.js"></script>
 
-    <script>
-        const chapterDatabase = {
-            "Class 11": typeof class11Data !== 'undefined' ? class11Data : {},
-            "Class 12": typeof class12Data !== 'undefined' ? class12Data : {}
-        };
-
-        function loadChapters() {
-            const list = document.getElementById("chapterList");
-            list.innerHTML = "";
-            const currentClass = document.getElementById("classSelect").value;
-            Object.keys(chapterDatabase[currentClass]).forEach(ch => {
-                let opt = document.createElement("option"); opt.value = ch; list.appendChild(opt);
-            });
-        }
-        
-        function loadTopics() {
-            const container = document.getElementById("topicsContainer");
-            const currentClass = document.getElementById("classSelect").value;
-            const chapter = document.getElementById("chapterSearch").value;
-            const topics = chapterDatabase[currentClass][chapter];
-            container.innerHTML = "";
-            if(!topics) { container.innerHTML = "Select a valid chapter."; return; }
-            topics.forEach(t => {
-                container.innerHTML += `<label style="display:inline-block; margin-right:15px;"><input type="checkbox" class="topicCheckbox" value="${t}" checked> ${t}</label>`;
-            });
-        }
-
-        function generatePrompt() {
-            const topics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value).join(", ");
-            const mcq = document.getElementById("mcqCount").value;
-            const ar = document.getElementById("arCount").value;
-            const vsa = document.getElementById("vsaCount").value;
-            const sa = document.getElementById("saCount").value;
-            const la = document.getElementById("laCount").value;
-            const num = document.getElementById("numCount").value;
-            
-            const mode = document.getElementById("outputMode").value;
-            const title = document.getElementById("examTitle").value || "Physics Worksheet";
-            const time = document.getElementById("examTime").value;
-
-            let prompt = `Act as an expert Physics educator. Create questions for a test based on the following context:
-            Chapter: ${document.getElementById("chapterSearch").value}.
-            Topics: ${topics}.
-            Difficulty: ${document.getElementById("difficulty").value}.
-            Time Allowed: ${time}.
-
-            DISTRIBUTION:
-            - ${mcq} Multiple Choice Questions
-            - ${ar} Assertion-Reason Questions
-            - ${vsa} Very Short Answer (2 Marks)
-            - ${sa} Short Answer (3 Marks)
-            - ${la} Long Answer (5 Marks)
-            - ${num} Numericals
-            
-            ${document.getElementById("enhNCERT").checked ? "- Ensure NCERT alignment." : ""}
-            ${document.getElementById("enhCBSE").checked ? "- Focus on CBSE Competency-based patterns." : ""}
-            ${document.getElementById("enhHOTS").checked ? "- Include 1-2 HOTS questions." : ""}
-
-            LAYOUT RULES (MANDATORY)
-            1. Never use <br> or multiple blank lines for spacing.
-            2. Every question must use exactly this structure:
-
-            <div class="question">
-                <span class="q-number">1.</span>
-                <div class="q-content">
-                    <p>Question text...</p>
-                    <ol class="options" type="a">
-                        <li>Option 1</li>
-                        <li>Option 2</li>
-                    </ol>
-                </div>
-            </div>
-
-            3. Question number and question text must appear on the same horizontal line.
-            4. Never place the question number on its own line.
-            5. Use only <p> tags inside .q-content.
-            6. Each question must have only one outer .question div.
-            7. Do not insert empty paragraphs.
-            8. Do not insert empty divs.
-            9. Do not use inline styles.
-            10. Keep spacing compact and suitable for A4 printable worksheets.
-
-            Additional Rules:
-            1. Section Titles: Wrap in <h3 class="section-title">Section Name</h3>
-            2. Units: Use m s<sup>-1</sup>, J s<sup>-1</sup>, etc. (No slashes).
-            ${mode === "teacher" ? "3. At the very end, add a <hr> and an <h3 class=\"section-title\">Answer Key</h3> with brief solutions." : ""}
-
-            IMPORTANT CONTENT RULES (MANDATORY):
-            - DO NOT generate the Worksheet Title, Chapter Name, Topic List, Difficulty, Time Allowed, Maximum Marks, or Subject details.
-            - Start directly with the first section header (e.g., <h3 class="section-title">Section A: Multiple Choice Questions</h3>).
-
-            IMPORTANT MATHEMATICAL FORMATTING RULES (MANDATORY)
-
-            1. Return ONLY valid HTML.
-            2. Never use LaTeX notation.
-            3. Never use Markdown math.
-            4. Never use $, $$, \\frac, \\Delta, \\theta, \\alpha, \\beta, \\mu, \\lambda, or any LaTeX commands.
-            5. Never wrap equations in code blocks.
-
-            Use HTML tags and entities only:
-            Superscripts: x<sup>2</sup>, 10<sup>-3</sup>
-            Subscripts: v<sub>0</sub>, F<sub>net</sub>
-            Greek Symbols: &Delta;, &theta;, &alpha;
-            Vectors: <strong>F</strong>, <strong>v</strong>
-            Units: m s<sup>-1</sup>, kg m<sup>2</sup> s<sup>-2</sup>
-            Fractions: (1/2)mv<sup>2</sup>, (Fd)/t
-            Dimensional Formulae: [M L T<sup>-2</sup>]
-            Scientific Notation: 6.63 &times; 10<sup>-34</sup>
-
-            All mathematical expressions, equations, units, symbols, and dimensional formulae must be valid HTML and render correctly in a browser without MathJax.`;
-            
-            return prompt;
-        }
-
-        async function startAI() {
-            const overlay = document.getElementById("loadingOverlay");
-            const chapter = document.getElementById("chapterSearch").value;
-            
-            if(!chapter) {
-                alert("Please select a chapter first!");
-                return;
-            }
-            
-            overlay.style.display = "flex";
-
-            const BACKEND_URL = "https://cinephysics-api.vercel.app/api/generate";
-
-            try {
-                console.log("Sending request to AI...");
-                
-                // --- NEW: Gather detailed data for Firestore ---
-                const selectedTopics = [...document.querySelectorAll(".topicCheckbox:checked")].map(cb => cb.value);
-                const mcq = parseInt(document.getElementById("mcqCount").value) || 0;
-                const ar = parseInt(document.getElementById("arCount").value) || 0;
-                const vsa = parseInt(document.getElementById("vsaCount").value) || 0;
-                const sa = parseInt(document.getElementById("saCount").value) || 0;
-                const la = parseInt(document.getElementById("laCount").value) || 0;
-                const num = parseInt(document.getElementById("numCount").value) || 0;
-                const totalMarks = (mcq * 1) + (ar * 1) + (vsa * 2) + (sa * 3) + (la * 5) + (num * 3);
-                
-                // Construct the highly detailed payload
-                const payload = {
-                    prompt: generatePrompt(),
-                    title: document.getElementById("examTitle").value || "Untitled Worksheet",
-                    className: document.getElementById("classSelect").value,
-                    chapter: chapter,
-                    topics: selectedTopics,
-                    difficulty: document.getElementById("difficulty").value,
-                    worksheetType: "Worksheet", 
-                    board: document.getElementById("enhCBSE").checked ? "CBSE" : "State Board",
-                    language: "English",
-                    outputMode: document.getElementById("outputMode").value,
-                    distribution: {
-                        mcq,
-                        assertionReason: ar,
-                        vsa,
-                        sa,
-                        la,
-                        numerical: num,
-                        totalMarks
-                    }
-                };
-
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Backend Error");
-                }
-
-                const data = await response.json();
-                
-                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                    let htmlContent = data.candidates[0].content.parts[0].text;
-                    htmlContent = htmlContent.replace(/```html/g, "").replace(/```/g, "").trim();
-
-                    localStorage.setItem("cp_ai_html", htmlContent);
-                    localStorage.setItem("cp_ai_topic", document.getElementById("examTitle").value || document.getElementById("chapterSearch").value);
-                    localStorage.setItem("cp_ai_time", document.getElementById("examTime").value);
-                    localStorage.setItem("cp_ai_marks", totalMarks); 
-
-                    window.location.href = "./worksheets/import.html";
-                } else {
-                    throw new Error("The AI response was empty or malformed.");
-                }
-
-            } catch (error) {
-                console.error("AI Fetch Error:", error);
-                alert("AI Error: " + error.message);
-                overlay.style.display = "none";
-            }
-        }
-        
-        document.getElementById("btnAISync").onclick = startAI;
-        window.onload = loadChapters;
-    </script>
 </body>
 </html>
