@@ -6,7 +6,6 @@
     <title>CinePhysicsHQ Exporter</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
     <script>
         window.MathJax = {
             tex: {
@@ -22,213 +21,587 @@
         :root {
             --cp-bg: #050505; --cp-panel: #0f0f0f; --cp-border: #222222;
             --cp-gold: #d8a435; --cp-pdf-dark: #0f172a; --cp-pdf-blue: #00bfff;
+            --cp-lesson-green: #059669;
         }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--cp-bg); color: #fff; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .panel { background: var(--cp-panel); border: 1px solid var(--cp-border); padding: 20px; border-radius: 8px; width: 100%; max-width: 1000px; margin-bottom: 20px; }
-        .btn { padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; text-transform: uppercase; border: none; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--cp-bg); 
+            color: #fff; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0;
+        }
+        .panel { 
+            background: var(--cp-panel); 
+            border: 1px solid var(--cp-border); 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 100%; 
+            max-width: 1000px; 
+            margin-bottom: 20px; 
+            box-sizing: border-box;
+        }
+        .btn { 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border: none; 
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
         
-        /* PDF Preview Container */
-        .print-container { background: white; color: black; width: 100%; max-width: 800px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        #previewAreaWrapper { position: relative; min-height: 1000px; }
+        /* Badge for Auto-Detected Document Type */
+        #docTypeBadge {
+            display: inline-block;
+            background: #27272a;
+            color: var(--cp-gold);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            border: 1px solid #3f3f46;
+        }
+
+        /* Layout Containers for Single & Split View */
+        .preview-flex-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: center;
+            gap: 30px;
+        }
+        @media (min-width: 1400px) {
+            .preview-flex-container.dual-mode {
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                max-width: 1660px;
+            }
+            .preview-flex-container.dual-mode .set-preview-col {
+                flex: 1;
+                max-width: 800px;
+            }
+        }
+
+        .set-preview-col {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Independent Toolbar Above Each Preview */
+        .set-controls-bar {
+            width: 100%;
+            background: #18181b;
+            border: 1px solid var(--cp-border);
+            padding: 10px 15px;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
+        .set-label { font-weight: bold; color: var(--cp-gold); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px; }
+        .control-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .control-buttons button {
+            background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46;
+            padding: 5px 10px; border-radius: 4px; font-size: 0.75rem;
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .control-buttons button:hover { background: var(--cp-gold); color: #000; border-color: var(--cp-gold); }
+
+        /* Fullscreen Customization */
+        .set-preview-col:fullscreen, .set-preview-col:-webkit-full-screen {
+            background: var(--cp-bg); padding: 20px; overflow-y: auto; max-width: none;
+        }
+
+        /* PDF Preview Shell */
+        .print-container { 
+            background: white; color: black; width: 100%; max-width: 800px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8); transition: transform 0.2s ease-in-out;
+            transform-origin: top center;
+        }
+        .previewAreaWrapper { position: relative; min-height: 1000px; }
         .banner { width: 100%; display: block; }
-        .title-bar { background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue)); color: white; padding: 15px 30px; font-size: 22px; font-weight: bold; }
         
-        #previewArea { padding: 40px; position: relative; z-index: 2; }
-        .meta-box { display: flex; justify-content: space-between; background: #f1f5f9; color: #1e293b; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
+        .title-bar { background: linear-gradient(90deg, var(--cp-pdf-dark), var(--cp-pdf-blue)); color: white; padding: 15px 30px; font-size: 22px; font-weight: bold; }
+        .title-bar.lesson-mode { background: linear-gradient(90deg, #064e3b, var(--cp-lesson-green)); }
+        
+        .previewArea { padding: 40px; position: relative; z-index: 2; }
+        
+        /* Versatile Metadata Box (Supports Worksheets & Lesson Plans) */
+        .meta-box { background: #f8fafc; color: #1e293b; padding: 15px; border: 1px solid #cbd5e1; margin-bottom: 25px; font-size: 14px; }
+        .meta-grid-standard { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .meta-grid-lesson { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px; }
+        .meta-grid-lesson div { border-bottom: 1px dashed #e2e8f0; padding-bottom: 4px; }
         
         .question-block { page-break-inside: avoid; margin-bottom: 25px; }
         .question-block h4 { margin-bottom: 5px; color: #1e293b; }
         
-        #dynamicContent, #dynamicContent * { color: #000 !important; }
+        /* Universal Text Formatting for White Paper */
+        .dynamicContent, .dynamicContent * { color: #000 !important; }
         
-        /* Keep watermark in DOM for jsPDF to read, but apply opacity here for the web preview */
+        /* Lesson Plan Specific Table & Timeline Formatting */
+        .dynamicContent table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; page-break-inside: avoid; }
+        .dynamicContent th, .dynamicContent td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: left; }
+        .dynamicContent th { background-color: #f1f5f9; font-weight: bold; color: #0f172a !important; }
+        .dynamicContent tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .dynamicContent h2, .dynamicContent h3 { color: #0f172a !important; border-bottom: 2px solid #e2e8f0; padding-bottom: 5px; margin-top: 25px; }
+        .dynamicContent ul, .dynamicContent ol { padding-left: 20px; line-height: 1.6; }
+        .dynamicContent li { margin-bottom: 6px; }
+
+        /* Watermark styling */
         .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; opacity: 0.015; pointer-events: none; z-index: 1; }
+
+        /* Print Media Styles */
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .panel, .set-controls-bar { display: none !important; }
+            .preview-flex-container { display: block !important; width: 100% !important; max-width: none !important; }
+            .set-preview-col { max-width: 100% !important; width: 100% !important; display: block !important; }
+            .print-container { box-shadow: none !important; width: 100% !important; max-width: none !important; transform: none !important; margin: 0 !important; }
+            
+            body.print-only-A #colB { display: none !important; }
+            body.print-only-B #colA { display: none !important; }
+            body.print-both #colB { page-break-before: always; break-before: page; }
+        }
     </style>
 </head>
 <body>
 
     <div class="panel">
-        <h2 style="color: var(--cp-gold); margin-bottom: 10px;">PDF Export Preview</h2>
-        <p style="font-size: 0.8rem; color: #888;">Review your AI generated worksheet. Click Download to save as PDF.</p>
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
+        <div id="docTypeBadge">Detecting Document Type...</div>
+        <h2 style="color: var(--cp-gold); margin: 0 0 10px 0;">CinePhysics Document Studio</h2>
+        <p style="font-size: 0.8rem; color: #888; margin-top: 0;">Review your generated document. Click Download to export a classroom-ready PDF.</p>
+        
+        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn" style="background: var(--cp-gold); color: #000;" onclick="exportPDF()">Download PDF</button>
             <button class="btn" style="background: transparent; color: #888; border: 1px solid #444;" onclick="window.location.href='../worksheet-builder.html'">Back to Builder</button>
         </div>
-    </div>
 
-    <div class="print-container">
-        <div id="previewAreaWrapper">
-            <img src="../logo.png" class="watermark" id="wmImage">
-            <img src="../banner.jpg" class="banner">
-            <div class="title-bar" id="pdfTitle">CinePhysics Assessment</div>
-            
-            <div id="previewArea">
-                <div class="meta-box">
-                    <div><strong>Subject:</strong> Physics</div>
-                    <div><strong>Time:</strong> <span id="pdfTime">--</span></div>
-                    <div><strong>Max Marks:</strong> <span id="pdfMarks">--</span></div>
-                </div>
-                
-                <div id="dynamicContent"></div>
+        <div id="combinedControls" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--cp-border);">
+            <div style="color: var(--cp-gold); font-size: 0.85rem; font-weight: bold; margin-bottom: 10px; text-transform: uppercase;">Dual Set Exam Detected — Combined Actions:</div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn" style="background: var(--cp-pdf-blue); color: #000; font-size: 0.8rem;" onclick="exportCombinedPDF()">Download Combined PDF (Set A + Set B)</button>
+                <button class="btn" style="background: #e2e8f0; color: #0f172a; font-size: 0.8rem;" onclick="printSet('BOTH')">Print Both</button>
             </div>
         </div>
     </div>
 
+    <div class="preview-flex-container" id="previewContainerWrapper">
+        
+        <div class="set-preview-col" id="colA">
+            <div class="set-controls-bar" id="controlsA" style="display: none;">
+                <span class="set-label" id="labelA">Preview</span>
+                <div class="control-buttons">
+                    <button onclick="exportSingle('A')">Download PDF</button>
+                    <button onclick="printSet('A')">Print</button>
+                    <button onclick="zoomSet('A', 0.1)">Zoom +</button>
+                    <button onclick="zoomSet('A', -0.1)">Zoom -</button>
+                    <button onclick="toggleFullScreen('colA')">Full Screen</button>
+                </div>
+            </div>
+            
+            <div class="print-container" id="printContainerA">
+                <div class="previewAreaWrapper" id="previewAreaWrapperA">
+                    <img src="../logo.png" class="watermark" id="wmImageA">
+                    <img src="../banner.jpg" class="banner">
+                    <div class="title-bar" id="pdfTitleA">CinePhysics Assessment</div>
+                    
+                    <div class="previewArea">
+                        <div class="meta-box" id="metaBoxA"></div>
+                        <div id="dynamicContentA" class="dynamicContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="set-preview-col" id="colB" style="display: none;">
+            <div class="set-controls-bar" id="controlsB">
+                <span class="set-label">Preview — Set B</span>
+                <div class="control-buttons">
+                    <button onclick="exportSingle('B')">Download PDF</button>
+                    <button onclick="printSet('B')">Print</button>
+                    <button onclick="zoomSet('B', 0.1)">Zoom +</button>
+                    <button onclick="zoomSet('B', -0.1)">Zoom -</button>
+                    <button onclick="toggleFullScreen('colB')">Full Screen</button>
+                </div>
+            </div>
+            
+            <div class="print-container" id="printContainerB">
+                <div class="previewAreaWrapper" id="previewAreaWrapperB">
+                    <img src="../logo.png" class="watermark" id="wmImageB">
+                    <img src="../banner.jpg" class="banner">
+                    <div class="title-bar" id="pdfTitleB">CinePhysics Assessment</div>
+                    
+                    <div class="previewArea">
+                        <div class="meta-box" id="metaBoxB"></div>
+                        <div id="dynamicContentB" class="dynamicContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
     <script>
+        // Global state tracking
+        window.isDualSetMode = false;
+        window.currentDocType = 'WORKSHEET';
+        const zoomStates = { A: 1.0, B: 1.0 };
+
         // ---------------------------------------------------------
-        // Mode 1: Load from Local Storage (Builder Preview)
+        // 1. Automatic Document Type Detector
+        // ---------------------------------------------------------
+        function detectDocumentType(htmlString) {
+            const text = (htmlString || "").replace(/<[^>]*>?/gm, ' ');
+            
+            // Check semantic keywords in order of specificity
+            if (/Lesson Plan|Learning Objectives|Teaching Methodology|Detailed Teaching Procedure|Prerequisite Knowledge/i.test(text)) {
+                return 'LESSON_PLAN';
+            } else if (/Question Bank|Item Bank|Question Pool/i.test(text)) {
+                return 'QUESTION_BANK';
+            } else if (/Exam|Examination|Test Paper|Midterm|Final Assessment/i.test(text)) {
+                return 'EXAM_PAPER';
+            }
+            return 'WORKSHEET';
+        }
+
+        // ---------------------------------------------------------
+        // 2. Core Routing & Rendering Layer
+        // ---------------------------------------------------------
+        function processAndRenderWorksheet(htmlString, defaultMeta) {
+            // Sanitize text color for white paper background
+            let cleanedHtml = (htmlString || "")
+                .replace(/color:\s*white/gi, "color:black")
+                .replace(/color:\s*#fff/gi, "color:black")
+                .replace(/color:\s*#ffffff/gi, "color:black");
+
+            // Automatically detect document type
+            window.currentDocType = detectDocumentType(cleanedHtml);
+            updateDocTypeBadge(window.currentDocType);
+
+            // Parse into temporary DOM for semantic inspection
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cleanedHtml, 'text/html');
+            const body = doc.body;
+
+            // Check for Dual Set Exam Papers/Worksheets
+            const setARegex = /(?:^|\b)(?:Worksheet|Paper|Exam|Test)?\s*[-–—:]*\s*Set\s*A(?:\b|$)/i;
+            const setBRegex = /(?:^|\b)(?:Worksheet|Paper|Exam|Test)?\s*[-–—:]*\s*Set\s*B(?:\b|$)/i;
+            let nodeA = null, nodeB = null;
+
+            const candidates = body.querySelectorAll('h1, h2, h3, h4, h5, h6, strong, b, p, div, span');
+            for (let el of candidates) {
+                if (el.children.length === 0 || el.tagName.match(/^H[1-6]$/i)) {
+                    const txt = el.textContent.trim();
+                    if (txt.length < 60) {
+                        if (!nodeA && setARegex.test(txt)) nodeA = el;
+                        if (!nodeB && setBRegex.test(txt)) nodeB = el;
+                    }
+                }
+            }
+
+            // Route Layout based on Document Type & Sets
+            if (window.currentDocType !== 'LESSON_PLAN' && nodeA && nodeB) {
+                // DUAL SET MODE (Worksheet / Exam)
+                window.isDualSetMode = true;
+                let ancestor = nodeA.parentNode;
+                while (ancestor && !ancestor.contains(nodeB)) ancestor = ancestor.parentNode;
+                if (!ancestor || ancestor === doc.documentElement) ancestor = body;
+
+                const setANodes = [], setBNodes = [];
+                let currentSet = 'A';
+
+                for (let child of ancestor.children) {
+                    if (child === nodeB || child.contains(nodeB)) currentSet = 'B';
+                    else if (child === nodeA || child.contains(nodeA)) currentSet = 'A';
+                    
+                    if (currentSet === 'A') setANodes.push(child.outerHTML);
+                    else setBNodes.push(child.outerHTML);
+                }
+
+                const contentA = setANodes.join(''), contentB = setBNodes.join('');
+                const metaA = extractMetadata(contentA, defaultMeta);
+                const metaB = extractMetadata(contentB, defaultMeta);
+
+                document.getElementById('previewContainerWrapper').classList.add('dual-mode');
+                document.getElementById('combinedControls').style.display = 'block';
+                document.getElementById('controlsA').style.display = 'flex';
+                document.getElementById('colB').style.display = 'flex';
+                document.getElementById('labelA').innerText = "Preview — Set A";
+
+                populatePreview('A', contentA, metaA);
+                populatePreview('B', contentB, metaB);
+
+            } else {
+                // SINGLE DOCUMENT MODE (Lesson Plan, Single Worksheet, Question Bank)
+                window.isDualSetMode = false;
+                document.getElementById('previewContainerWrapper').classList.remove('dual-mode');
+                document.getElementById('combinedControls').style.display = 'none';
+                document.getElementById('controlsA').style.display = 'none';
+                document.getElementById('colB').style.display = 'none';
+
+                const meta = extractMetadata(cleanedHtml, defaultMeta);
+                populatePreview('A', cleanedHtml, meta);
+            }
+
+            // Trigger MathJax Typesetting
+            if (window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('previewContainerWrapper')])
+                    .then(() => console.log('MathJax rendered equations successfully.'))
+                    .catch((err) => console.error('MathJax error:', err.message));
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 3. Dynamic Metadata Extraction & UI Injection
+        // ---------------------------------------------------------
+        function extractMetadata(htmlContent, defaultMeta) {
+            const temp = document.createElement('div');
+            temp.innerHTML = htmlContent;
+            const text = temp.textContent;
+            
+            const match = (regex) => {
+                const res = text.match(regex);
+                return res ? res[1].trim() : null;
+            };
+
+            return {
+                title: match(/(?:Lesson Title|Examination|Title)\s*:\s*([^|\n<]+)/i) || defaultMeta.title,
+                subject: match(/Subject\s*:\s*([^|\n<]+)/i) || defaultMeta.subject,
+                time: match(/(?:Time|Duration|Period Duration)\s*:\s*([^|\n<]+)/i) || defaultMeta.time,
+                marks: match(/(?:Max(?:imum)?|Total)?\s*Marks\s*:\s*(\d+)/i) || defaultMeta.marks,
+                // Lesson Plan Specific Fields
+                class: match(/(?:Class|Grade|Standard)\s*:\s*([^|\n<]+)/i) || "11th / 12th",
+                chapter: match(/Chapter\s*:\s*([^|\n<]+)/i) || "General Physics",
+                teacher: match(/Teacher(?: Name)?\s*:\s*([^|\n<]+)/i) || "Faculty",
+                date: match(/(?:Teaching )?Date\s*:\s*([^|\n<]+)/i) || new Date().toLocaleDateString(),
+                board: match(/(?:Board|Curriculum)\s*:\s*([^|\n<]+)/i) || "CBSE / State Board"
+            };
+        }
+
+        function populatePreview(set, htmlContent, meta) {
+            const titleBar = document.getElementById(`pdfTitle${set}`);
+            const metaBox = document.getElementById(`metaBox${set}`);
+            const contentArea = document.getElementById(`dynamicContent${set}`);
+
+            contentArea.innerHTML = htmlContent || "<p>No content available.</p>";
+            titleBar.innerText = meta.title || "CinePhysics Assessment";
+
+            // Adapt Header & Metadata Box based on auto-detected doc type
+            if (window.currentDocType === 'LESSON_PLAN') {
+                titleBar.classList.add('lesson-mode');
+                metaBox.innerHTML = `
+                    <div class="meta-grid-lesson">
+                        <div><strong>Teacher:</strong> ${meta.teacher}</div>
+                        <div><strong>Teaching Date:</strong> ${meta.date}</div>
+                        <div><strong>Class:</strong> ${meta.class}</div>
+                        <div><strong>Duration:</strong> ${meta.time}</div>
+                        <div><strong>Chapter:</strong> ${meta.chapter}</div>
+                        <div><strong>Board:</strong> ${meta.board}</div>
+                    </div>
+                `;
+            } else {
+                titleBar.classList.remove('lesson-mode');
+                metaBox.innerHTML = `
+                    <div class="meta-grid-standard">
+                        <div><strong>Subject:</strong> ${meta.subject}</div>
+                        <div><strong>Time:</strong> ${meta.time}</div>
+                        <div><strong>Max Marks:</strong> ${meta.marks}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function updateDocTypeBadge(type) {
+            const badge = document.getElementById('docTypeBadge');
+            const map = {
+                'LESSON_PLAN': '📘 Auto-Detected: Lesson Plan',
+                'QUESTION_BANK': '📚 Auto-Detected: Question Bank',
+                'EXAM_PAPER': '📝 Auto-Detected: Exam Paper',
+                'WORKSHEET': '📄 Auto-Detected: Worksheet'
+            };
+            badge.innerText = map[type] || '📄 Auto-Detected: Document';
+        }
+
+        // ---------------------------------------------------------
+        // 4. Data Fetchers (localStorage & API)
         // ---------------------------------------------------------
         function loadFromLocalStorage() {
-            let html = localStorage.getItem("cp_ai_html");
-            const topic = localStorage.getItem("cp_ai_topic") || "Physics Worksheet";
-            const time = localStorage.getItem("cp_ai_time") || "60 Minutes";
-            const marks = localStorage.getItem("cp_ai_marks") || "0";
-
-            if(html) {
-                html = html.replace(/color:\s*white/gi, "color:black")
-                           .replace(/color:\s*#fff/gi, "color:black")
-                           .replace(/color:\s*#ffffff/gi, "color:black");
-
-                document.getElementById("dynamicContent").innerHTML = html;
-                document.getElementById("pdfTitle").innerText = topic;
-                document.getElementById("pdfTime").innerText = time;
-                document.getElementById("pdfMarks").innerText = marks;
-                
-                if (window.MathJax) {
-                    MathJax.typesetPromise([document.getElementById('dynamicContent')])
-                        .then(() => console.log('MathJax successfully rendered the equations.'))
-                        .catch((err) => console.error('MathJax rendering failed: ', err.message));
-                }
-            } else {
-                document.getElementById("dynamicContent").innerHTML = `<p>No content found in storage. Please generate from the builder.</p>`;
-            }
+            const html = localStorage.getItem("cp_ai_html");
+            const defaultMeta = {
+                title: localStorage.getItem("cp_ai_topic") || "Physics Document",
+                subject: "Physics",
+                time: localStorage.getItem("cp_ai_time") || "60 Minutes",
+                marks: localStorage.getItem("cp_ai_marks") || "100"
+            };
+            if (html) processAndRenderWorksheet(html, defaultMeta);
+            else document.getElementById("dynamicContentA").innerHTML = `<p>No content found in storage. Please generate from the builder.</p>`;
         }
 
-        // ---------------------------------------------------------
-        // Mode 2: Load from API (Library Preview)
-        // ---------------------------------------------------------
         async function loadFromAPI(id) {
             try {
-                // 1. Fetch the data from your new API endpoint
                 const res = await fetch(`https://cinephysics-api.vercel.app/api/worksheet?id=${id}`);
-                
-                // 2. Check if the response is successful and parse API error if not
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.error || "Unable to load worksheet.");
-                }
-
-                // 3. Parse the JSON response
+                if (!res.ok) throw new Error("Unable to load worksheet.");
                 const data = await res.json();
-
-                // 4. Ensure data exists before mapping
+                
                 if (data) {
-                    let html = data.worksheetHTML || "";
-                    
-                    // Keep existing color override logic for the white print preview
-                    html = html.replace(/color:\s*white/gi, "color:black")
-                               .replace(/color:\s*#fff/gi, "color:black")
-                               .replace(/color:\s*#ffffff/gi, "color:black");
-
-                    // 5. Populate the DOM elements with the API data
-                    document.getElementById("pdfTitle").innerText = data.title || "Physics Worksheet";
-                    document.getElementById("pdfTime").innerText = data.time || "--"; 
-                    document.getElementById("pdfMarks").innerText = data.distribution?.totalMarks ?? "--";
-                    document.getElementById("dynamicContent").innerHTML = html;
-
-                    // 6. Trigger MathJax to format the equations
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([document.getElementById('dynamicContent')])
-                            .then(() => console.log('MathJax successfully rendered the equations from API.'))
-                            .catch((err) => console.error('MathJax rendering failed: ', err.message));
-                    }
+                    const defaultMeta = {
+                        title: data.title || "Physics Document",
+                        subject: data.subject || "Physics",
+                        time: data.time || "--",
+                        marks: data.distribution?.totalMarks ?? "--"
+                    };
+                    processAndRenderWorksheet(data.worksheetHTML || "", defaultMeta);
                 } else {
-                    document.getElementById("dynamicContent").innerHTML = "Worksheet not found.";
+                    document.getElementById("dynamicContentA").innerHTML = "Document not found.";
                 }
             } catch (error) {
-                console.error("API Loading Error:", error);
-                document.getElementById("dynamicContent").innerHTML = "Unable to load worksheet.";
+                console.error("API Error:", error);
+                document.getElementById("dynamicContentA").innerHTML = "Unable to load document.";
             }
         }
 
-        // ---------------------------------------------------------
-        // Initialization & Routing
-        // ---------------------------------------------------------
         window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
-
-            if (id) {
-                loadFromAPI(id);
-            } else {
-                loadFromLocalStorage();
-            }
+            const id = new URLSearchParams(window.location.search).get('id');
+            if (id) loadFromAPI(id);
+            else loadFromLocalStorage();
         };
 
         // ---------------------------------------------------------
-        // Export PDF (Untouched as requested)
+        // 5. UI Controls: Zoom, Fullscreen & Print
         // ---------------------------------------------------------
-        function exportPDF() {
-            const element = document.getElementById("previewAreaWrapper");
-            const wmImg = document.getElementById("wmImage");
-            
-            // 1. Hide the CSS watermark so it doesn't double print
-            wmImg.style.display = 'none';
+        function zoomSet(set, delta) {
+            const el = document.getElementById(`printContainer${set}`);
+            if (!el) return;
+            zoomStates[set] = Math.min(Math.max(0.5, zoomStates[set] + delta), 1.8);
+            el.style.transform = `scale(${zoomStates[set]})`;
+            const heightDiff = (el.offsetHeight * zoomStates[set]) - el.offsetHeight;
+            el.style.marginBottom = `${heightDiff}px`;
+        }
 
-            // 2. Prepare the watermark with 0.015 opacity onto a pure Canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = wmImg.naturalWidth || 800;
-            canvas.height = wmImg.naturalHeight || 800;
-            const ctx = canvas.getContext('2d');
-            ctx.globalAlpha = 0.015; // Set exact opacity here
-            ctx.drawImage(wmImg, 0, 0, canvas.width, canvas.height);
-            const imgData = canvas.toDataURL('image/png');
+        function toggleFullScreen(colId) {
+            const el = document.getElementById(colId);
+            if (!el) return;
+            if (!document.fullscreenElement) {
+                if (el.requestFullscreen) el.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
 
-            const opt = {
-                margin: [0, 0, 15, 0], // Added 15mm bottom margin so questions don't overlap footer
-                filename: 'CinePhysics_Worksheet.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], avoid: '.question-block' }
+        function printSet(mode) {
+            document.body.className = '';
+            if (mode === 'A') document.body.classList.add('print-only-A');
+            else if (mode === 'B') document.body.classList.add('print-only-B');
+            else if (mode === 'BOTH') document.body.classList.add('print-both');
+            window.print();
+        }
+
+        // ---------------------------------------------------------
+        // 6. Untouched Core PDF Export Engine
+        // ---------------------------------------------------------
+        function runPDFExport(targetElement, filename) {
+            return new Promise((resolve) => {
+                const wmImg = targetElement.querySelector(".watermark") || document.getElementById("wmImageA");
+                const watermarks = targetElement.querySelectorAll(".watermark");
+                watermarks.forEach(wm => wm.style.display = 'none');
+
+                const canvas = document.createElement('canvas');
+                canvas.width = wmImg.naturalWidth || 800;
+                canvas.height = wmImg.naturalHeight || 800;
+                const ctx = canvas.getContext('2d');
+                ctx.globalAlpha = 0.015;
+                ctx.drawImage(wmImg, 0, 0, canvas.width, canvas.height);
+                const imgData = canvas.toDataURL('image/png');
+
+                const opt = {
+                    margin: [0, 0, 15, 0],
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'], avoid: '.question-block, tr, h2, h3' }
+                };
+
+                html2pdf().set(opt).from(targetElement).toPdf().get('pdf').then(function (pdf) {
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const wmWidth = 140;
+                    const wmHeight = (canvas.height / canvas.width) * wmWidth;
+                    const wmX = (pageWidth - wmWidth) / 2;
+                    const wmY = (pageHeight - wmHeight) / 2;
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.addImage(imgData, 'PNG', wmX, wmY, wmWidth, wmHeight);
+                        
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(128, 128, 128);
+                        const footerText = "Abhijit Singh | CinePhysicsHQ";
+                        const textWidth = pdf.getStringUnitWidth(footerText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                        pdf.text(footerText, (pageWidth - textWidth) / 2, pageHeight - 8);
+                        
+                        const pageText = `Page ${i} of ${totalPages}`;
+                        const pw = pdf.getStringUnitWidth(pageText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
+                        pdf.text(pageText, pageWidth - pw - 10, pageHeight - 8); 
+                    }
+                }).save().then(() => {
+                    watermarks.forEach(wm => wm.style.display = 'block');
+                    resolve();
+                });
+            });
+        }
+
+        // Helper to generate context-aware filenames
+        function getDynamicFilename(suffix = "") {
+            const map = {
+                'LESSON_PLAN': 'CinePhysics_Lesson_Plan',
+                'QUESTION_BANK': 'CinePhysics_Question_Bank',
+                'EXAM_PAPER': 'CinePhysics_Exam_Paper',
+                'WORKSHEET': 'CinePhysics_Worksheet'
             };
+            const base = map[window.currentDocType] || 'CinePhysics_Document';
+            return `${base}${suffix}.pdf`;
+        }
 
-            // 3. Generate PDF and loop through pages to add repeating elements
-            html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
-                const totalPages = pdf.internal.getNumberOfPages();
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
+        function exportPDF() {
+            if (window.isDualSetMode) exportCombinedPDF();
+            else runPDFExport(document.getElementById("previewAreaWrapperA"), getDynamicFilename());
+        }
 
-                // Calculate watermark dimensions (140mm wide)
-                const wmWidth = 140;
-                const wmHeight = (canvas.height / canvas.width) * wmWidth;
-                const wmX = (pageWidth - wmWidth) / 2;
-                const wmY = (pageHeight - wmHeight) / 2;
+        function exportSingle(set) {
+            runPDFExport(document.getElementById(`previewAreaWrapper${set}`), getDynamicFilename(`_Set_${set}`));
+        }
 
-                for (let i = 1; i <= totalPages; i++) {
-                    pdf.setPage(i);
-                    
-                    // Add Repeating Watermark Image
-                    pdf.addImage(imgData, 'PNG', wmX, wmY, wmWidth, wmHeight);
-                    
-                    // Add Repeating Footer Text
-                    pdf.setFontSize(10);
-                    pdf.setTextColor(128, 128, 128); // Gray color
-                    const footerText = "Abhijit Singh | CinePhysicsHQ";
-                    
-                    // Center the footer text
-                    const textWidth = pdf.getStringUnitWidth(footerText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    const textX = (pageWidth - textWidth) / 2;
-                    pdf.text(footerText, textX, pageHeight - 8); // 8mm from bottom edge
-                    
-                    // Optional: Add Page Numbers to the bottom right
-                    const pageText = `Page ${i} of ${totalPages}`;
-                    const pw = pdf.getStringUnitWidth(pageText) * pdf.internal.getFontSize() / pdf.internal.scaleFactor;
-                    pdf.text(pageText, pageWidth - pw - 10, pageHeight - 8); 
-                }
-            }).save().then(() => {
-                // Restore the CSS watermark in the web preview
-                wmImg.style.display = 'block';
+        function exportCombinedPDF() {
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = "width:800px;background:white;color:black;position:absolute;left:-9999px;top:0;";
+            
+            const cloneA = document.getElementById("previewAreaWrapperA").cloneNode(true);
+            const cloneB = document.getElementById("previewAreaWrapperB").cloneNode(true);
+
+            const pageBreak = document.createElement('div');
+            pageBreak.style.cssText = "page-break-before:always;break-before:page;height:1px;";
+
+            tempContainer.append(cloneA, pageBreak, cloneB);
+            document.body.appendChild(tempContainer);
+
+            runPDFExport(tempContainer, getDynamicFilename('_Combined')).then(() => {
+                document.body.removeChild(tempContainer);
             });
         }
     </script>
