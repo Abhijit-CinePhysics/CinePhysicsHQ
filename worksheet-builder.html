@@ -55,10 +55,10 @@
             width: 100%; padding: 0.75rem; background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary); border-radius: 4px;
         }
-        input:focus, select:focus { outline: none; border-color: var(--gold-accent); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold-accent); }
         
         .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: normal; margin-top: 5px; }
-        .checkbox-label input[type="checkbox"] { width: auto; margin: 0; cursor: pointer; accent-color: var(--gold-accent); }
+        .checkbox-label input[type="checkbox"], .checkbox-label input[type="radio"] { width: auto; margin: 0; cursor: pointer; accent-color: var(--gold-accent); }
 
         /* Grids */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -70,8 +70,8 @@
         .scroll-list { max-height: 200px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px; }
 
         /* Mode Switcher */
-        .mode-switcher { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; }
-        .mode-btn { padding: 0.8rem 2rem; border: 1px solid var(--gold-accent); background: transparent; color: var(--text-primary); font-weight: bold; cursor: pointer; border-radius: 30px; transition: 0.3s; }
+        .mode-switcher { display: flex; justify-content: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+        .mode-btn { padding: 0.8rem 1.8rem; border: 1px solid var(--gold-accent); background: transparent; color: var(--text-primary); font-weight: bold; cursor: pointer; border-radius: 30px; transition: 0.3s; }
         .mode-btn.active { background: var(--gold-accent); color: #000; box-shadow: 0 0 15px rgba(212, 160, 23, 0.4); }
 
         /* Buttons & Overlays */
@@ -102,7 +102,7 @@
 
     <div id="loadingOverlay" class="loading-overlay">
         <h2 style="color: var(--gold-bright); margin-bottom: 10px;">CinePhysics AI is generating...</h2>
-        <p style="color: white;" id="loadingText">Crafting high-quality physics questions.</p>
+        <p style="color: white;" id="loadingText">Crafting high-quality physics document.</p>
     </div>
 
     <nav>
@@ -114,7 +114,7 @@
     <header class="hero">
         <div class="hero-content">
             <h1 style="font-size: 2.5rem;">AI Teacher Dashboard</h1>
-            <p style="color: var(--gold-accent); letter-spacing: 2px;">WORKSHEETS & EXAM PAPERS</p>
+            <p style="color: var(--gold-accent); letter-spacing: 2px;">WORKSHEETS, EXAMS & LESSON PLANS</p>
         </div>
     </header>
 
@@ -123,6 +123,7 @@
         <div class="mode-switcher">
             <button class="mode-btn active" data-mode="worksheet" onclick="App.UI.setMode('worksheet')">Worksheet Generator</button>
             <button class="mode-btn" data-mode="exam" onclick="App.UI.setMode('exam')">Exam Paper Generator</button>
+            <button class="mode-btn" data-mode="lesson" onclick="App.UI.setMode('lesson')">Lesson Plan Generator</button>
         </div>
 
         <div id="worksheetView">
@@ -258,7 +259,7 @@
                         <label>Output Mode</label>
                         <select id="exOutputMode">
                             <option value="Student Copy">Student Copy</option>
-                            <option value="Teacher Copy">Teacher Copy (With Key)</option>
+                            <option value="Teacher Copy (With Key)</option>
                             <option value="Sample Paper">Sample Paper</option>
                             <option value="Board Pattern Paper">Board Pattern Paper</option>
                             <option value="Mock Test">Mock Test</option>
@@ -293,7 +294,194 @@
             </div>
         </div>
 
-        <div class="chapter-card">
+        <div id="lessonView" class="hidden">
+            <div class="chapter-card">
+                <h3>1. Lesson Curriculum</h3>
+                <div class="grid-2">
+                    <div>
+                        <label>Class</label>
+                        <select id="lpClass" onchange="App.Curriculum.loadLessonChapters()">
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Board Standard</label>
+                        <select id="lpBoardStandard">
+                            <option value="CBSE">CBSE</option>
+                            <option value="JEE Foundation">JEE Foundation</option>
+                            <option value="State Board">State Board</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top: 15px;">
+                    <div>
+                        <label>Select Chapter</label>
+                        <input list="lpChapterList" id="lpChapter" placeholder="Select Chapter..." onchange="App.Curriculum.loadLessonTopics()">
+                        <datalist id="lpChapterList"></datalist>
+                    </div>
+                    <div>
+                        <label>Select Topics</label>
+                        <div class="checkbox-label" style="margin-bottom: 5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">
+                            <input type="checkbox" id="lpSelectAllTopics" onchange="App.UI.toggleAllCheckboxes('lpTopicsContainer', this.checked)"> 
+                            <span style="color:var(--gold-bright)">Select Entire Chapter</span>
+                        </div>
+                        <div id="lpTopicsContainer" class="scroll-list">Select a chapter first.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>2. Lesson Details</h3>
+                <div class="grid-3">
+                    <div>
+                        <label>Lesson Title *</label>
+                        <input type="text" id="lpTitle" placeholder="e.g. Laws of Motion - Applications">
+                    </div>
+                    <div>
+                        <label>Duration of Period</label>
+                        <select id="lpDuration" onchange="App.UI.handleCustomInput(this, 'lpCustomDuration')">
+                            <option value="35 Minutes">35 Minutes</option>
+                            <option value="40 Minutes" selected>40 Minutes</option>
+                            <option value="45 Minutes">45 Minutes</option>
+                            <option value="60 Minutes">60 Minutes</option>
+                            <option value="80 Minutes">80 Minutes</option>
+                            <option value="90 Minutes">90 Minutes</option>
+                            <option value="Double Period">Double Period</option>
+                            <option value="Custom">Custom Duration</option>
+                        </select>
+                        <input type="text" id="lpCustomDuration" class="hidden" placeholder="Enter Custom Duration">
+                    </div>
+                    <div>
+                        <label>Teaching Date (Optional)</label>
+                        <input type="date" id="lpDate">
+                    </div>
+                    <div>
+                        <label>Grade / Section (Optional)</label>
+                        <input type="text" id="lpSection" placeholder="e.g. 11-A">
+                    </div>
+                    <div>
+                        <label>Teacher Name (Optional)</label>
+                        <input type="text" id="lpTeacher" placeholder="e.g. Dr. R. K. Sharma">
+                    </div>
+                    <div>
+                        <label>Output Style</label>
+                        <select id="lpOutputStyle">
+                            <option value="Detailed Lesson Plan">Detailed Lesson Plan</option>
+                            <option value="One Page Lesson Plan">One Page Lesson Plan</option>
+                            <option value="Daily Lesson Plan">Daily Lesson Plan</option>
+                            <option value="Weekly Lesson Plan">Weekly Lesson Plan</option>
+                            <option value="Observation Lesson Plan">Observation Lesson Plan</option>
+                            <option value="Demonstration Lesson Plan">Demonstration Lesson Plan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>3. Learning Objectives & Pedagogy</h3>
+                <div style="margin-bottom: 15px;">
+                    <label>Learning Objectives</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px;">
+                        <label class="checkbox-label"><input type="radio" name="lpObjMode" value="ai" checked onchange="App.UI.toggleTextarea('lpCustomObjectives', false)"> AI Generate Objectives Automatically</label>
+                        <label class="checkbox-label"><input type="radio" name="lpObjMode" value="custom" onchange="App.UI.toggleTextarea('lpCustomObjectives', true)"> Enter Custom Learning Objectives</label>
+                    </div>
+                    <textarea id="lpCustomObjectives" class="hidden" rows="3" placeholder="Enter specific learning outcomes expected from students..." style="margin-top: 10px;"></textarea>
+                </div>
+
+                <label>Bloom's Taxonomy Focus</label>
+                <div class="checkbox-grid" style="margin-bottom: 15px;">
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Remember" checked> Remember</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Understand" checked> Understand</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Apply" checked> Apply</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Analyze"> Analyze</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Evaluate"> Evaluate</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-bloom" value="Create"> Create</label>
+                </div>
+
+                <label>Teaching Methods</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Lecture" checked> Lecture</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Interactive Discussion" checked> Interactive Discussion</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Demonstration"> Demonstration</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Activity Based Learning"> Activity Based Learning</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Problem Solving" checked> Problem Solving</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Inquiry Based Learning"> Inquiry Based Learning</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Experimental Method"> Experimental Method</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Smart Board Presentation"> Smart Board Presentation</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Simulation Based Learning"> Simulation Based Learning</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-method" value="Peer Learning"> Peer Learning</label>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>4. Resources & Student Activities</h3>
+                <label>Teaching Resources</label>
+                <div class="checkbox-grid" style="margin-bottom: 15px;">
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="NCERT Textbook" checked> NCERT Textbook</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Blackboard"> Blackboard</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Whiteboard" checked> Whiteboard</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="PPT"> PPT</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Smart Board"> Smart Board</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Projector"> Projector</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Virtual Lab"> Virtual Lab</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="CinePhysicsHQ Simulation" checked> CinePhysicsHQ Simulation</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="YouTube Video"> YouTube Video</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Models"> Models</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Charts"> Charts</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Laboratory Equipment"> Laboratory Equipment</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Worksheets"> Worksheets</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-resource" value="Question Bank"> Question Bank</label>
+                </div>
+
+                <label>Student Activities</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Think-Pair-Share"> Think-Pair-Share</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Group Discussion"> Group Discussion</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Numerical Practice" checked> Numerical Practice</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="MCQ Practice"> MCQ Practice</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="HOTS Questions"> HOTS Questions</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Case Study"> Case Study</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Experiment"> Experiment</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Observation"> Observation</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Class Quiz" checked> Class Quiz</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-activity" value="Exit Ticket"> Exit Ticket</label>
+                </div>
+            </div>
+
+            <div class="chapter-card">
+                <h3>5. Assessment & Differentiation</h3>
+                <label>Assessment Strategy</label>
+                <div class="checkbox-grid" style="margin-bottom: 15px;">
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Oral Questions" checked> Oral Questions</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="MCQs"> MCQs</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Short Answer Questions" checked> Short Answer Questions</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Numerical Problems" checked> Numerical Problems</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Worksheet"> Worksheet</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Homework"> Homework</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Class Test"> Class Test</label>
+                    <label class="checkbox-label"><input type="checkbox" class="lp-assessment" value="Exit Assessment"> Exit Assessment</label>
+                </div>
+
+                <label>Differentiation Strategies</label>
+                <div class="checkbox-grid" style="margin-bottom: 15px;">
+                    <label class="checkbox-label"><input type="checkbox" id="lpDiffSlow" checked> Support for Slow Learners</label>
+                    <label class="checkbox-label"><input type="checkbox" id="lpDiffAdv" checked> Enrichment for Advanced Learners</label>
+                    <label class="checkbox-label"><input type="checkbox" id="lpDiffInc"> Inclusive Classroom Strategies</label>
+                </div>
+
+                <div>
+                    <label>Homework Assignment</label>
+                    <div style="display: flex; gap: 20px; margin-top: 5px;">
+                        <label class="checkbox-label"><input type="radio" name="lpHwMode" value="ai" checked onchange="App.UI.toggleTextarea('lpCustomHomework', false)"> AI Generate Homework</label>
+                        <label class="checkbox-label"><input type="radio" name="lpHwMode" value="custom" onchange="App.UI.toggleTextarea('lpCustomHomework', true)"> Enter Custom Homework</label>
+                    </div>
+                    <textarea id="lpCustomHomework" class="hidden" rows="2" placeholder="Enter custom practice problems or textbook page exercises..." style="margin-top: 10px;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="chapter-card" id="questionDistCard">
             <h3 id="qdTitle">Question Distribution</h3>
             <div class="grid-4" style="margin-bottom: 15px;">
                 <div><label>MCQ</label><input type="number" id="distMcq" value="5" min="0"></div>
@@ -338,10 +526,10 @@
             </div>
         </div>
 
-        <div class="chapter-card">
+        <div class="chapter-card" id="enhancementsCard">
             <h3>Optional Enhancements</h3>
             <div class="checkbox-grid" id="enhancementsGrid">
-                </div>
+            </div>
         </div>
 
         <div id="globalError" class="validation-msg" style="margin-bottom: 15px; font-size: 1rem; text-align: center;"></div>
@@ -351,7 +539,6 @@
 
     <script src="chapterData11.js"></script>
     <script src="chapterData12.js"></script>
-    
     <script src="dashboard.js"></script>
 
 </body>
