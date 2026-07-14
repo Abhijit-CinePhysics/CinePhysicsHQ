@@ -489,15 +489,21 @@
 
         <div class="chapter-card" id="questionDistCard">
             <h3 id="qdTitle">Question Distribution</h3>
-            <div class="grid-4" style="margin-bottom: 15px;">
+            
+            <div class="grid-3" style="margin-bottom: 25px;">
                 <div><label>MCQ</label><input type="number" id="distMcq" value="5" min="0"></div>
                 <div><label>Assertion-Reason</label><input type="number" id="distAr" value="2" min="0"></div>
-                <div><label>VSA</label><input type="number" id="distVsa" value="0" min="0"></div>
-                <div><label>SA</label><input type="number" id="distSa" value="3" min="0"></div>
-                <div><label>LA</label><input type="number" id="distLa" value="1" min="0"></div>
+                <div><label>Case Study</label><input type="number" id="distCaseStudy" value="0" min="0"></div>
+                <div><label>VSA (2 Marks)</label><input type="number" id="distVsa" value="0" min="0"></div>
+                <div><label>SA (3 Marks)</label><input type="number" id="distSa" value="3" min="0"></div>
+                <div><label>LA (5 Marks)</label><input type="number" id="distLa" value="1" min="0"></div>
+                <div><label>Match the Following</label><input type="number" id="distMatch" value="0" min="0"></div>
+                <div><label>Fill in the Blanks</label><input type="number" id="distFill" value="0" min="0"></div>
+                <div><label>True / False</label><input type="number" id="distTf" value="0" min="0"></div>
             </div>
             
-            <div class="grid-3">
+            <h4 style="color: var(--gold-accent); margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-transform: uppercase;">Advanced Question Weightage</h4>
+            <div class="grid-3" style="margin-bottom: 25px;">
                 <div>
                     <label>Numerical Weightage</label>
                     <select id="distNumWeight" onchange="App.UI.handleCustomInput(this, 'distCustomNum')">
@@ -511,6 +517,36 @@
                     </select>
                     <input type="number" id="distCustomNum" class="hidden" placeholder="0-100" min="0" max="100">
                 </div>
+                <div>
+                    <label>Diagram Based Weightage</label>
+                    <select id="distDiagWeight" onchange="App.UI.handleCustomInput(this, 'distCustomDiag')">
+                        <option value="0">0%</option>
+                        <option value="10" selected>10%</option>
+                        <option value="20">20%</option>
+                        <option value="30">30%</option>
+                        <option value="40">40%</option>
+                        <option value="50">50%</option>
+                        <option value="Custom">Custom %</option>
+                    </select>
+                    <input type="number" id="distCustomDiag" class="hidden" placeholder="0-100" min="0" max="100">
+                </div>
+                <div>
+                    <label>HOTS Weightage</label>
+                    <select id="distHotsWeight" onchange="App.UI.handleCustomInput(this, 'distCustomHots')">
+                        <option value="0">0%</option>
+                        <option value="10">10%</option>
+                        <option value="20" selected>20%</option>
+                        <option value="30">30%</option>
+                        <option value="40">40%</option>
+                        <option value="50">50%</option>
+                        <option value="Custom">Custom %</option>
+                    </select>
+                    <input type="number" id="distCustomHots" class="hidden" placeholder="0-100" min="0" max="100">
+                </div>
+            </div>
+
+            <h4 style="color: var(--gold-accent); margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-transform: uppercase;">General Settings</h4>
+            <div class="grid-2">
                 <div>
                     <label>Difficulty</label>
                     <select id="distDifficulty">
