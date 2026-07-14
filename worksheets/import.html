@@ -262,6 +262,79 @@
         const zoomStates = { A: 1.0, B: 1.0 };
 
         // ---------------------------------------------------------
+        // 0. Physics Math Rendering Engine
+        // ---------------------------------------------------------
+        /**
+         * Preprocesses AI-generated text/HTML to clean up mathematical formatting,
+         * LaTeX, and vector notations before rendering to the DOM.
+         */
+        function sanitizePhysicsHTML(html) {
+            if (!html) return "";
+            
+            let processed = html;
+
+            // 1. HTML entities (e.g., &mathbf;F; -> <strong>F</strong>)
+            processed = processed.replace(/&mathbf;([a-zA-Z]);/g, '<strong>$1</strong>');
+
+            // 2. LaTeX vector notation (e.g., \mathbf{F} or \vec{v} -> <strong>F</strong>)
+            processed = processed.replace(/\\mathbf{([a-zA-Z]+)}/g, '<strong>$1</strong>');
+            processed = processed.replace(/\\vec{([a-zA-Z]+)}/g, '<strong>$1</strong>');
+
+            // 3. Fractions (e.g., \frac{a}{b} -> (a)/(b))
+            processed = processed.replace(/\\frac{([^{}]+)}{([^{}]+)}/g, '($1)/($2)');
+
+            // 4. Square roots (e.g., \sqrt{x} -> √(x))
+            processed = processed.replace(/\\sqrt{([^{}]+)}/g, '√($1)');
+
+            // 5. Greek symbols
+            const greekMap = {
+                'theta': 'θ', 'alpha': 'α', 'beta': 'β', 'gamma': 'γ',
+                'lambda': 'λ', 'mu': 'μ', 'omega': 'ω', 'phi': 'φ',
+                'Delta': 'Δ', 'delta': 'δ', 'pi': 'π'
+            };
+            // Replaces \theta, \alpha, etc.
+            processed = processed.replace(/\\(theta|alpha|beta|gamma|lambda|mu|omega|phi|Delta|delta|pi)\b/g, (match, p1) => greekMap[p1]);
+
+            // 6. Mathematical operators
+            const operatorMap = {
+                'times': '×', 'cdot': '·', 'pm': '±', 'degree': '°'
+            };
+            processed = processed.replace(/\\(times|cdot|pm|degree)\b/g, (match, p1) => operatorMap[p1]);
+
+            // 7 & 8. Superscripts and Subscripts
+            // Handles explicitly bracketed exponents/subscripts first: x^{-3} -> x<sup>-3</sup>
+            processed = processed.replace(/\^{([^{}]+)}/g, '<sup>$1</sup>');
+            processed = processed.replace(/_{([^{}]+)}/g, '<sub>$1</sub>');
+            
+            // Handles unbracketed ones: x^2 -> x<sup>2</sup>, v_0 -> v<sub>0</sub>
+            processed = processed.replace(/\^([-\w]+)/g, '<sup>$1</sup>');
+            processed = processed.replace(/_([-\w]+)/g, '<sub>$1</sub>');
+
+            // 9. Common Physics vectors (F, a, v, E, B, i, j, k)
+            // Rule A: Matches i, j, k immediately following a number (e.g., 2i -> 2<strong>i</strong>)
+            processed = processed.replace(/(\d)(i|j|k)\b/g, '$1<strong>$2</strong>');
+            
+            // Rule B: Matches standalone variables when adjacent to math operators (=, +, -, (, )).
+            // The negative lookbehind (?<![>\w]) ensures we don't accidentally match English words or re-wrap existing HTML.
+            processed = processed.replace(/(?<![>\w])(F|E|B|v|a|i|j|k)(?=\s*[\=\+\-\(\)])/g, '<strong>$1</strong>');
+            processed = processed.replace(/([\=\+\-\(\)]\s*)(F|E|B|v|a|i|j|k)(?![<\w])/g, '$1<strong>$2</strong>');
+
+            // 11. Clean unsupported syntax (Remove LaTeX delimiters)
+            // Removes $$, $, \(, \), \[, \]
+            processed = processed.replace(/\$\$/g, '');
+            processed = processed.replace(/\$/g, '');
+            processed = processed.replace(/\\\(/g, '');
+            processed = processed.replace(/\\\)/g, '');
+            processed = processed.replace(/\\\[/g, '');
+            processed = processed.replace(/\\\]/g, '');
+
+            // Final safety check: Clean up any accidentally nested strong tags
+            processed = processed.replace(/<strong>\s*<strong>(.*?)<\/strong>\s*<\/strong>/g, '<strong>$1</strong>');
+
+            return processed;
+        }
+
+        // ---------------------------------------------------------
         // 1. Automatic Document Type Detector
         // ---------------------------------------------------------
         function detectDocumentType(htmlString) {
@@ -287,6 +360,11 @@
                 .replace(/color:\s*white/gi, "color:black")
                 .replace(/color:\s*#fff/gi, "color:black")
                 .replace(/color:\s*#ffffff/gi, "color:black");
+
+            // --- NEW INTEGRATION ---
+            // Run the Physics Math Rendering Engine before parsing the DOM
+            cleanedHtml = sanitizePhysicsHTML(cleanedHtml);
+            // -----------------------
 
             // Automatically detect document type
             window.currentDocType = detectDocumentType(cleanedHtml);
