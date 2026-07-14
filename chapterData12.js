@@ -1,4 +1,4 @@
-const class12Data = {
+const chapterData12 = {
 
 "Electric Charges and Fields": [
 "Electric Charges",
