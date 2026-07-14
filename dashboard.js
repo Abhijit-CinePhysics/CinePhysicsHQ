@@ -4,7 +4,7 @@
  */
 
 const App = {
-    mode: 'worksheet', // 'worksheet' or 'exam'
+    mode: 'worksheet', // 'worksheet', 'exam', or 'lesson'
     
     init() {
         this.Curriculum.init();
@@ -17,7 +17,7 @@ const App = {
     UI: {
         init() {
             this.renderEnhancements();
-            // Sync Class dropdowns
+            // Sync Class dropdowns for Exam View
             document.getElementById('exClass').addEventListener('change', (e) => {
                 document.getElementById('exClassDisp').value = e.target.value;
             });
@@ -31,15 +31,23 @@ const App = {
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.mode-btn[data-mode="${newMode}"]`).classList.add('active');
             
-            // Toggle views
+            // Hide all views first
+            document.getElementById('worksheetView').classList.add('hidden');
+            document.getElementById('examView').classList.add('hidden');
+            const lessonView = document.getElementById('lessonView');
+            if (lessonView) lessonView.classList.add('hidden');
+            
+            // Toggle active view
             if (newMode === 'worksheet') {
                 document.getElementById('worksheetView').classList.remove('hidden');
-                document.getElementById('examView').classList.add('hidden');
                 document.getElementById('qdTitle').innerText = '3. Question Distribution';
-            } else {
-                document.getElementById('worksheetView').classList.add('hidden');
+            } else if (newMode === 'exam') {
                 document.getElementById('examView').classList.remove('hidden');
                 document.getElementById('qdTitle').innerText = '5. Question Distribution';
+            } else if (newMode === 'lesson' && lessonView) {
+                lessonView.classList.remove('hidden');
+                // Adjust title dynamically based on layout, or hide if not needed for lessons
+                document.getElementById('qdTitle').innerText = '6. Question Distribution'; 
             }
             this.clearErrors();
         },
@@ -107,12 +115,22 @@ const App = {
         database: {},
         
         init() {
+            // Scalable mapping for Classes 9 through 12. 
+            // The typeof checks ensure the script doesn't crash if a file is missing.
             this.database = {
-                "Class 11": typeof class11Data !== 'undefined' ? class11Data : {},
-                "Class 12": typeof class12Data !== 'undefined' ? class12Data : {}
+                "Class 9": typeof chapterData9 !== 'undefined' ? chapterData9 : {},
+                "Class 10": typeof chapterData10 !== 'undefined' ? chapterData10 : {},
+                "Class 11": typeof chapterData11 !== 'undefined' ? chapterData11 : {},
+                "Class 12": typeof chapterData12 !== 'undefined' ? chapterData12 : {}
             };
+            
             this.loadWorksheetChapters();
             this.loadExamChapters();
+            
+            // Initialize lesson chapters if the view exists in the HTML
+            if (document.getElementById("lpClass")) {
+                this.loadLessonChapters();
+            }
         },
 
         // Worksheet Loaders
@@ -171,6 +189,31 @@ const App = {
                     });
                 }
             });
+        },
+
+        // Lesson Plan Loaders
+        loadLessonChapters() {
+            const list = document.getElementById("lpChapterList");
+            list.innerHTML = "";
+            const currentClass = document.getElementById("lpClass").value;
+            Object.keys(this.database[currentClass] || {}).forEach(ch => {
+                list.appendChild(new Option(ch, ch));
+            });
+            document.getElementById("lpTopicsContainer").innerHTML = "Select a chapter first.";
+        },
+        
+        loadLessonTopics() {
+            const container = document.getElementById("lpTopicsContainer");
+            const currentClass = document.getElementById("lpClass").value;
+            const chapter = document.getElementById("lpChapter").value;
+            const topics = this.database[currentClass][chapter];
+            
+            container.innerHTML = "";
+            if(!topics) { container.innerHTML = "Select a valid chapter."; return; }
+            topics.forEach(t => {
+                // Ensure class matches what you use for lesson topic validation later
+                container.innerHTML += `<label class="checkbox-label"><input type="checkbox" class="lp-topic-cb" value="${t}" checked> ${t}</label>`;
+            });
         }
     },
 
@@ -187,7 +230,7 @@ const App = {
             const totalQuestions = ['distMcq', 'distAr', 'distVsa', 'distSa', 'distLa']
                 .reduce((sum, id) => sum + (parseInt(document.getElementById(id).value) || 0), 0);
             
-            if (totalQuestions <= 0) {
+            if (totalQuestions <= 0 && App.mode !== 'lesson') {
                 msg = "Minimum one question must be requested in Question Distribution.";
                 isValid = false;
             }
@@ -201,7 +244,7 @@ const App = {
                 else if (topics.length === 0) { msg = "Worksheet: Please select at least one topic."; isValid = false; }
                 else if (!title) { msg = "Worksheet: Please enter a Worksheet Title."; isValid = false; }
 
-            } else {
+            } else if (App.mode === 'exam') {
                 const schoolName = document.getElementById('exSchoolName').value;
                 const examName = document.getElementById('exExamName').value;
                 const paperTitle = document.getElementById('exPaperTitle').value;
@@ -216,7 +259,8 @@ const App = {
                 
                 const customMarks = document.getElementById('exMaxMarks').value === 'Custom' ? document.getElementById('exCustomMarks').value : true;
                 if (!customMarks) { msg = "Exam: Please enter valid Custom Maximum Marks."; isValid = false; }
-            }
+            } 
+            // Future expansion: Add lesson plan specific validation here if needed
 
             if (!isValid) App.UI.showError(msg);
             return isValid;
@@ -231,7 +275,7 @@ const App = {
             let prompt = "Act as an expert Physics educator. Create questions based on the following parameters:\n\n";
             
             if (App.mode === 'worksheet') prompt += this.buildWorksheetContext(payloadObj.worksheet);
-            else prompt += this.buildExamContext(payloadObj.exam);
+            else if (App.mode === 'exam') prompt += this.buildExamContext(payloadObj.exam);
             
             prompt += this.buildDistribution(payloadObj.distribution);
             prompt += this.buildEnhancements(payloadObj.enhancements, payloadObj.exam);
@@ -388,7 +432,7 @@ All mathematical expressions, equations, and symbols MUST be valid HTML and rend
                     difficulty: document.getElementById('distDifficulty').value,
                     time: document.getElementById('distTime').value
                 };
-            } else {
+            } else if (App.mode === 'exam') {
                 const mmSelect = document.getElementById('exMaxMarks').value;
                 payload.exam = {
                     paperTitle: document.getElementById('exPaperTitle').value,
@@ -427,12 +471,21 @@ All mathematical expressions, equations, and symbols MUST be valid HTML and rend
                 };
             }
 
+            // Note: Lesson payload logic will be expanded here in the next phase!
+            
             // Generate modular prompt string and inject into root for Backend API
-            payload.prompt = App.PromptBuilder.build(payload);
+            if (App.mode !== 'lesson') {
+                payload.prompt = App.PromptBuilder.build(payload);
+            }
             
             // Root properties for backward compatibility with your existing backend
-            payload.title = App.mode === 'worksheet' ? payload.worksheet.title : payload.exam.paperTitle;
-            payload.className = App.mode === 'worksheet' ? payload.worksheet.className : payload.exam.className;
+            if (App.mode === 'worksheet') {
+                payload.title = payload.worksheet.title;
+                payload.className = payload.worksheet.className;
+            } else if (App.mode === 'exam') {
+                payload.title = payload.exam.paperTitle;
+                payload.className = payload.exam.className;
+            }
             payload.difficulty = document.getElementById('distDifficulty').value;
             
             return payload;
@@ -474,7 +527,7 @@ All mathematical expressions, equations, and symbols MUST be valid HTML and rend
 
                     // --- STORAGE MANAGER: Save Metadata for PDF Exporter ---
                     localStorage.setItem("cp_ai_html", htmlContent);
-                    localStorage.setItem("cp_ai_topic", payload.title);
+                    localStorage.setItem("cp_ai_topic", payload.title || "AI Document");
                     localStorage.setItem("cp_ai_time", document.getElementById("distTime").value);
                     
                     // Marks calculation backward compatibility fallback if not explicit
