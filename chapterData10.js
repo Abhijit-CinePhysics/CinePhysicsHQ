@@ -1,4 +1,4 @@
-const class10Data = {
+const chapterData10 = {
   "Light - Reflection and Refraction": [
     "Reflection of Light",
     "Spherical Mirrors",
