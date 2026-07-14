@@ -1,4 +1,4 @@
-const class9Data = {
+const chapterData9 = {
   "Motion": [
     "Motion",
     "Distance and Displacement",
