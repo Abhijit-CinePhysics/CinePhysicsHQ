@@ -1,4 +1,4 @@
-const class11Data = {
+const chapterData11 = {
 
 "Units and Measurements": [
 "Need for Measurement",
