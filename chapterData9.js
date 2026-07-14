@@ -18,6 +18,7 @@ const chapterData9 = {
     "Newton's Second Law",
     "Newton's Third Law",
     "Law of Conservation of Momentum"
+    "Connected bodies"
   ],
 
   "Gravitation": [
